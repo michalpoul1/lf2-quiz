@@ -1,0 +1,24 @@
+{
+  "name": "2. LF UK Přijímačky",
+  "short_name": "2.LF Quiz",
+  "description": "Procvičování modelových otázek pro přijímací zkoušky na 2. LF UK",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1e3a5f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
