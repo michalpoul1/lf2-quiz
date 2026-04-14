@@ -8,6 +8,7 @@ import {
   getSubchapterQuestions,
   filterValidQuestions,
   shuffleArray,
+  getExplanation,
 } from "@/lib/data";
 import { recordAnswer, getSubjectProgress } from "@/lib/progress";
 import { isQuestionSaved } from "@/lib/collections";
@@ -60,6 +61,7 @@ export default function QuizRunner({
   >([]);
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set());
   const [modalQuestionId, setModalQuestionId] = useState<number | string | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
 
   const sourceQuestions = useMemo(() => {
     if (subchapterParam && chapterId !== "all") {
@@ -166,6 +168,7 @@ export default function QuizRunner({
       setCurrentIndex((i) => i + 1);
       setSelected(new Set());
       setChecked(false);
+      setShowExplanation(false);
     }
   };
 
@@ -488,6 +491,61 @@ export default function QuizRunner({
                 ? "Správně!"
                 : `${selectedCorrectCount}/${correctSet.size} správně`}
             </div>
+
+            {/* Explanation toggle & card */}
+            {(() => {
+              const isCorrect = selectedCorrectCount === correctSet.size && selected.size === correctSet.size;
+              const explanation = getExplanation(subject, currentQuestion.id);
+              return (
+                <>
+                  {!showExplanation && (
+                    <button
+                      onClick={() => setShowExplanation(true)}
+                      className={`w-full text-sm font-medium py-2.5 rounded-xl tap-highlight transition-colors ${
+                        isCorrect
+                          ? "text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                          : "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-950/50"
+                      }`}
+                    >
+                      💡 {isCorrect ? "Zobrazit vysvětlení" : "Vysvětlit"}
+                    </button>
+                  )}
+                  {showExplanation && (
+                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+                      <div className="flex items-start gap-2 mb-2">
+                        <span className="text-lg leading-none">💡</span>
+                        <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300">Vysvětlení</h3>
+                      </div>
+                      {explanation ? (
+                        <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed explanation-content">
+                          {explanation.split("\n\n").map((block, i) => (
+                            <p key={i} className={i > 0 ? "mt-2" : ""}>
+                              {block.split(/(\*\*[^*]+\*\*)/).map((part, j) =>
+                                part.startsWith("**") && part.endsWith("**") ? (
+                                  <strong key={j} className="font-semibold">{part.slice(2, -2)}</strong>
+                                ) : (
+                                  <span key={j}>{part}</span>
+                                )
+                              )}
+                            </p>
+                          ))}
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Vysvětlení pro tuto otázku zatím není k dispozici.
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                            Tip: Vyhledej si správnou odpověď v učebnici pro lepší zapamatování.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+
             <button
               onClick={handleNext}
               className="w-full bg-[var(--color-primary)] text-white font-semibold py-4 rounded-xl text-lg tap-highlight active:opacity-80 transition-opacity"
