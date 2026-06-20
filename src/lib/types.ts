@@ -1,11 +1,13 @@
 export interface Option {
   letter: string;
   text: string;
+  image?: string;
 }
 
 export interface Question {
   id: number | string;
   text: string;
+  image?: string;
   options: Option[];
   correct: string[];
 }

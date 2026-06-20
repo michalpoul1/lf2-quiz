@@ -16,24 +16,29 @@ import SaveToCollectionModal from "@/components/SaveToCollectionModal";
 import type { Question } from "@/lib/types";
 
 interface Props {
+  facultyId: string;
   subject: string;
   chapterParam: string;
   subchapterParam?: string;
   mode: string;
+  /** When set, skip the setup screen and start directly at this question ID. */
+  startId?: string;
 }
 
 type QuizState = "setup" | "active" | "results";
 
 export default function QuizRunner({
+  facultyId,
   subject,
   chapterParam,
   subchapterParam,
   mode,
+  startId,
 }: Props) {
-  const data = getSubjectData(subject);
+  const data = getSubjectData(facultyId, subject);
   const chapterId = chapterParam === "all" ? "all" : Number(chapterParam);
   const chapter =
-    chapterId === "all"
+    !data || chapterId === "all"
       ? null
       : data.chapters.find((ch) => ch.id === chapterId);
 
@@ -48,11 +53,11 @@ export default function QuizRunner({
   }
 
   const backHref = subchapterParam
-    ? `/${subject}/chapter/${chapterParam}`
-    : `/${subject}`;
+    ? `/faculty/${facultyId}/${subject}/chapter/${chapterParam}`
+    : `/faculty/${facultyId}/${subject}`;
 
-  const [shuffle, setShuffle] = useState(true);
-  const [quizState, setQuizState] = useState<QuizState>("setup");
+  const [shuffle, setShuffle] = useState(!startId);
+  const [quizState, setQuizState] = useState<QuizState>(startId ? "active" : "setup");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [checked, setChecked] = useState(false);
@@ -66,16 +71,16 @@ export default function QuizRunner({
   const sourceQuestions = useMemo(() => {
     if (subchapterParam && chapterId !== "all") {
       return filterValidQuestions(
-        getSubchapterQuestions(subject, chapterId as number, subchapterParam)
+        getSubchapterQuestions(facultyId, subject, chapterId as number, subchapterParam)
       );
     }
-    return filterValidQuestions(getChapterQuestions(subject, chapterId));
-  }, [subject, chapterId, subchapterParam]);
+    return filterValidQuestions(getChapterQuestions(facultyId, subject, chapterId));
+  }, [facultyId, subject, chapterId, subchapterParam]);
 
   const questions = useMemo(() => {
     let qs: Question[];
     if (mode === "wrong") {
-      const progress = getSubjectProgress(subject);
+      const progress = getSubjectProgress(facultyId, subject);
       const wrongIds = new Set<string>();
       if (chapterId === "all") {
         for (const cp of Object.values(progress)) {
@@ -94,6 +99,16 @@ export default function QuizRunner({
     } else {
       qs = sourceQuestions;
     }
+
+    // When startId is present: move target question to front, don't shuffle
+    if (startId) {
+      const idx = qs.findIndex((q) => String(q.id) === startId);
+      if (idx > 0) {
+        qs = [qs[idx], ...qs.slice(0, idx), ...qs.slice(idx + 1)];
+      }
+      return qs;
+    }
+
     return shuffle ? shuffleArray(qs) : qs;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizState]);
@@ -102,11 +117,11 @@ export default function QuizRunner({
   useEffect(() => {
     const bm = new Set<string>();
     for (const q of sourceQuestions) {
-      if (isQuestionSaved(subject, q.id)) bm.add(String(q.id));
+      if (isQuestionSaved(facultyId, subject, q.id)) bm.add(String(q.id));
     }
     setBookmarked(bm);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject]);
+  }, [facultyId, subject]);
 
   const handleOpenBookmark = (qId: number | string) => {
     setModalQuestionId(qId);
@@ -126,6 +141,7 @@ export default function QuizRunner({
 
   const findProgressKey = useCallback(
     (qId: number | string): string => {
+      if (!data) return chapterParam;
       // For subjects with subchapters, use subchapter id as key
       for (const ch of data.chapters) {
         if (ch.subchapters) {
@@ -141,7 +157,7 @@ export default function QuizRunner({
       }
       return chapterParam;
     },
-    [data.chapters, chapterParam]
+    [data, chapterParam]
   );
 
   const handleCheck = () => {
@@ -154,7 +170,7 @@ export default function QuizRunner({
       selectedArr.every((s) => correctSet.has(s));
 
     const key = findProgressKey(currentQuestion.id);
-    recordAnswer(subject, key, currentQuestion.id, isCorrect);
+    recordAnswer(facultyId, subject, key, currentQuestion.id, isCorrect);
     setResults((prev) => [
       ...prev,
       { questionId: currentQuestion.id, correct: isCorrect },
@@ -184,8 +200,19 @@ export default function QuizRunner({
 
   // Build quiz URL for replay
   const quizUrl = subchapterParam
-    ? `/${subject}/quiz?chapter=${chapterParam}&sub=${subchapterParam}`
-    : `/${subject}/quiz?chapter=${chapterParam}`;
+    ? `/faculty/${facultyId}/${subject}/quiz?chapter=${chapterParam}&sub=${subchapterParam}`
+    : `/faculty/${facultyId}/${subject}/quiz?chapter=${chapterParam}`;
+
+  if (!data) {
+    return (
+      <main className="pt-10 text-center">
+        <p className="text-gray-500 mb-4">Data nejsou k dispozici.</p>
+        <Link href={`/faculty/${facultyId}`} className="text-[var(--color-primary)] dark:text-blue-400 font-medium">
+          Zpět
+        </Link>
+      </main>
+    );
+  }
 
   // --- SETUP SCREEN ---
   if (quizState === "setup") {
@@ -385,6 +412,16 @@ export default function QuizRunner({
           <p className="text-base font-medium leading-relaxed">
             {currentQuestion.text}
           </p>
+          {currentQuestion.image && (
+            <div className="mt-3 inline-block rounded-lg bg-white p-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={currentQuestion.image}
+                alt="Strukturní vzorec"
+                className="max-w-full h-auto"
+              />
+            </div>
+          )}
         </div>
 
         <p className="text-xs text-gray-400 mb-3 px-1">
@@ -451,7 +488,18 @@ export default function QuizRunner({
                   )}
                 </div>
                 <span className="text-base leading-snug pt-0.5">
-                  {opt.text}
+                  {opt.image ? (
+                    <span className="inline-block rounded-md bg-white p-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={opt.image}
+                        alt={`Možnost ${opt.letter}`}
+                        className="max-h-24 w-auto"
+                      />
+                    </span>
+                  ) : (
+                    opt.text
+                  )}
                   {checked && textExtra && (
                     <span className="text-[var(--color-missed)] text-sm font-medium">
                       {textExtra}
@@ -495,7 +543,7 @@ export default function QuizRunner({
             {/* Explanation toggle & card */}
             {(() => {
               const isCorrect = selectedCorrectCount === correctSet.size && selected.size === correctSet.size;
-              const explanation = getExplanation(subject, currentQuestion.id);
+              const explanation = getExplanation(facultyId, subject, currentQuestion.id);
               return (
                 <>
                   {!showExplanation && (
@@ -560,6 +608,7 @@ export default function QuizRunner({
 
       <SaveToCollectionModal
         open={modalQuestionId !== null}
+        facultyId={facultyId}
         subject={subject}
         questionId={modalQuestionId ?? ""}
         onClose={() => setModalQuestionId(null)}
