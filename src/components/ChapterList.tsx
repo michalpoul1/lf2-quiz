@@ -2,17 +2,36 @@
 
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
-import { getSubjectData, getChapterQuestions, countValidQuestions, filterValidQuestions } from "@/lib/data";
+import { getSubjectData, getChapterQuestions, countValidQuestions } from "@/lib/data";
 import { getChapterProgress, getTotalProgress, getSubjectProgress } from "@/lib/progress";
+import { normalizeText, getHighlightedSegments } from "@/lib/searchUtils";
 import type { ChapterProgress, Question } from "@/lib/types";
 
+function HighlightedText({ text, term }: { text: string; term: string }) {
+  const segments = getHighlightedSegments(text, term);
+  return (
+    <>
+      {segments.map((seg, i) =>
+        seg.highlight ? (
+          <mark key={i} className="bg-yellow-200 dark:bg-yellow-700/50 text-inherit font-semibold rounded-sm px-0.5 not-italic">
+            {seg.text}
+          </mark>
+        ) : (
+          <span key={i}>{seg.text}</span>
+        )
+      )}
+    </>
+  );
+}
+
 interface Props {
+  facultyId: string;
   subject: string;
   subjectName: string;
 }
 
-export default function ChapterList({ subject, subjectName }: Props) {
-  const data = getSubjectData(subject);
+export default function ChapterList({ facultyId, subject, subjectName }: Props) {
+  const data = getSubjectData(facultyId, subject);
   const [chapterProgress, setChapterProgress] = useState<Record<string, ChapterProgress>>({});
   const [total, setTotal] = useState({ answered: 0, correct: 0 });
   const [totalWrong, setTotalWrong] = useState(0);
@@ -20,21 +39,22 @@ export default function ChapterList({ subject, subjectName }: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   useEffect(() => {
+    if (!data) return;
     const cp: Record<string, ChapterProgress> = {};
     for (const ch of data.chapters) {
-      cp[ch.id] = getChapterProgress(subject, ch.id);
+      cp[ch.id] = getChapterProgress(facultyId, subject, ch.id);
     }
     setChapterProgress(cp);
-    setTotal(getTotalProgress(subject));
+    setTotal(getTotalProgress(facultyId, subject));
 
     // Count total wrong answers
-    const progress = getSubjectProgress(subject);
+    const progress = getSubjectProgress(facultyId, subject);
     let wrongCount = 0;
     for (const cp of Object.values(progress)) {
       wrongCount += cp.wrongIds.length;
     }
     setTotalWrong(wrongCount);
-  }, [data.chapters, subject]);
+  }, [data, facultyId, subject]);
 
   // Debounce search
   useEffect(() => {
@@ -46,46 +66,66 @@ export default function ChapterList({ subject, subjectName }: Props) {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Search results
+  // Search results — diacritic-insensitive
   const searchResults = useMemo(() => {
-    if (!debouncedSearch || debouncedSearch.length < 3) return null;
-    const term = debouncedSearch.toLowerCase();
-    const results: { question: Question; chapterName: string; chapterId: number; subchapterId?: string }[] = [];
+    if (!debouncedSearch || debouncedSearch.length < 3 || !data) return null;
+    const term = normalizeText(debouncedSearch);
+    const results: {
+      question: Question;
+      chapterName: string;
+      chapterId: number;
+      subchapterId?: string;
+      matchedOptionText?: string;
+    }[] = [];
 
     for (const ch of data.chapters) {
       if (ch.questions) {
         for (const q of ch.questions) {
-          if (
-            q.text.toLowerCase().includes(term) ||
-            q.options.some((o) => o.text.toLowerCase().includes(term))
-          ) {
+          if (!q.correct.length) continue;
+          const textMatch = normalizeText(q.text).includes(term);
+          if (textMatch) {
             results.push({ question: q, chapterName: ch.name, chapterId: ch.id });
+          } else {
+            const matchedOpt = q.options.find((o) => normalizeText(o.text).includes(term));
+            if (matchedOpt) {
+              results.push({ question: q, chapterName: ch.name, chapterId: ch.id, matchedOptionText: matchedOpt.text });
+            }
           }
         }
       }
       if (ch.subchapters) {
         for (const sub of ch.subchapters) {
           for (const q of sub.questions) {
-            if (
-              q.text.toLowerCase().includes(term) ||
-              q.options.some((o) => o.text.toLowerCase().includes(term))
-            ) {
-              results.push({
-                question: q,
-                chapterName: `${ch.name} > ${sub.name}`,
-                chapterId: ch.id,
-                subchapterId: sub.id,
-              });
+            if (!q.correct.length) continue;
+            const textMatch = normalizeText(q.text).includes(term);
+            if (textMatch) {
+              results.push({ question: q, chapterName: `${ch.name} › ${sub.name}`, chapterId: ch.id, subchapterId: sub.id });
+            } else {
+              const matchedOpt = q.options.find((o) => normalizeText(o.text).includes(term));
+              if (matchedOpt) {
+                results.push({ question: q, chapterName: `${ch.name} › ${sub.name}`, chapterId: ch.id, subchapterId: sub.id, matchedOptionText: matchedOpt.text });
+              }
             }
           }
         }
       }
     }
     return results.slice(0, 50);
-  }, [debouncedSearch, data.chapters]);
+  }, [debouncedSearch, data]);
+
+  if (!data) {
+    return (
+      <main className="pt-10 text-center">
+        <p className="text-gray-500 mb-4">Data nejsou k dispozici.</p>
+        <Link href={`/faculty/${facultyId}`} className="text-[var(--color-primary)] dark:text-blue-400 font-medium">
+          Zpět
+        </Link>
+      </main>
+    );
+  }
 
   const validTotal = data.chapters.reduce(
-    (sum, ch) => sum + countValidQuestions(getChapterQuestions(subject, ch.id)),
+    (sum, ch) => sum + countValidQuestions(getChapterQuestions(facultyId, subject, ch.id)),
     0
   );
 
@@ -94,7 +134,7 @@ export default function ChapterList({ subject, subjectName }: Props) {
   return (
     <main className="pt-6">
       <Link
-        href="/"
+        href={`/faculty/${facultyId}`}
         className="inline-flex items-center text-sm text-gray-500 mb-4 tap-highlight"
       >
         <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -148,26 +188,33 @@ export default function ChapterList({ subject, subjectName }: Props) {
         <div className="mb-6">
           <p className="text-sm text-gray-400 mb-3">
             {searchResults.length > 0
-              ? `${searchResults.length} výsledků`
+              ? `${searchResults.length}${searchResults.length === 50 ? "+" : ""} výsledků`
               : "Žádné výsledky"}
           </p>
           <div className="space-y-2">
             {searchResults.map((r) => {
-              const quizHref = r.subchapterId
-                ? `/${subject}/quiz?chapter=${r.chapterId}&sub=${r.subchapterId}`
-                : `/${subject}/quiz?chapter=${r.chapterId}`;
+              const params = new URLSearchParams();
+              params.set("chapter", String(r.chapterId));
+              if (r.subchapterId) params.set("sub", r.subchapterId);
+              params.set("startId", String(r.question.id));
+              const quizHref = `/faculty/${facultyId}/${subject}/quiz?${params.toString()}`;
               return (
                 <Link
-                  key={`${r.chapterId}-${r.question.id}`}
+                  key={quizHref}
                   href={quizHref}
                   className="block bg-white dark:bg-[#1e293b] rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 tap-highlight active:bg-gray-50 dark:active:bg-gray-800 transition-colors"
                 >
                   <p className="text-xs text-gray-400 mb-1">
                     {r.chapterName} &middot; Ot. {r.question.id}
                   </p>
-                  <p className="text-sm leading-snug line-clamp-2">
-                    {r.question.text}
+                  <p className="text-sm leading-snug line-clamp-2 text-gray-800 dark:text-gray-200">
+                    <HighlightedText text={r.question.text} term={debouncedSearch} />
                   </p>
+                  {r.matchedOptionText && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
+                      Odpověď: <HighlightedText text={r.matchedOptionText} term={debouncedSearch} />
+                    </p>
+                  )}
                 </Link>
               );
             })}
@@ -178,14 +225,14 @@ export default function ChapterList({ subject, subjectName }: Props) {
           {/* Action buttons */}
           <div className="flex gap-2.5 mb-5">
             <Link
-              href={`/${subject}/quiz?chapter=all`}
+              href={`/faculty/${facultyId}/${subject}/quiz?chapter=all`}
               className="flex-1 text-center bg-[var(--color-primary)] text-white font-semibold py-3.5 rounded-xl tap-highlight active:opacity-80 transition-opacity"
             >
               Procvičovat vše
             </Link>
             {totalWrong > 0 && (
               <Link
-                href={`/${subject}/quiz?chapter=all&mode=wrong`}
+                href={`/faculty/${facultyId}/${subject}/quiz?chapter=all&mode=wrong`}
                 className="flex-1 text-center bg-[var(--color-wrong)] text-white font-semibold py-3.5 rounded-xl tap-highlight active:opacity-80 transition-opacity"
               >
                 Chyby ({totalWrong})
@@ -205,10 +252,10 @@ export default function ChapterList({ subject, subjectName }: Props) {
           <div className="space-y-2.5">
             {data.chapters.map((ch) => {
               const cp = chapterProgress[ch.id] || { answered: 0, correct: 0, wrongIds: [] };
-              const validCount = countValidQuestions(getChapterQuestions(subject, ch.id));
+              const validCount = countValidQuestions(getChapterQuestions(facultyId, subject, ch.id));
               const href = hasSubchapters
-                ? `/${subject}/chapter/${ch.id}`
-                : `/${subject}/quiz?chapter=${ch.id}`;
+                ? `/faculty/${facultyId}/${subject}/chapter/${ch.id}`
+                : `/faculty/${facultyId}/${subject}/quiz?chapter=${ch.id}`;
 
               return (
                 <Link
