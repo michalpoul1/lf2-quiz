@@ -1,43 +1,61 @@
-import biologyData from "../../data/biology.json";
-import physicsData from "../../data/physics.json";
-import chemistryData from "../../data/chemistry.json";
-import explanationsBiology from "../../data/explanations-biology.json";
-import explanationsChemistry from "../../data/explanations-chemistry.json";
-import explanationsPhysics from "../../data/explanations-physics.json";
+import biologyData2lf from "../../data/2lf/biology.json";
+import physicsData2lf from "../../data/2lf/physics.json";
+import chemistryData2lf from "../../data/2lf/chemistry.json";
+import explanationsBiology2lf from "../../data/2lf/explanations-biology.json";
+import explanationsChemistry2lf from "../../data/2lf/explanations-chemistry.json";
+import explanationsPhysics2lf from "../../data/2lf/explanations-physics.json";
+import biologyData1lf from "../../data/1lf/biology.json";
+import explanationsBiology1lf from "../../data/1lf/explanations-biology.json";
+import biologyDataLfp from "../../data/lfp/biology.json";
+import explanationsBiologyLfp from "../../data/lfp/explanations-biology.json";
 import type { SubjectData, Question } from "./types";
 
+// Internal map keyed by `${facultyId}:${subjectKey}`.
 const subjectMap: Record<string, SubjectData> = {
-  biology: biologyData as unknown as SubjectData,
-  physics: physicsData as unknown as SubjectData,
-  chemistry: chemistryData as unknown as SubjectData,
+  "2lf:biology": biologyData2lf as unknown as SubjectData,
+  "2lf:chemistry": chemistryData2lf as unknown as SubjectData,
+  "2lf:physics": physicsData2lf as unknown as SubjectData,
+  "1lf:biology": biologyData1lf as unknown as SubjectData,
+  "lfp:biology": biologyDataLfp as unknown as SubjectData,
 };
 
 const explanationsMap: Record<string, Record<string, string>> = {
-  biology: explanationsBiology as Record<string, string>,
-  chemistry: explanationsChemistry as Record<string, string>,
-  physics: explanationsPhysics as Record<string, string>,
+  "2lf:biology": explanationsBiology2lf as Record<string, string>,
+  "2lf:chemistry": explanationsChemistry2lf as Record<string, string>,
+  "2lf:physics": explanationsPhysics2lf as Record<string, string>,
+  "1lf:biology": explanationsBiology1lf as Record<string, string>,
+  "lfp:biology": explanationsBiologyLfp as Record<string, string>,
 };
 
-export function getExplanation(subject: string, questionId: number | string): string | null {
-  const map = explanationsMap[subject];
+function key(facultyId: string, subject: string): string {
+  return `${facultyId}:${subject}`;
+}
+
+export function getExplanation(
+  facultyId: string,
+  subject: string,
+  questionId: number | string
+): string | null {
+  const map = explanationsMap[key(facultyId, subject)];
   if (!map) return null;
   return map[String(questionId)] || null;
 }
 
-export function getSubjectData(subject: string): SubjectData {
-  return subjectMap[subject];
-}
-
-export function getBiologyData(): SubjectData {
-  return subjectMap.biology;
+export function getSubjectData(
+  facultyId: string,
+  subject: string
+): SubjectData | undefined {
+  return subjectMap[key(facultyId, subject)];
 }
 
 /** Get all questions for a chapter (flat), handling both questions[] and subchapters[]. */
 export function getChapterQuestions(
+  facultyId: string,
   subject: string,
   chapterId: number | "all"
 ): Question[] {
-  const data = getSubjectData(subject);
+  const data = getSubjectData(facultyId, subject);
+  if (!data) return [];
   if (chapterId === "all") {
     return data.chapters.flatMap((ch) => getAllQuestionsFromChapter(ch));
   }
@@ -47,11 +65,13 @@ export function getChapterQuestions(
 
 /** Get questions from a specific subchapter. */
 export function getSubchapterQuestions(
+  facultyId: string,
   subject: string,
   chapterId: number,
   subchapterId: string
 ): Question[] {
-  const data = getSubjectData(subject);
+  const data = getSubjectData(facultyId, subject);
+  if (!data) return [];
   const chapter = data.chapters.find((ch) => ch.id === chapterId);
   if (!chapter?.subchapters) return [];
   const sub = chapter.subchapters.find((s) => s.id === subchapterId);

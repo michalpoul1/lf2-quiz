@@ -5,6 +5,7 @@
     {
       "id": 1,
       "name": "Úvod do biologie",
+      "subtitle": "obecná charakteristika živých systémů, biologické a medicínské obory, základní biochemické procesy v živých organismech",
       "questions": [
         {
           "id": 1,
@@ -785,8 +786,7 @@
             "d"
           ]
         }
-      ],
-      "subtitle": "obecná charakteristika živých systémů, biologické a medicínské obory, základní biochemické procesy v živých organismech"
+      ]
     },
     {
       "id": 2,
@@ -813,7 +813,11 @@
               "text": "sinice"
             }
           ],
-          "correct": []
+          "correct": [
+            "b",
+            "c",
+            "d"
+          ]
         },
         {
           "id": 32,
@@ -11931,7 +11935,14 @@
           "correct": [
             "c"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Bakteriologie a virologie",
+      "subtitle": "prokaryota, viry, priony",
+      "questions": [
         {
           "id": 463,
           "text": "Vyberte skupinu, která obsahuje výhradně zástupce prokaryot:",
@@ -12646,7 +12657,14 @@
           "correct": [
             "b"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Biologie rostlin a hub",
+      "subtitle": "obecná a systematická botanika, fyziologie rostlin, mykologie",
+      "questions": [
         {
           "id": 491,
           "text": "Plastidy se vyskytují:",
@@ -13011,13 +13029,7 @@
             "b",
             "c"
           ]
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "name": "Bakteriologie a virologie",
-      "questions": [
+        },
         {
           "id": 505,
           "text": "K výraznému přechodu rostlin na souš dochází:",
@@ -13324,7 +13336,14 @@
           "correct": [
             "d"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Biologie živočichů a protistů",
+      "subtitle": "obecná a systematická zoologie a protozoologie, fylogeneze živočichů a protistů",
+      "questions": [
         {
           "id": 517,
           "text": "Živočišné tkáně neobsahují:",
@@ -14041,14 +14060,7 @@
             "a",
             "b"
           ]
-        }
-      ],
-      "subtitle": "prokaryota, viry, priony"
-    },
-    {
-      "id": 6,
-      "name": "Biologie rostlin a hub",
-      "questions": [
+        },
         {
           "id": 545,
           "text": "Měkkýši mají vyvinutu:",
@@ -15320,14 +15332,7 @@
             "c",
             "d"
           ]
-        }
-      ],
-      "subtitle": "obecná a systematická botanika, fyziologie rostlin, mykologie"
-    },
-    {
-      "id": 7,
-      "name": "Biologie živočichů a protistů",
-      "questions": [
+        },
         {
           "id": 595,
           "text": "Dokonale oddělený krevní oběh nemají:",
@@ -15608,7 +15613,14 @@
             "c",
             "d"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Biologie člověka",
+      "subtitle": "anatomie, histologie, fyziologie a imunologie",
+      "questions": [
         {
           "id": 606,
           "text": "Páteř člověka se skládá zpravidla:",
@@ -17538,7 +17550,7 @@
             }
           ],
           "correct": [
-            "c"
+            "b"
           ]
         },
         {
@@ -17798,7 +17810,10 @@
               "text": "probíhá přeměna protrombinu na trombin"
             }
           ],
-          "correct": []
+          "correct": [
+            "a",
+            "c"
+          ]
         },
         {
           "id": 692,
@@ -17879,14 +17894,7 @@
           "correct": [
             "a"
           ]
-        }
-      ],
-      "subtitle": "obecná a systematická zoologie a protozoologie, fylogeneze živočichů a protistů"
-    },
-    {
-      "id": 8,
-      "name": "Biologie člověka",
-      "questions": [
+        },
         {
           "id": 695,
           "text": "Plazmatické buňky:",
@@ -20644,7 +20652,14 @@
           "correct": [
             "d"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Evoluční biologie",
+      "subtitle": "zákonitosti evoluce, evoluční teorie, vývoj života na Zemi, vývoj člověka",
+      "questions": [
         {
           "id": 803,
           "text": "Reprodukčně izolační mechanismy:",
@@ -22019,12 +22034,12 @@
             "a"
           ]
         }
-      ],
-      "subtitle": "anatomie, histologie, fyziologie a imunologie"
+      ]
     },
     {
-      "id": 9,
-      "name": "Evoluční biologie",
+      "id": 10,
+      "name": "Ekologie",
+      "subtitle": "obecná ekologie, ochrana životního prostředí, globální problémy",
       "questions": [
         {
           "id": 857,
@@ -22431,14 +22446,7 @@
             "c",
             "d"
           ]
-        }
-      ],
-      "subtitle": "zákonitosti evoluce, evoluční teorie, vývoj života na Zemi, vývoj člověka"
-    },
-    {
-      "id": 10,
-      "name": "Ekologie",
-      "questions": [
+        },
         {
           "id": 873,
           "text": "Jako plankton označujeme vodní organismy, které:",
@@ -22772,7 +22780,13 @@
             "a",
             "d"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Historie biologie a medicíny",
+      "questions": [
         {
           "id": 886,
           "text": "Buněčná teorie byla poprvé zformulována:",
@@ -23026,14 +23040,7 @@
             "b",
             "c"
           ]
-        }
-      ],
-      "subtitle": "obecná ekologie, ochrana životního prostředí, globální problémy"
-    },
-    {
-      "id": 11,
-      "name": "Historie biologie a medicíny",
-      "questions": [
+        },
         {
           "id": 896,
           "text": "Buněčnou teorii, kterou zformulovali Schleiden a Schwann a poté rozpracovali Remak a Virchow, charakterizují tyto poznatky:",
