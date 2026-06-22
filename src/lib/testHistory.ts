@@ -1,10 +1,12 @@
 const STORAGE_KEY = "lf2-quiz-test-history";
 const STREAK_KEY = "lf2-quiz-streak";
+const DEFAULT_FACULTY = "2lf";
 
 export interface TestRecord {
   id: string;
   type: "quick" | "simulation";
   date: string;
+  facultyId: string;
   subjects: string[];
   totalQuestions: number;
   correctAnswers: number;
@@ -20,13 +22,28 @@ function genId(): string {
   return `test_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 5)}`;
 }
 
+let historyMigrationDone = false;
+
 export function getTestHistory(): TestRecord[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const data = JSON.parse(raw);
-    return Array.isArray(data) ? data : [];
+    if (!Array.isArray(data)) return [];
+    let changed = false;
+    const migrated: TestRecord[] = data.map((t) => {
+      if (!t.facultyId) {
+        changed = true;
+        return { ...t, facultyId: DEFAULT_FACULTY };
+      }
+      return t;
+    });
+    if (!historyMigrationDone) {
+      historyMigrationDone = true;
+      if (changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+    }
+    return migrated;
   } catch {
     return [];
   }
@@ -34,6 +51,7 @@ export function getTestHistory(): TestRecord[] {
 
 export function saveTestResult(
   type: "quick" | "simulation",
+  facultyId: string,
   subjects: string[],
   totalQuestions: number,
   correctAnswers: number,
@@ -45,6 +63,7 @@ export function saveTestResult(
     id: genId(),
     type,
     date: new Date().toISOString(),
+    facultyId,
     subjects,
     totalQuestions,
     correctAnswers,

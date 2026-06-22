@@ -18,8 +18,8 @@ import { recordAnswer } from "@/lib/progress";
 import SaveToCollectionModal from "@/components/SaveToCollectionModal";
 import type { Question } from "@/lib/types";
 
-function findProgressKey(subject: string, qId: number | string): string {
-  const data = getSubjectData(subject);
+function findProgressKey(facultyId: string, subject: string, qId: number | string): string {
+  const data = getSubjectData(facultyId, subject);
   if (!data) return "unknown";
   for (const ch of data.chapters) {
     if (ch.subchapters) {
@@ -37,10 +37,11 @@ function findProgressKey(subject: string, qId: number | string): string {
 }
 
 function findQuestion(
+  facultyId: string,
   subject: string,
   qId: number | string
 ): Question | null {
-  const data = getSubjectData(subject);
+  const data = getSubjectData(facultyId, subject);
   if (!data) return null;
   for (const ch of data.chapters) {
     if (ch.questions) {
@@ -58,11 +59,13 @@ function findQuestion(
 }
 
 interface BmQuestion extends Question {
+  _facultyId: string;
   _subject: string;
 }
 
 interface ResultRow {
   questionId: number | string;
+  facultyId: string;
   subject: string;
   correct: boolean;
 }
@@ -82,6 +85,7 @@ function BookmarkQuizInner() {
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set());
   const [modalQuestionId, setModalQuestionId] = useState<number | string | null>(null);
   const [modalSubject, setModalSubject] = useState<string>("");
+  const [modalFacultyId, setModalFacultyId] = useState<string>("2lf");
   const [removeCorrect, setRemoveCorrect] = useState(false);
   const [removalDone, setRemovalDone] = useState(false);
 
@@ -102,10 +106,10 @@ function BookmarkQuizInner() {
     const resolved: BmQuestion[] = [];
     const bmSet = new Set<string>();
     for (const cq of qs) {
-      const q = findQuestion(cq.subject, cq.questionId);
+      const q = findQuestion(cq.facultyId, cq.subject, cq.questionId);
       if (q) {
-        resolved.push({ ...q, _subject: cq.subject });
-        bmSet.add(`${cq.subject}-${cq.questionId}`);
+        resolved.push({ ...q, _facultyId: cq.facultyId, _subject: cq.subject });
+        bmSet.add(`${cq.facultyId}-${cq.subject}-${cq.questionId}`);
       }
     }
     setBookmarked(bmSet);
@@ -121,11 +125,12 @@ function BookmarkQuizInner() {
     if (!currentQuestion) return;
     setModalQuestionId(currentQuestion.id);
     setModalSubject(currentQuestion._subject);
+    setModalFacultyId(currentQuestion._facultyId);
   };
 
   const handleModalSaved = (isSaved: boolean) => {
     if (modalQuestionId === null) return;
-    const key = `${modalSubject}-${modalQuestionId}`;
+    const key = `${modalFacultyId}-${modalSubject}-${modalQuestionId}`;
     setBookmarked((prev) => {
       const next = new Set(prev);
       if (isSaved) next.add(key);
@@ -142,12 +147,13 @@ function BookmarkQuizInner() {
     const isCorrect =
       selectedArr.length === correctSet.size &&
       selectedArr.every((s) => correctSet.has(s));
-    const key = findProgressKey(currentQuestion._subject, currentQuestion.id);
-    recordAnswer(currentQuestion._subject, key, currentQuestion.id, isCorrect);
+    const key = findProgressKey(currentQuestion._facultyId, currentQuestion._subject, currentQuestion.id);
+    recordAnswer(currentQuestion._facultyId, currentQuestion._subject, key, currentQuestion.id, isCorrect);
     setResults((prev) => [
       ...prev,
       {
         questionId: currentQuestion.id,
+        facultyId: currentQuestion._facultyId,
         subject: currentQuestion._subject,
         correct: isCorrect,
       },
@@ -180,7 +186,7 @@ function BookmarkQuizInner() {
     // Apply removal: delete correctly answered questions from the collection
     for (const r of results) {
       if (r.correct) {
-        removeQuestionFromCollection(collectionId, r.subject, r.questionId);
+        removeQuestionFromCollection(collectionId, r.facultyId, r.subject, r.questionId);
       }
     }
     setRemovalDone(true);
@@ -301,7 +307,7 @@ function BookmarkQuizInner() {
   const selectedCorrectCount = Array.from(selected).filter((s) =>
     correctSet.has(s)
   ).length;
-  const isBm = bookmarked.has(`${currentQuestion._subject}-${currentQuestion.id}`);
+  const isBm = bookmarked.has(`${currentQuestion._facultyId}-${currentQuestion._subject}-${currentQuestion.id}`);
 
   return (
     <main className="pt-4 pb-4">
@@ -505,6 +511,7 @@ function BookmarkQuizInner() {
 
       <SaveToCollectionModal
         open={modalQuestionId !== null}
+        facultyId={modalFacultyId}
         subject={modalSubject}
         questionId={modalQuestionId ?? ""}
         onClose={() => setModalQuestionId(null)}

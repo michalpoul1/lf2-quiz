@@ -3,13 +3,16 @@
  *
  * Replaces the old "lf2-quiz-bookmarks" flat list with named, colored
  * collections. On first read, any old bookmarks are migrated into a
- * collection named "Neuřazené".
+ * collection named "Neuřazené". Entries are tagged with facultyId;
+ * legacy entries without one are migrated to "2lf".
  */
 
 const STORAGE_KEY = "lf2-quiz-collections";
 const OLD_BOOKMARKS_KEY = "lf2-quiz-bookmarks";
+const DEFAULT_FACULTY = "2lf";
 
 export interface CollectionQuestion {
+  facultyId: string;
   subject: string;
   questionId: number | string;
 }
@@ -43,6 +46,24 @@ function emptyData(): CollectionsData {
   return { collections: [] };
 }
 
+let facultyMigrationDone = false;
+
+function normalizeFacultyIds(data: CollectionsData): {
+  data: CollectionsData;
+  changed: boolean;
+} {
+  let changed = false;
+  for (const c of data.collections) {
+    for (const q of c.questions) {
+      if (!q.facultyId) {
+        q.facultyId = DEFAULT_FACULTY;
+        changed = true;
+      }
+    }
+  }
+  return { data, changed };
+}
+
 function readRaw(): CollectionsData {
   if (typeof window === "undefined") return emptyData();
   try {
@@ -50,7 +71,13 @@ function readRaw(): CollectionsData {
     if (!raw) return emptyData();
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.collections)) return emptyData();
-    return parsed as CollectionsData;
+    const data = parsed as CollectionsData;
+    if (!facultyMigrationDone) {
+      const { changed } = normalizeFacultyIds(data);
+      facultyMigrationDone = true;
+      if (changed) writeRaw(data);
+    }
+    return data;
   } catch {
     return emptyData();
   }
@@ -66,7 +93,11 @@ function genId(): string {
 }
 
 function sameQuestion(a: CollectionQuestion, b: CollectionQuestion): boolean {
-  return a.subject === b.subject && String(a.questionId) === String(b.questionId);
+  return (
+    a.facultyId === b.facultyId &&
+    a.subject === b.subject &&
+    String(a.questionId) === String(b.questionId)
+  );
 }
 
 /**
@@ -141,13 +172,14 @@ export function unpinCollection(id: string): void {
  * `targetCollectionIds` is the desired full set the question should be in.
  */
 export function setQuestionCollections(
+  facultyId: string,
   subject: string,
   questionId: number | string,
   targetCollectionIds: string[]
 ): void {
   const data = readRaw();
   const target = new Set(targetCollectionIds);
-  const q: CollectionQuestion = { subject, questionId };
+  const q: CollectionQuestion = { facultyId, subject, questionId };
   for (const c of data.collections) {
     const has = c.questions.some((cq) => sameQuestion(cq, q));
     if (target.has(c.id) && !has) {
@@ -161,6 +193,7 @@ export function setQuestionCollections(
 
 export function removeQuestionFromCollection(
   collectionId: string,
+  facultyId: string,
   subject: string,
   questionId: number | string
 ): void {
@@ -168,17 +201,18 @@ export function removeQuestionFromCollection(
   const c = data.collections.find((c) => c.id === collectionId);
   if (!c) return;
   c.questions = c.questions.filter(
-    (cq) => !sameQuestion(cq, { subject, questionId })
+    (cq) => !sameQuestion(cq, { facultyId, subject, questionId })
   );
   writeRaw(data);
 }
 
 export function getCollectionsContaining(
+  facultyId: string,
   subject: string,
   questionId: number | string
 ): string[] {
   const data = readRaw();
-  const q: CollectionQuestion = { subject, questionId };
+  const q: CollectionQuestion = { facultyId, subject, questionId };
   return data.collections
     .filter((c) => c.questions.some((cq) => sameQuestion(cq, q)))
     .map((c) => c.id);
@@ -189,10 +223,11 @@ export function getCollectionsContaining(
  * decide whether to display a filled-in bookmark icon).
  */
 export function isQuestionSaved(
+  facultyId: string,
   subject: string,
   questionId: number | string
 ): boolean {
-  return getCollectionsContaining(subject, questionId).length > 0;
+  return getCollectionsContaining(facultyId, subject, questionId).length > 0;
 }
 
 /**
@@ -203,7 +238,7 @@ export function getAllSavedQuestions(): CollectionQuestion[] {
   const result: CollectionQuestion[] = [];
   for (const c of readRaw().collections) {
     for (const q of c.questions) {
-      const key = `${q.subject}::${q.questionId}`;
+      const key = `${q.facultyId}::${q.subject}::${q.questionId}`;
       if (!seen.has(key)) {
         seen.add(key);
         result.push(q);
@@ -229,7 +264,8 @@ function migrateOldBookmarks(): void {
     const flat: CollectionQuestion[] = [];
     for (const [subject, ids] of Object.entries(oldData || {})) {
       if (!Array.isArray(ids)) continue;
-      for (const id of ids) flat.push({ subject, questionId: id });
+      for (const id of ids)
+        flat.push({ facultyId: DEFAULT_FACULTY, subject, questionId: id });
     }
     if (flat.length === 0) {
       localStorage.removeItem(OLD_BOOKMARKS_KEY);

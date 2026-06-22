@@ -12,6 +12,7 @@ import {
 
 interface Props {
   open: boolean;
+  facultyId: string;
   subject: string;
   questionId: number | string;
   onClose: () => void;
@@ -21,6 +22,7 @@ interface Props {
 
 export default function SaveToCollectionModal({
   open,
+  facultyId,
   subject,
   questionId,
   onClose,
@@ -41,13 +43,13 @@ export default function SaveToCollectionModal({
     if (!open) return;
     const cs = getCollections();
     setCollections(cs);
-    setSelected(new Set(getCollectionsContaining(subject, questionId)));
+    setSelected(new Set(getCollectionsContaining(facultyId, subject, questionId)));
     setCreatingName("");
     setCreatingColor(COLLECTION_COLORS[0]);
     setMounted(true);
     // Trigger slide-up animation on next frame
     requestAnimationFrame(() => setVisible(true));
-  }, [open, subject, questionId]);
+  }, [open, facultyId, subject, questionId]);
 
   // Lock body scroll while open
   useEffect(() => {
@@ -90,7 +92,7 @@ export default function SaveToCollectionModal({
   };
 
   const handleSave = () => {
-    setQuestionCollections(subject, questionId, Array.from(selected));
+    setQuestionCollections(facultyId, subject, questionId, Array.from(selected));
     onSaved?.(selected.size > 0);
     // Find the name of the first selected collection for the toast
     const savedTo = collections.find((c) => selected.has(c.id));
