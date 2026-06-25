@@ -227,11 +227,11 @@ export default function StatisticsPage() {
         {testHistory.length === 0 ? (
           <p className="text-sm text-gray-400 dark:text-gray-500">
             Zatím žádné testy. Zkuste{" "}
-            <button onClick={() => router.push(`/faculty/${firstFacultyId}/quick-test`)} className="text-[var(--color-primary)] dark:text-blue-400 underline">
+            <button onClick={() => router.push("/quick-test")} className="text-[var(--color-primary)] dark:text-blue-400 underline">
               Rychlý test
             </button>{" "}
             nebo{" "}
-            <button onClick={() => router.push(`/faculty/${firstFacultyId}/exam-simulation`)} className="text-[var(--color-primary)] dark:text-blue-400 underline">
+            <button onClick={() => router.push("/exam-simulation")} className="text-[var(--color-primary)] dark:text-blue-400 underline">
               Simulaci přijímaček
             </button>
             !
@@ -323,7 +323,7 @@ export default function StatisticsPage() {
                           return (
                             <button
                               key={ch.id}
-                              onClick={() => router.push(`/faculty/${f.id}/${s.id}/quiz?chapter=${ch.id}`)}
+                              onClick={() => router.push(`/${s.id}/quiz?chapter=${ch.id}`)}
                               className="w-full flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 tap-highlight transition-colors"
                             >
                               <span className="text-xs text-gray-400 w-5 text-right flex-shrink-0">{ch.id}.</span>
@@ -429,7 +429,7 @@ export default function StatisticsPage() {
                       <p className="text-xs text-gray-500 dark:text-gray-400">{subjectName(ch.subject)}</p>
                     </div>
                     <button
-                      onClick={() => router.push(`/faculty/${ch.facultyId}/${ch.subject}/quiz?chapter=${ch.id}`)}
+                      onClick={() => router.push(`/${ch.subject}/quiz?chapter=${ch.id}`)}
                       className="text-xs font-medium text-[var(--color-wrong)] bg-red-100 dark:bg-red-900/40 px-3 py-1.5 rounded-lg tap-highlight flex-shrink-0"
                     >
                       Procvičovat

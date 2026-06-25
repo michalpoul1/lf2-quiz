@@ -117,7 +117,7 @@ export default function ChapterList({ facultyId, subject, subjectName }: Props) 
     return (
       <main className="pt-10 text-center">
         <p className="text-gray-500 mb-4">Data nejsou k dispozici.</p>
-        <Link href={`/faculty/${facultyId}`} className="text-[var(--color-primary)] dark:text-blue-400 font-medium">
+        <Link href="/" className="text-[var(--color-primary)] dark:text-blue-400 font-medium">
           Zpět
         </Link>
       </main>
@@ -134,7 +134,7 @@ export default function ChapterList({ facultyId, subject, subjectName }: Props) 
   return (
     <main className="pt-6">
       <Link
-        href={`/faculty/${facultyId}`}
+        href="/"
         className="inline-flex items-center text-sm text-gray-500 mb-4 tap-highlight"
       >
         <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -197,7 +197,7 @@ export default function ChapterList({ facultyId, subject, subjectName }: Props) 
               params.set("chapter", String(r.chapterId));
               if (r.subchapterId) params.set("sub", r.subchapterId);
               params.set("startId", String(r.question.id));
-              const quizHref = `/faculty/${facultyId}/${subject}/quiz?${params.toString()}`;
+              const quizHref = `/${subject}/quiz?${params.toString()}`;
               return (
                 <Link
                   key={quizHref}
@@ -225,14 +225,14 @@ export default function ChapterList({ facultyId, subject, subjectName }: Props) 
           {/* Action buttons */}
           <div className="flex gap-2.5 mb-5">
             <Link
-              href={`/faculty/${facultyId}/${subject}/quiz?chapter=all`}
+              href={`/${subject}/quiz?chapter=all`}
               className="flex-1 text-center bg-[var(--color-primary)] text-white font-semibold py-3.5 rounded-xl tap-highlight active:opacity-80 transition-opacity"
             >
               Procvičovat vše
             </Link>
             {totalWrong > 0 && (
               <Link
-                href={`/faculty/${facultyId}/${subject}/quiz?chapter=all&mode=wrong`}
+                href={`/${subject}/quiz?chapter=all&mode=wrong`}
                 className="flex-1 text-center bg-[var(--color-wrong)] text-white font-semibold py-3.5 rounded-xl tap-highlight active:opacity-80 transition-opacity"
               >
                 Chyby ({totalWrong})
@@ -254,8 +254,8 @@ export default function ChapterList({ facultyId, subject, subjectName }: Props) 
               const cp = chapterProgress[ch.id] || { answered: 0, correct: 0, wrongIds: [] };
               const validCount = countValidQuestions(getChapterQuestions(facultyId, subject, ch.id));
               const href = hasSubchapters
-                ? `/faculty/${facultyId}/${subject}/chapter/${ch.id}`
-                : `/faculty/${facultyId}/${subject}/quiz?chapter=${ch.id}`;
+                ? `/${subject}/chapter/${ch.id}`
+                : `/${subject}/quiz?chapter=${ch.id}`;
 
               return (
                 <Link

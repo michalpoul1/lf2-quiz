@@ -234,7 +234,7 @@ export default function GlobalSearch() {
     params.set("chapter", String(entry.chapterId));
     if (entry.subchapterId) params.set("sub", entry.subchapterId);
     params.set("startId", String(entry.question.id));
-    return `/faculty/${entry.facultyId}/${entry.subject}/quiz?${params.toString()}`;
+    return `/${entry.subject}/quiz?${params.toString()}`;
   }
 
   function handleResultClick(entry: SearchEntry) {

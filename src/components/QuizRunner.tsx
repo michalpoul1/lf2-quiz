@@ -53,8 +53,8 @@ export default function QuizRunner({
   }
 
   const backHref = subchapterParam
-    ? `/faculty/${facultyId}/${subject}/chapter/${chapterParam}`
-    : `/faculty/${facultyId}/${subject}`;
+    ? `/${subject}/chapter/${chapterParam}`
+    : `/${subject}`;
 
   const [shuffle, setShuffle] = useState(!startId);
   const [quizState, setQuizState] = useState<QuizState>(startId ? "active" : "setup");
@@ -200,14 +200,14 @@ export default function QuizRunner({
 
   // Build quiz URL for replay
   const quizUrl = subchapterParam
-    ? `/faculty/${facultyId}/${subject}/quiz?chapter=${chapterParam}&sub=${subchapterParam}`
-    : `/faculty/${facultyId}/${subject}/quiz?chapter=${chapterParam}`;
+    ? `/${subject}/quiz?chapter=${chapterParam}&sub=${subchapterParam}`
+    : `/${subject}/quiz?chapter=${chapterParam}`;
 
   if (!data) {
     return (
       <main className="pt-10 text-center">
         <p className="text-gray-500 mb-4">Data nejsou k dispozici.</p>
-        <Link href={`/faculty/${facultyId}`} className="text-[var(--color-primary)] dark:text-blue-400 font-medium">
+        <Link href="/" className="text-[var(--color-primary)] dark:text-blue-400 font-medium">
           Zpět
         </Link>
       </main>
