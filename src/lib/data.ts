@@ -4,10 +4,6 @@ import chemistryData2lf from "../../data/2lf/chemistry.json";
 import explanationsBiology2lf from "../../data/2lf/explanations-biology.json";
 import explanationsChemistry2lf from "../../data/2lf/explanations-chemistry.json";
 import explanationsPhysics2lf from "../../data/2lf/explanations-physics.json";
-import biologyData1lf from "../../data/1lf/biology.json";
-import explanationsBiology1lf from "../../data/1lf/explanations-biology.json";
-import biologyDataLfp from "../../data/lfp/biology.json";
-import explanationsBiologyLfp from "../../data/lfp/explanations-biology.json";
 import type { SubjectData, Question } from "./types";
 
 // Internal map keyed by `${facultyId}:${subjectKey}`.
@@ -15,16 +11,12 @@ const subjectMap: Record<string, SubjectData> = {
   "2lf:biology": biologyData2lf as unknown as SubjectData,
   "2lf:chemistry": chemistryData2lf as unknown as SubjectData,
   "2lf:physics": physicsData2lf as unknown as SubjectData,
-  "1lf:biology": biologyData1lf as unknown as SubjectData,
-  "lfp:biology": biologyDataLfp as unknown as SubjectData,
 };
 
 const explanationsMap: Record<string, Record<string, string>> = {
   "2lf:biology": explanationsBiology2lf as Record<string, string>,
   "2lf:chemistry": explanationsChemistry2lf as Record<string, string>,
   "2lf:physics": explanationsPhysics2lf as Record<string, string>,
-  "1lf:biology": explanationsBiology1lf as Record<string, string>,
-  "lfp:biology": explanationsBiologyLfp as Record<string, string>,
 };
 
 function key(facultyId: string, subject: string): string {
