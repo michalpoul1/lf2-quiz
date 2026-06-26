@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { getSubjectData, getChapterQuestions, countValidQuestions } from "@/lib/data";
 import { getChapterProgress, getTotalProgress, resetProgress } from "@/lib/progress";
 import { getTestHistory, getStreak, getTodayAnswered, clearTestHistory } from "@/lib/testHistory";
-import { getActiveFaculties } from "@/config/faculties";
 import type { ChapterProgress } from "@/lib/types";
 import type { TestRecord } from "@/lib/testHistory";
 import DonutChart from "@/components/DonutChart";
@@ -21,6 +20,12 @@ const SUBJECT_ICONS: Record<string, string> = {
   chemistry: "⚗️",
   physics: "⚡",
 };
+
+const SUBJECTS: { id: string; name: string; icon: string }[] = [
+  { id: "biology", name: "Biologie", icon: SUBJECT_ICONS.biology },
+  { id: "chemistry", name: "Chemie", icon: SUBJECT_ICONS.chemistry },
+  { id: "physics", name: "Fyzika", icon: SUBJECT_ICONS.physics },
+];
 
 function pctColor(pct: number): string {
   if (pct >= 75) return "var(--color-correct)";
@@ -55,7 +60,6 @@ function formatDate(iso: string): string {
 interface ChapterStat {
   id: number;
   name: string;
-  facultyId: string;
   subject: string;
   totalQuestions: number;
   progress: ChapterProgress;
@@ -63,7 +67,6 @@ interface ChapterStat {
 }
 
 interface SubjectStat {
-  facultyId: string;
   subjectId: string;
   subjectName: string;
   icon: string;
@@ -87,55 +90,46 @@ export default function StatisticsPage() {
   const [streak, setStreak] = useState(0);
   const [todayCount, setTodayCount] = useState(0);
 
-  const activeFaculties = getActiveFaculties();
-  const firstFacultyId = activeFaculties[0]?.id ?? "2lf";
-  const showFacultyHeaders = activeFaculties.length > 1;
-
   const loadData = () => {
     const result: Record<string, SubjectStat> = {};
-    for (const f of activeFaculties) {
-      for (const s of f.subjects) {
-        const key = `${f.id}:${s.id}`;
-        const subjectData = getSubjectData(f.id, s.id);
-        if (!subjectData) continue;
-        const total = getTotalProgress(f.id, s.id);
-        const totalQuestions = subjectData.chapters.reduce(
-          (sum, ch) => sum + countValidQuestions(getChapterQuestions(f.id, s.id, ch.id)),
-          0
-        );
-        const chapters: ChapterStat[] = subjectData.chapters.map((ch) => {
-          const validCount = countValidQuestions(getChapterQuestions(f.id, s.id, ch.id));
-          const cp = getChapterProgress(f.id, s.id, ch.id);
-          let aggregated = { ...cp };
-          if (ch.subchapters) {
-            aggregated = { answered: 0, correct: 0, wrongIds: [] };
-            for (const sub of ch.subchapters) {
-              const scp = getChapterProgress(f.id, s.id, sub.id);
-              aggregated.answered += scp.answered;
-              aggregated.correct += scp.correct;
-              aggregated.wrongIds = [...aggregated.wrongIds, ...scp.wrongIds];
-            }
+    for (const s of SUBJECTS) {
+      const subjectData = getSubjectData(s.id);
+      if (!subjectData) continue;
+      const total = getTotalProgress(s.id);
+      const totalQuestions = subjectData.chapters.reduce(
+        (sum, ch) => sum + countValidQuestions(getChapterQuestions(s.id, ch.id)),
+        0
+      );
+      const chapters: ChapterStat[] = subjectData.chapters.map((ch) => {
+        const validCount = countValidQuestions(getChapterQuestions(s.id, ch.id));
+        const cp = getChapterProgress(s.id, ch.id);
+        let aggregated = { ...cp };
+        if (ch.subchapters) {
+          aggregated = { answered: 0, correct: 0, wrongIds: [] };
+          for (const sub of ch.subchapters) {
+            const scp = getChapterProgress(s.id, sub.id);
+            aggregated.answered += scp.answered;
+            aggregated.correct += scp.correct;
+            aggregated.wrongIds = [...aggregated.wrongIds, ...scp.wrongIds];
           }
-          return {
-            id: ch.id,
-            name: ch.name,
-            facultyId: f.id,
-            subject: s.id,
-            totalQuestions: validCount,
-            progress: aggregated,
-            pct: aggregated.answered > 0 ? Math.round((aggregated.correct / aggregated.answered) * 100) : -1,
-          };
-        });
-        result[key] = {
-          facultyId: f.id,
-          subjectId: s.id,
-          subjectName: s.name,
-          icon: s.icon || SUBJECT_ICONS[s.id] || "📘",
-          total,
-          totalQuestions,
-          chapters,
+        }
+        return {
+          id: ch.id,
+          name: ch.name,
+          subject: s.id,
+          totalQuestions: validCount,
+          progress: aggregated,
+          pct: aggregated.answered > 0 ? Math.round((aggregated.correct / aggregated.answered) * 100) : -1,
         };
-      }
+      });
+      result[s.id] = {
+        subjectId: s.id,
+        subjectName: s.name,
+        icon: s.icon,
+        total,
+        totalQuestions,
+        chapters,
+      };
     }
     setData(result);
     setTestHistory(getTestHistory().slice(0, 10));
@@ -162,18 +156,15 @@ export default function StatisticsPage() {
   const strongest = sorted.slice(0, 3);
   const weakest = [...qualified].sort((a, b) => a.pct - b.pct).slice(0, 3);
 
-  const handleResetSubject = (compositeKey: string) => {
-    const stat = data[compositeKey];
-    if (stat) resetProgress(stat.facultyId, stat.subjectId);
+  const handleResetSubject = (subjectId: string) => {
+    resetProgress(subjectId);
     setConfirmReset(null);
     loadData();
   };
 
   const handleResetAll = () => {
-    for (const f of activeFaculties) {
-      for (const s of f.subjects) {
-        resetProgress(f.id, s.id);
-      }
+    for (const s of SUBJECTS) {
+      resetProgress(s.id);
     }
     clearTestHistory();
     setConfirmResetAll(false);
@@ -277,16 +268,11 @@ export default function StatisticsPage() {
         )}
       </div>
 
-      {/* ===== SECTION 3: Subject cards (expandable), grouped by faculty when >1 active ===== */}
-      <div className="space-y-5">
-        {activeFaculties.map((f) => (
-          <div key={f.id} className="space-y-3">
-            {showFacultyHeaders && (
-              <h2 className="text-base font-semibold text-gray-600 dark:text-gray-300 px-1">{f.name}</h2>
-            )}
-            {f.subjects.map((s) => {
-              const key = `${f.id}:${s.id}`;
-              const d = data[key];
+      {/* ===== SECTION 3: Subject cards (expandable) ===== */}
+      <div className="space-y-3">
+        {SUBJECTS.map((s) => {
+          const key = s.id;
+          const d = data[key];
               if (!d) return null;
               const totalPct = d.total.answered > 0 ? Math.round((d.total.correct / d.total.answered) * 100) : -1;
               const isExpanded = expanded === key;
@@ -386,9 +372,7 @@ export default function StatisticsPage() {
                   )}
                 </div>
               );
-            })}
-          </div>
-        ))}
+        })}
       </div>
 
       {/* ===== SECTION 4: Strengths & Weaknesses ===== */}
@@ -400,7 +384,7 @@ export default function StatisticsPage() {
               <div className="space-y-2">
                 {strongest.map((ch) => (
                   <div
-                    key={`${ch.facultyId}-${ch.subject}-${ch.id}`}
+                    key={`${ch.subject}-${ch.id}`}
                     className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl px-4 py-3 border border-emerald-100 dark:border-emerald-900/50"
                   >
                     <span className="text-[var(--color-correct)] font-bold text-lg flex-shrink-0">{ch.pct}%</span>
@@ -420,7 +404,7 @@ export default function StatisticsPage() {
               <div className="space-y-2">
                 {weakest.map((ch) => (
                   <div
-                    key={`${ch.facultyId}-${ch.subject}-${ch.id}`}
+                    key={`${ch.subject}-${ch.id}`}
                     className="flex items-center gap-3 bg-red-50 dark:bg-red-950/30 rounded-xl px-4 py-3 border border-red-100 dark:border-red-900/50"
                   >
                     <span className="text-[var(--color-wrong)] font-bold text-lg flex-shrink-0">{ch.pct}%</span>

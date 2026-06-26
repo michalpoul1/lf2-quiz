@@ -37,8 +37,8 @@ function formatTimer(ms: number): string {
   return `${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
 }
 
-function findProgressKey(facultyId: string, subject: string, qId: number | string): string {
-  const data = getSubjectData(facultyId, subject);
+function findProgressKey(subject: string, qId: number | string): string {
+  const data = getSubjectData(subject);
   if (!data) return "unknown";
   for (const ch of data.chapters) {
     if (ch.subchapters) {
@@ -54,7 +54,6 @@ function findProgressKey(facultyId: string, subject: string, qId: number | strin
 }
 
 function buildQuestions(
-  facultyId: string,
   totalCount: number,
   bioRatio: number,
   chemRatio: number,
@@ -66,7 +65,7 @@ function buildQuestions(
   const physCount = totalCount - bioCount - chemCount;
 
   const pick = (subject: string, n: number): TaggedQuestion[] => {
-    const all = filterValidQuestions(getChapterQuestions(facultyId, subject, "all"));
+    const all = filterValidQuestions(getChapterQuestions(subject, "all"));
     return shuffleArray(all)
       .slice(0, n)
       .map((q) => ({ ...q, _subject: subject }));
@@ -114,8 +113,6 @@ function clearExam() {
 
 /* ══════════════════════════════════════════════════════════ */
 export default function ExamSimulationPage() {
-
-  const facultyId = "2lf";
   const backHref = "/";
   const [phase, setPhase] = useState<Phase>("setup");
 
@@ -190,7 +187,7 @@ export default function ExamSimulationPage() {
 
   /* ─── start exam ─── */
   const startExam = () => {
-    const qs = buildQuestions(facultyId, totalCount, bioRatio, chemRatio, physRatio);
+    const qs = buildQuestions(totalCount, bioRatio, chemRatio, physRatio);
     const timeLimitMs = timeMinutes * 60 * 1000;
     const now = Date.now();
     timeLimitMsRef.current = timeLimitMs;
@@ -235,8 +232,8 @@ export default function ExamSimulationPage() {
         const isCorrect =
           userAns.length === correctSet.size &&
           userAns.every((l) => correctSet.has(l));
-        const key = findProgressKey(facultyId, q._subject, q.id);
-        recordAnswer(facultyId, q._subject, key, q.id, isCorrect);
+        const key = findProgressKey(q._subject, q.id);
+        recordAnswer(q._subject, key, q.id, isCorrect);
       }
       // Save test result to history
       let correctCount = 0;
@@ -248,13 +245,13 @@ export default function ExamSimulationPage() {
         if (userAns.length === cSet.size && userAns.every((l) => cSet.has(l)))
           correctCount++;
       }
-      saveTestResult("simulation", facultyId, [...subjects], questions.length, correctCount, Math.floor(elapsed / 1000));
+      saveTestResult("simulation", [...subjects], questions.length, correctCount, Math.floor(elapsed / 1000));
 
       clearExam();
       setPhase("results");
       window.scrollTo(0, 0);
     },
-    [questions, answers, startedAt, facultyId]
+    [questions, answers, startedAt]
   );
 
   /* ─── scroll to question ─── */

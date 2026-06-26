@@ -1,6 +1,9 @@
 const STORAGE_KEY = "lf2-quiz-test-history";
 const STREAK_KEY = "lf2-quiz-streak";
-const DEFAULT_FACULTY = "2lf";
+
+// Records carry facultyId for backwards compatibility with existing stored
+// history. Internally we always tag new entries with the 2lf namespace.
+const FACULTY = "2lf";
 
 export interface TestRecord {
   id: string;
@@ -35,7 +38,7 @@ export function getTestHistory(): TestRecord[] {
     const migrated: TestRecord[] = data.map((t) => {
       if (!t.facultyId) {
         changed = true;
-        return { ...t, facultyId: DEFAULT_FACULTY };
+        return { ...t, facultyId: FACULTY };
       }
       return t;
     });
@@ -51,7 +54,6 @@ export function getTestHistory(): TestRecord[] {
 
 export function saveTestResult(
   type: "quick" | "simulation",
-  facultyId: string,
   subjects: string[],
   totalQuestions: number,
   correctAnswers: number,
@@ -63,7 +65,7 @@ export function saveTestResult(
     id: genId(),
     type,
     date: new Date().toISOString(),
-    facultyId,
+    facultyId: FACULTY,
     subjects,
     totalQuestions,
     correctAnswers,

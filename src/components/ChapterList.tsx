@@ -25,13 +25,12 @@ function HighlightedText({ text, term }: { text: string; term: string }) {
 }
 
 interface Props {
-  facultyId: string;
   subject: string;
   subjectName: string;
 }
 
-export default function ChapterList({ facultyId, subject, subjectName }: Props) {
-  const data = getSubjectData(facultyId, subject);
+export default function ChapterList({ subject, subjectName }: Props) {
+  const data = getSubjectData(subject);
   const [chapterProgress, setChapterProgress] = useState<Record<string, ChapterProgress>>({});
   const [total, setTotal] = useState({ answered: 0, correct: 0 });
   const [totalWrong, setTotalWrong] = useState(0);
@@ -42,19 +41,19 @@ export default function ChapterList({ facultyId, subject, subjectName }: Props) 
     if (!data) return;
     const cp: Record<string, ChapterProgress> = {};
     for (const ch of data.chapters) {
-      cp[ch.id] = getChapterProgress(facultyId, subject, ch.id);
+      cp[ch.id] = getChapterProgress(subject, ch.id);
     }
     setChapterProgress(cp);
-    setTotal(getTotalProgress(facultyId, subject));
+    setTotal(getTotalProgress(subject));
 
     // Count total wrong answers
-    const progress = getSubjectProgress(facultyId, subject);
+    const progress = getSubjectProgress(subject);
     let wrongCount = 0;
     for (const cp of Object.values(progress)) {
       wrongCount += cp.wrongIds.length;
     }
     setTotalWrong(wrongCount);
-  }, [data, facultyId, subject]);
+  }, [data, subject]);
 
   // Debounce search
   useEffect(() => {
@@ -125,7 +124,7 @@ export default function ChapterList({ facultyId, subject, subjectName }: Props) 
   }
 
   const validTotal = data.chapters.reduce(
-    (sum, ch) => sum + countValidQuestions(getChapterQuestions(facultyId, subject, ch.id)),
+    (sum, ch) => sum + countValidQuestions(getChapterQuestions(subject, ch.id)),
     0
   );
 
@@ -252,7 +251,7 @@ export default function ChapterList({ facultyId, subject, subjectName }: Props) 
           <div className="space-y-2.5">
             {data.chapters.map((ch) => {
               const cp = chapterProgress[ch.id] || { answered: 0, correct: 0, wrongIds: [] };
-              const validCount = countValidQuestions(getChapterQuestions(facultyId, subject, ch.id));
+              const validCount = countValidQuestions(getChapterQuestions(subject, ch.id));
               const href = hasSubchapters
                 ? `/${subject}/chapter/${ch.id}`
                 : `/${subject}/quiz?chapter=${ch.id}`;

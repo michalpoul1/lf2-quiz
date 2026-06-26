@@ -20,7 +20,7 @@ export default function Home() {
   useEffect(() => {
     const p: Record<string, { answered: number; correct: number }> = {};
     for (const s of SUBJECTS) {
-      p[s.id] = getTotalProgress("2lf", s.id);
+      p[s.id] = getTotalProgress(s.id);
     }
     setProgress(p);
   }, []);
@@ -66,7 +66,7 @@ export default function Home() {
 
       <div className="space-y-3">
         {SUBJECTS.map((s) => {
-          const data = getSubjectData("2lf", s.id);
+          const data = getSubjectData(s.id);
           const total = data?.totalQuestions ?? 0;
           const p = progress[s.id] || { answered: 0, correct: 0 };
 

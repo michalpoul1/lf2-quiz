@@ -6,47 +6,46 @@ import explanationsChemistry2lf from "../../data/2lf/explanations-chemistry.json
 import explanationsPhysics2lf from "../../data/2lf/explanations-physics.json";
 import type { SubjectData, Question } from "./types";
 
-// Internal map keyed by `${facultyId}:${subjectKey}`.
+// Internal namespace — kept under "2lf" so localStorage shape (which is
+// also keyed by facultyId) continues to work for existing users. Don't
+// flatten without a migration.
+const FACULTY = "2lf";
+
 const subjectMap: Record<string, SubjectData> = {
-  "2lf:biology": biologyData2lf as unknown as SubjectData,
-  "2lf:chemistry": chemistryData2lf as unknown as SubjectData,
-  "2lf:physics": physicsData2lf as unknown as SubjectData,
+  [`${FACULTY}:biology`]: biologyData2lf as unknown as SubjectData,
+  [`${FACULTY}:chemistry`]: chemistryData2lf as unknown as SubjectData,
+  [`${FACULTY}:physics`]: physicsData2lf as unknown as SubjectData,
 };
 
 const explanationsMap: Record<string, Record<string, string>> = {
-  "2lf:biology": explanationsBiology2lf as Record<string, string>,
-  "2lf:chemistry": explanationsChemistry2lf as Record<string, string>,
-  "2lf:physics": explanationsPhysics2lf as Record<string, string>,
+  [`${FACULTY}:biology`]: explanationsBiology2lf as Record<string, string>,
+  [`${FACULTY}:chemistry`]: explanationsChemistry2lf as Record<string, string>,
+  [`${FACULTY}:physics`]: explanationsPhysics2lf as Record<string, string>,
 };
 
-function key(facultyId: string, subject: string): string {
-  return `${facultyId}:${subject}`;
+function key(subject: string): string {
+  return `${FACULTY}:${subject}`;
 }
 
 export function getExplanation(
-  facultyId: string,
   subject: string,
   questionId: number | string
 ): string | null {
-  const map = explanationsMap[key(facultyId, subject)];
+  const map = explanationsMap[key(subject)];
   if (!map) return null;
   return map[String(questionId)] || null;
 }
 
-export function getSubjectData(
-  facultyId: string,
-  subject: string
-): SubjectData | undefined {
-  return subjectMap[key(facultyId, subject)];
+export function getSubjectData(subject: string): SubjectData | undefined {
+  return subjectMap[key(subject)];
 }
 
 /** Get all questions for a chapter (flat), handling both questions[] and subchapters[]. */
 export function getChapterQuestions(
-  facultyId: string,
   subject: string,
   chapterId: number | "all"
 ): Question[] {
-  const data = getSubjectData(facultyId, subject);
+  const data = getSubjectData(subject);
   if (!data) return [];
   if (chapterId === "all") {
     return data.chapters.flatMap((ch) => getAllQuestionsFromChapter(ch));
@@ -57,12 +56,11 @@ export function getChapterQuestions(
 
 /** Get questions from a specific subchapter. */
 export function getSubchapterQuestions(
-  facultyId: string,
   subject: string,
   chapterId: number,
   subchapterId: string
 ): Question[] {
-  const data = getSubjectData(facultyId, subject);
+  const data = getSubjectData(subject);
   if (!data) return [];
   const chapter = data.chapters.find((ch) => ch.id === chapterId);
   if (!chapter?.subchapters) return [];

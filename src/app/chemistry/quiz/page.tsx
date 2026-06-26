@@ -13,7 +13,6 @@ function QuizContent() {
 
   return (
     <QuizRunner
-      facultyId="2lf"
       subject="chemistry"
       chapterParam={chapter}
       subchapterParam={sub}

@@ -2,7 +2,7 @@ import { getSubjectData } from "@/lib/data";
 import ChemistryChapterClient from "./ChemistryChapterClient";
 
 export function generateStaticParams() {
-  const data = getSubjectData("2lf", "chemistry");
+  const data = getSubjectData("chemistry");
   if (!data) return [];
   return data.chapters.map((ch) => ({ id: String(ch.id) }));
 }

@@ -13,7 +13,7 @@ export default function ChemistryChapterClient({
 }) {
   const params = use(paramsPromise);
   const chapterId = Number(params.id);
-  const data = getSubjectData("2lf", "chemistry");
+  const data = getSubjectData("chemistry");
   const chapter = data?.chapters.find((ch) => ch.id === chapterId);
 
   const [subProgress, setSubProgress] = useState<Record<string, ChapterProgress>>({});
@@ -22,7 +22,7 @@ export default function ChemistryChapterClient({
     if (!chapter?.subchapters) return;
     const sp: Record<string, ChapterProgress> = {};
     for (const sub of chapter.subchapters) {
-      sp[sub.id] = getChapterProgress("2lf", "chemistry", sub.id);
+      sp[sub.id] = getChapterProgress("chemistry", sub.id);
     }
     setSubProgress(sp);
   }, [chapter]);
@@ -38,7 +38,7 @@ export default function ChemistryChapterClient({
     );
   }
 
-  const totalValid = countValidQuestions(getChapterQuestions("2lf", "chemistry", chapterId));
+  const totalValid = countValidQuestions(getChapterQuestions("chemistry", chapterId));
 
   return (
     <main className="pt-6">

@@ -25,7 +25,6 @@ const SUBJECT_SHORT: Record<string, string> = {
 };
 
 interface ResolvedQuestion {
-  facultyId: string;
   subject: string;
   questionId: number | string;
   question: Question;
@@ -33,11 +32,10 @@ interface ResolvedQuestion {
 }
 
 function findQuestion(
-  facultyId: string,
   subject: string,
   qId: number | string
 ): { question: Question; chapterPath: string } | null {
-  const data = getSubjectData(facultyId, subject);
+  const data = getSubjectData(subject);
   if (!data) return null;
   for (const ch of data.chapters) {
     if (ch.questions) {
@@ -99,10 +97,9 @@ export default function CollectionDetail({ collectionId }: Props) {
     }
     const resolved: ResolvedQuestion[] = [];
     for (const q of qs) {
-      const found = findQuestion(q.facultyId, q.subject, q.questionId);
+      const found = findQuestion(q.subject, q.questionId);
       if (found) {
         resolved.push({
-          facultyId: q.facultyId,
           subject: q.subject,
           questionId: q.questionId,
           question: found.question,
@@ -133,17 +130,17 @@ export default function CollectionDetail({ collectionId }: Props) {
   const handleRemove = (it: ResolvedQuestion) => {
     if (isVirtualAll) {
       // Remove from every collection containing it
-      const ids = getCollectionsContaining(it.facultyId, it.subject, it.questionId);
+      const ids = getCollectionsContaining(it.subject, it.questionId);
       for (const id of ids) {
-        removeQuestionFromCollection(id, it.facultyId, it.subject, it.questionId);
+        removeQuestionFromCollection(id, it.subject, it.questionId);
       }
     } else {
-      removeQuestionFromCollection(collectionId, it.facultyId, it.subject, it.questionId);
+      removeQuestionFromCollection(collectionId, it.subject, it.questionId);
     }
     setItems((prev) =>
       prev.filter(
         (x) =>
-          !(x.facultyId === it.facultyId && x.subject === it.subject && String(x.questionId) === String(it.questionId))
+          !(x.subject === it.subject && String(x.questionId) === String(it.questionId))
       )
     );
   };

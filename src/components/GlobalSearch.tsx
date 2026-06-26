@@ -3,14 +3,12 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getSubjectData } from "@/lib/data";
-import { getActiveFaculties } from "@/config/faculties";
 import { normalizeText, getHighlightedSegments } from "@/lib/searchUtils";
 import type { Question } from "@/lib/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface SearchEntry {
-  facultyId: string;
   subject: SubjectKey;
   question: Question;
   chapterId: number;
@@ -70,39 +68,33 @@ let SEARCH_INDEX: SearchEntry[] | null = null;
 
 function buildSearchIndex(): SearchEntry[] {
   const entries: SearchEntry[] = [];
-  for (const faculty of getActiveFaculties()) {
-    for (const subj of faculty.subjects) {
-      const subject = subj.id as SubjectKey;
-      if (!SUBJECTS.includes(subject)) continue;
-      const data = getSubjectData(faculty.id, subject);
-      if (!data) continue;
-      for (const ch of data.chapters) {
-        if (ch.questions) {
-          for (const q of ch.questions) {
+  for (const subject of SUBJECTS) {
+    const data = getSubjectData(subject);
+    if (!data) continue;
+    for (const ch of data.chapters) {
+      if (ch.questions) {
+        for (const q of ch.questions) {
+          if (q.correct.length > 0) {
+            entries.push({
+              subject,
+              question: q,
+              chapterId: ch.id,
+              chapterName: ch.name,
+            });
+          }
+        }
+      }
+      if (ch.subchapters) {
+        for (const sub of ch.subchapters) {
+          for (const q of sub.questions) {
             if (q.correct.length > 0) {
               entries.push({
-                facultyId: faculty.id,
                 subject,
                 question: q,
                 chapterId: ch.id,
-                chapterName: ch.name,
+                chapterName: `${ch.name} › ${sub.name}`,
+                subchapterId: sub.id,
               });
-            }
-          }
-        }
-        if (ch.subchapters) {
-          for (const sub of ch.subchapters) {
-            for (const q of sub.questions) {
-              if (q.correct.length > 0) {
-                entries.push({
-                  facultyId: faculty.id,
-                  subject,
-                  question: q,
-                  chapterId: ch.id,
-                  chapterName: `${ch.name} › ${sub.name}`,
-                  subchapterId: sub.id,
-                });
-              }
             }
           }
         }
@@ -366,7 +358,7 @@ export default function GlobalSearch() {
                 const cfg = SUBJECT_CONFIG[entry.subject];
                 return (
                   <button
-                    key={`${entry.facultyId}-${entry.subject}-${entry.question.id}`}
+                    key={`${entry.subject}-${entry.question.id}`}
                     onClick={() => handleResultClick(entry)}
                     className="w-full text-left px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-100 dark:active:bg-gray-700/50 transition-colors tap-highlight"
                   >

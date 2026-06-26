@@ -9,7 +9,6 @@ import {
   filterValidQuestions,
   shuffleArray,
 } from "@/lib/data";
-import { getFaculty } from "@/config/faculties";
 import { isQuestionSaved } from "@/lib/collections";
 import SaveToCollectionModal from "@/components/SaveToCollectionModal";
 import CustomSlider from "@/components/CustomSlider";
@@ -23,8 +22,8 @@ interface TaggedQuestion extends Question {
 
 type Phase = "setup" | "active" | "results";
 
-function findProgressKey(facultyId: string, subject: string, qId: number | string): string {
-  const data = getSubjectData(facultyId, subject);
+function findProgressKey(subject: string, qId: number | string): string {
+  const data = getSubjectData(subject);
   if (!data) return "unknown";
   for (const ch of data.chapters) {
     if (ch.subchapters) {
@@ -46,19 +45,13 @@ function formatTime(ms: number): string {
   return `${min}:${sec.toString().padStart(2, "0")}`;
 }
 
-export default function QuickTestPage() {
+const SUBJECTS = [
+  { key: "biology", name: "Biologie", icon: "\u{1F9EC}" },
+  { key: "chemistry", name: "Chemie", icon: "⚗️" },
+  { key: "physics", name: "Fyzika", icon: "⚡" },
+];
 
-  const facultyId = "2lf";
-  const faculty = getFaculty(facultyId);
-  const SUBJECTS = useMemo(
-    () =>
-      (faculty?.subjects ?? []).map((s) => ({
-        key: s.id,
-        name: s.name,
-        icon: s.icon,
-      })),
-    [faculty]
-  );
+export default function QuickTestPage() {
   const backHref = "/";
 
   // Setup state
@@ -101,7 +94,7 @@ export default function QuickTestPage() {
     savedRef.current = true;
     const correctCount = results.filter((r) => r.correct).length;
     const subjects = [...new Set(results.map((r) => r.question._subject))];
-    saveTestResult("quick", facultyId, subjects, results.length, correctCount, Math.floor(elapsed / 1000));
+    saveTestResult("quick", subjects, results.length, correctCount, Math.floor(elapsed / 1000));
   }, [phase, results, elapsed]);
 
   const toggleSubject = (key: string) => {
@@ -119,7 +112,7 @@ export default function QuickTestPage() {
   const startTest = () => {
     const pool: TaggedQuestion[] = [];
     for (const subj of selectedSubjects) {
-      const qs = filterValidQuestions(getChapterQuestions(facultyId, subj, "all"));
+      const qs = filterValidQuestions(getChapterQuestions(subj, "all"));
       pool.push(...qs.map((q) => ({ ...q, _subject: subj })));
     }
     const shuffled = shuffleArray(pool).slice(0, count);
@@ -132,7 +125,7 @@ export default function QuickTestPage() {
     // Init bookmarks
     const bm = new Set<string>();
     for (const q of shuffled) {
-      if (isQuestionSaved(facultyId, q._subject, q.id)) bm.add(`${q._subject}-${q.id}`);
+      if (isQuestionSaved(q._subject, q.id)) bm.add(`${q._subject}-${q.id}`);
     }
     setBookmarked(bm);
     startTimeRef.current = Date.now();
@@ -167,8 +160,8 @@ export default function QuickTestPage() {
     const isCorrect =
       selectedArr.length === correctSet.size &&
       selectedArr.every((s) => correctSet.has(s));
-    const key = findProgressKey(facultyId, currentQuestion._subject, currentQuestion.id);
-    recordAnswer(facultyId, currentQuestion._subject, key, currentQuestion.id, isCorrect);
+    const key = findProgressKey(currentQuestion._subject, currentQuestion.id);
+    recordAnswer(currentQuestion._subject, key, currentQuestion.id, isCorrect);
     setResults((prev) => [
       ...prev,
       {
@@ -214,10 +207,10 @@ export default function QuickTestPage() {
   const subjectCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const s of SUBJECTS) {
-      counts[s.key] = filterValidQuestions(getChapterQuestions(facultyId, s.key, "all")).length;
+      counts[s.key] = filterValidQuestions(getChapterQuestions(s.key, "all")).length;
     }
     return counts;
-  }, [facultyId, SUBJECTS]);
+  }, []);
 
   const totalAvailable = useMemo(() => {
     let total = 0;
@@ -672,7 +665,6 @@ export default function QuickTestPage() {
 
       <SaveToCollectionModal
         open={bookmarkModalOpen && !!currentQuestion}
-        facultyId={facultyId}
         subject={currentQuestion?._subject ?? ""}
         questionId={currentQuestion?.id ?? ""}
         onClose={() => setBookmarkModalOpen(false)}

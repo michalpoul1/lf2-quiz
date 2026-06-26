@@ -16,7 +16,6 @@ import SaveToCollectionModal from "@/components/SaveToCollectionModal";
 import type { Question } from "@/lib/types";
 
 interface Props {
-  facultyId: string;
   subject: string;
   chapterParam: string;
   subchapterParam?: string;
@@ -28,14 +27,13 @@ interface Props {
 type QuizState = "setup" | "active" | "results";
 
 export default function QuizRunner({
-  facultyId,
   subject,
   chapterParam,
   subchapterParam,
   mode,
   startId,
 }: Props) {
-  const data = getSubjectData(facultyId, subject);
+  const data = getSubjectData(subject);
   const chapterId = chapterParam === "all" ? "all" : Number(chapterParam);
   const chapter =
     !data || chapterId === "all"
@@ -71,16 +69,16 @@ export default function QuizRunner({
   const sourceQuestions = useMemo(() => {
     if (subchapterParam && chapterId !== "all") {
       return filterValidQuestions(
-        getSubchapterQuestions(facultyId, subject, chapterId as number, subchapterParam)
+        getSubchapterQuestions(subject, chapterId as number, subchapterParam)
       );
     }
-    return filterValidQuestions(getChapterQuestions(facultyId, subject, chapterId));
-  }, [facultyId, subject, chapterId, subchapterParam]);
+    return filterValidQuestions(getChapterQuestions(subject, chapterId));
+  }, [subject, chapterId, subchapterParam]);
 
   const questions = useMemo(() => {
     let qs: Question[];
     if (mode === "wrong") {
-      const progress = getSubjectProgress(facultyId, subject);
+      const progress = getSubjectProgress(subject);
       const wrongIds = new Set<string>();
       if (chapterId === "all") {
         for (const cp of Object.values(progress)) {
@@ -117,11 +115,11 @@ export default function QuizRunner({
   useEffect(() => {
     const bm = new Set<string>();
     for (const q of sourceQuestions) {
-      if (isQuestionSaved(facultyId, subject, q.id)) bm.add(String(q.id));
+      if (isQuestionSaved(subject, q.id)) bm.add(String(q.id));
     }
     setBookmarked(bm);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [facultyId, subject]);
+  }, [subject]);
 
   const handleOpenBookmark = (qId: number | string) => {
     setModalQuestionId(qId);
@@ -170,7 +168,7 @@ export default function QuizRunner({
       selectedArr.every((s) => correctSet.has(s));
 
     const key = findProgressKey(currentQuestion.id);
-    recordAnswer(facultyId, subject, key, currentQuestion.id, isCorrect);
+    recordAnswer(subject, key, currentQuestion.id, isCorrect);
     setResults((prev) => [
       ...prev,
       { questionId: currentQuestion.id, correct: isCorrect },
@@ -543,7 +541,7 @@ export default function QuizRunner({
             {/* Explanation toggle & card */}
             {(() => {
               const isCorrect = selectedCorrectCount === correctSet.size && selected.size === correctSet.size;
-              const explanation = getExplanation(facultyId, subject, currentQuestion.id);
+              const explanation = getExplanation(subject, currentQuestion.id);
               return (
                 <>
                   {!showExplanation && (
@@ -608,7 +606,6 @@ export default function QuizRunner({
 
       <SaveToCollectionModal
         open={modalQuestionId !== null}
-        facultyId={facultyId}
         subject={subject}
         questionId={modalQuestionId ?? ""}
         onClose={() => setModalQuestionId(null)}

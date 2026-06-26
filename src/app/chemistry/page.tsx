@@ -3,5 +3,5 @@
 import ChapterList from "@/components/ChapterList";
 
 export default function ChemistryPage() {
-  return <ChapterList facultyId="2lf" subject="chemistry" subjectName="Chemie" />;
+  return <ChapterList subject="chemistry" subjectName="Chemie" />;
 }

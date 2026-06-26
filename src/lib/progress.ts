@@ -2,7 +2,10 @@ import type { SubjectProgress, ChapterProgress } from "./types";
 
 const STORAGE_KEY = "lf2-quiz-progress";
 const LEGACY_SUBJECT_KEYS = new Set(["biology", "chemistry", "physics"]);
-const DEFAULT_FACULTY = "2lf";
+
+// Storage shape stays nested under the 2lf namespace so existing users keep
+// their progress. Don't flatten without a migration.
+const FACULTY = "2lf";
 
 type FacultyProgress = Record<string, SubjectProgress>;
 type AllProgress = Record<string, FacultyProgress>;
@@ -16,7 +19,7 @@ function migrateIfNeeded(raw: unknown): AllProgress {
   const topKeys = Object.keys(obj);
   const looksLegacy = topKeys.some((k) => LEGACY_SUBJECT_KEYS.has(k));
   if (!looksLegacy) return obj as AllProgress;
-  // Move top-level subject entries under "2lf".
+  // Move top-level subject entries under the 2lf bucket.
   const migrated: AllProgress = {};
   const legacyFacultyBucket: FacultyProgress = {};
   for (const [k, v] of Object.entries(obj)) {
@@ -28,8 +31,8 @@ function migrateIfNeeded(raw: unknown): AllProgress {
     }
   }
   if (Object.keys(legacyFacultyBucket).length > 0) {
-    migrated[DEFAULT_FACULTY] = {
-      ...(migrated[DEFAULT_FACULTY] || {}),
+    migrated[FACULTY] = {
+      ...(migrated[FACULTY] || {}),
       ...legacyFacultyBucket,
     };
   }
@@ -61,28 +64,23 @@ function saveAll(data: AllProgress) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-export function getSubjectProgress(
-  facultyId: string,
-  subject: string
-): SubjectProgress {
+export function getSubjectProgress(subject: string): SubjectProgress {
   const all = getAll();
-  return all[facultyId]?.[subject] || {};
+  return all[FACULTY]?.[subject] || {};
 }
 
 export function getChapterProgress(
-  facultyId: string,
   subject: string,
   chapterId: number | string
 ): ChapterProgress {
-  const sp = getSubjectProgress(facultyId, subject);
+  const sp = getSubjectProgress(subject);
   return sp[String(chapterId)] || { answered: 0, correct: 0, wrongIds: [] };
 }
 
 export function getTotalProgress(
-  facultyId: string,
   subject: string
 ): { answered: number; correct: number } {
-  const sp = getSubjectProgress(facultyId, subject);
+  const sp = getSubjectProgress(subject);
   let answered = 0;
   let correct = 0;
   for (const ch of Object.values(sp)) {
@@ -93,15 +91,14 @@ export function getTotalProgress(
 }
 
 export function recordAnswer(
-  facultyId: string,
   subject: string,
   chapterId: number | string,
   questionId: number | string,
   isCorrect: boolean
 ) {
   const all = getAll();
-  if (!all[facultyId]) all[facultyId] = {};
-  const fp = all[facultyId];
+  if (!all[FACULTY]) all[FACULTY] = {};
+  const fp = all[FACULTY];
   if (!fp[subject]) fp[subject] = {};
   const key = String(chapterId);
   if (!fp[subject][key]) {
@@ -120,11 +117,11 @@ export function recordAnswer(
   saveAll(all);
 }
 
-export function resetProgress(facultyId: string, subject: string) {
+export function resetProgress(subject: string) {
   const all = getAll();
-  if (all[facultyId]) {
-    delete all[facultyId][subject];
-    if (Object.keys(all[facultyId]).length === 0) delete all[facultyId];
+  if (all[FACULTY]) {
+    delete all[FACULTY][subject];
+    if (Object.keys(all[FACULTY]).length === 0) delete all[FACULTY];
   }
   saveAll(all);
 }

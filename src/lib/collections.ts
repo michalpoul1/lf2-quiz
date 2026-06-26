@@ -3,13 +3,17 @@
  *
  * Replaces the old "lf2-quiz-bookmarks" flat list with named, colored
  * collections. On first read, any old bookmarks are migrated into a
- * collection named "Neuřazené". Entries are tagged with facultyId;
- * legacy entries without one are migrated to "2lf".
+ * collection named "Neuřazené". The stored `CollectionQuestion.facultyId`
+ * field is retained for backwards compatibility with existing localStorage
+ * data; internally we always use the 2lf namespace.
  */
 
 const STORAGE_KEY = "lf2-quiz-collections";
 const OLD_BOOKMARKS_KEY = "lf2-quiz-bookmarks";
-const DEFAULT_FACULTY = "2lf";
+
+// Storage shape stays nested under the 2lf namespace so existing users keep
+// their bookmarks. Don't flatten without a migration.
+const FACULTY = "2lf";
 
 export interface CollectionQuestion {
   facultyId: string;
@@ -56,7 +60,7 @@ function normalizeFacultyIds(data: CollectionsData): {
   for (const c of data.collections) {
     for (const q of c.questions) {
       if (!q.facultyId) {
-        q.facultyId = DEFAULT_FACULTY;
+        q.facultyId = FACULTY;
         changed = true;
       }
     }
@@ -172,14 +176,13 @@ export function unpinCollection(id: string): void {
  * `targetCollectionIds` is the desired full set the question should be in.
  */
 export function setQuestionCollections(
-  facultyId: string,
   subject: string,
   questionId: number | string,
   targetCollectionIds: string[]
 ): void {
   const data = readRaw();
   const target = new Set(targetCollectionIds);
-  const q: CollectionQuestion = { facultyId, subject, questionId };
+  const q: CollectionQuestion = { facultyId: FACULTY, subject, questionId };
   for (const c of data.collections) {
     const has = c.questions.some((cq) => sameQuestion(cq, q));
     if (target.has(c.id) && !has) {
@@ -193,7 +196,6 @@ export function setQuestionCollections(
 
 export function removeQuestionFromCollection(
   collectionId: string,
-  facultyId: string,
   subject: string,
   questionId: number | string
 ): void {
@@ -201,18 +203,17 @@ export function removeQuestionFromCollection(
   const c = data.collections.find((c) => c.id === collectionId);
   if (!c) return;
   c.questions = c.questions.filter(
-    (cq) => !sameQuestion(cq, { facultyId, subject, questionId })
+    (cq) => !sameQuestion(cq, { facultyId: FACULTY, subject, questionId })
   );
   writeRaw(data);
 }
 
 export function getCollectionsContaining(
-  facultyId: string,
   subject: string,
   questionId: number | string
 ): string[] {
   const data = readRaw();
-  const q: CollectionQuestion = { facultyId, subject, questionId };
+  const q: CollectionQuestion = { facultyId: FACULTY, subject, questionId };
   return data.collections
     .filter((c) => c.questions.some((cq) => sameQuestion(cq, q)))
     .map((c) => c.id);
@@ -223,11 +224,10 @@ export function getCollectionsContaining(
  * decide whether to display a filled-in bookmark icon).
  */
 export function isQuestionSaved(
-  facultyId: string,
   subject: string,
   questionId: number | string
 ): boolean {
-  return getCollectionsContaining(facultyId, subject, questionId).length > 0;
+  return getCollectionsContaining(subject, questionId).length > 0;
 }
 
 /**
@@ -265,7 +265,7 @@ function migrateOldBookmarks(): void {
     for (const [subject, ids] of Object.entries(oldData || {})) {
       if (!Array.isArray(ids)) continue;
       for (const id of ids)
-        flat.push({ facultyId: DEFAULT_FACULTY, subject, questionId: id });
+        flat.push({ facultyId: FACULTY, subject, questionId: id });
     }
     if (flat.length === 0) {
       localStorage.removeItem(OLD_BOOKMARKS_KEY);
