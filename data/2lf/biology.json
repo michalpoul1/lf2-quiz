@@ -159,7 +159,7 @@
             },
             {
               "letter": "d",
-              "text": "se potomci jednoho rodičovského páru od sebe zpravidla odlišují, poně- vadž se rodičovské vlohy dědí v různých kombinacích"
+              "text": "se potomci jednoho rodičovského páru od sebe zpravidla odlišují, poněvadž se rodičovské vlohy dědí v různých kombinacích"
             }
           ],
           "correct": [
@@ -196,7 +196,7 @@
         },
         {
           "id": 8,
-          "text": "Vyberte správně spárované pojmy (tj. spojení příslušného oboru a pro- blematiky, která patří do hlavního okruhu jeho zájmu):",
+          "text": "Vyberte správně spárované pojmy (tj. spojení příslušného oboru a problematiky, která patří do hlavního okruhu jeho zájmu):",
           "options": [
             {
               "letter": "a",
@@ -349,7 +349,7 @@
         },
         {
           "id": 14,
-          "text": "Nejvýznamnější molekulou, v níž se v buňkách ukládá chemická ener- gie, je:",
+          "text": "Nejvýznamnější molekulou, v níž se v buňkách ukládá chemická energie, je:",
           "options": [
             {
               "letter": "a",
@@ -484,15 +484,15 @@
             },
             {
               "letter": "b",
-              "text": "Výchozím substrátem glykolýzy je CO  . 2"
+              "text": "Výchozím substrátem glykolýzy je CO. 2"
             },
             {
               "letter": "c",
-              "text": "Obligátně anaerobní prokaryota mohou dlouhou dobu přežívat za pří- tomnosti kyslíku."
+              "text": "Obligátně anaerobní prokaryota mohou dlouhou dobu přežívat za přítomnosti kyslíku."
             },
             {
               "letter": "d",
-              "text": "Biologická denitrifikace probíhá zpravidla v anaerobním prostředí a je- jím produktem je molekulární dusík (N ). 2"
+              "text": "Biologická denitrifikace probíhá zpravidla v anaerobním prostředí a jejím produktem je molekulární dusík (N ). 2"
             }
           ],
           "correct": [
@@ -658,7 +658,7 @@
         },
         {
           "id": 26,
-          "text": "Z chemického hlediska je společným znakem chlorofylu a hemu (nepro- teinové složky hemoglobinu):",
+          "text": "Z chemického hlediska je společným znakem chlorofylu a hemu (neproteinové složky hemoglobinu):",
           "options": [
             {
               "letter": "a",
@@ -743,7 +743,7 @@
             },
             {
               "letter": "b",
-              "text": "Esenciální aminokyseliny není lidské tělo schopno samo syntetizovat ."
+              "text": "Esenciální aminokyseliny není lidské tělo schopno samo syntetizovat."
             },
             {
               "letter": "c",
@@ -751,7 +751,7 @@
             },
             {
               "letter": "d",
-              "text": "Esenciální aminokyseliny je třeba přijímat jako složky potravy ."
+              "text": "Esenciální aminokyseliny je třeba přijímat jako složky potravy."
             }
           ],
           "correct": [
@@ -779,7 +779,7 @@
             },
             {
               "letter": "d",
-              "text": "je soubor procesů, při nichž převažuje přeměna strukturně složitějších látek na menší, chemicky jednodušší molekuly Buněčná biologie"
+              "text": "je soubor procesů, při nichž převažuje přeměna strukturně složitějších látek na menší, chemicky jednodušší molekuly"
             }
           ],
           "correct": [
@@ -821,7 +821,7 @@
         },
         {
           "id": 32,
-          "text": "Vyberte skupinu, která obsahuje výhradně jednobuněčné (nikoliv nebu- něčné nebo mnohobuněčné!) organismy:",
+          "text": "Vyberte skupinu, která obsahuje výhradně jednobuněčné (nikoliv nebuněčné nebo mnohobuněčné!) organismy:",
           "options": [
             {
               "letter": "a",
@@ -854,7 +854,7 @@
             },
             {
               "letter": "b",
-              "text": "splynutí dvou celých (zpravidla mnohobuněčných) jedinců známé u ně- kterých primitivních bezobratlých"
+              "text": "splynutí dvou celých (zpravidla mnohobuněčných) jedinců známé u některých primitivních bezobratlých"
             },
             {
               "letter": "c",
@@ -1297,7 +1297,7 @@
             },
             {
               "letter": "d",
-              "text": "pro eukaryotní buňky je charakteristický nízký počet membránových organel a neohraničený nukleoid tvořeným jediným kruhovým chromozo- mem, uloženým v cytoplazmě"
+              "text": "pro eukaryotní buňky je charakteristický nízký počet membránových organel a neohraničený nukleoid tvořeným jediným kruhovým chromozomem, uloženým v cytoplazmě"
             }
           ],
           "correct": [
@@ -1389,7 +1389,7 @@
         },
         {
           "id": 54,
-          "text": "Je-li osmotická hodnota vnějšího prostředí shodná s osmotickou hod- notou buněčného obsahu, nachází se buňka v prostředí:",
+          "text": "Je-li osmotická hodnota vnějšího prostředí shodná s osmotickou hodnotou buněčného obsahu, nachází se buňka v prostředí:",
           "options": [
             {
               "letter": "a",
@@ -1555,7 +1555,7 @@
             },
             {
               "letter": "b",
-              "text": "se mikrotubuly dělicího vřeténka se prodlužují, a tím oddalují chromo- zomy od centriolů"
+              "text": "se mikrotubuly dělicího vřeténka se prodlužují, a tím oddalují chromozomy od centriolů"
             },
             {
               "letter": "c",
@@ -1609,7 +1609,7 @@
             },
             {
               "letter": "b",
-              "text": "vznikají u živočichů dvě dceřiné buňky tvorbou buněčné přepážky v nit- ru buňky mateřské"
+              "text": "vznikají u živočichů dvě dceřiné buňky tvorbou buněčné přepážky v nitru buňky mateřské"
             },
             {
               "letter": "c",
@@ -1678,7 +1678,7 @@
         },
         {
           "id": 65,
-          "text": "Buňky s jednou sadou chromozomů (tj. které mají od každého chromo- zomového páru jen jeden homologický chromozom) se nazývají:",
+          "text": "Buňky s jednou sadou chromozomů (tj. které mají od každého chromozomového páru jen jeden homologický chromozom) se nazývají:",
           "options": [
             {
               "letter": "a",
@@ -1856,7 +1856,7 @@
         },
         {
           "id": 72,
-          "text": "Která (popř. které) z uvedených buněčných organel obsahují membrá- nové struktury?",
+          "text": "Která (popř. které) z uvedených buněčných organel obsahují membránové struktury?",
           "options": [
             {
               "letter": "a",
@@ -1909,7 +1909,7 @@
         },
         {
           "id": 74,
-          "text": "Vyberte skupinu (popř. skupiny) obsahující výhradně názvy těch or- ganel a struktur, které můžeme nalézt ve zdravých (neinfikovaných) euka- ryotních buňkách:",
+          "text": "Vyberte skupinu (popř. skupiny) obsahující výhradně názvy těch organel a struktur, které můžeme nalézt ve zdravých (neinfikovaných) eukaryotních buňkách:",
           "options": [
             {
               "letter": "a",
@@ -1978,7 +1978,7 @@
             },
             {
               "letter": "d",
-              "text": "dodává do endoplazmatického retikula proteiny určené k dalším chemic- kým úpravám, popř. k sekreci mimo buňku"
+              "text": "dodává do endoplazmatického retikula proteiny určené k dalším chemickým úpravám, popř. k sekreci mimo buňku"
             }
           ],
           "correct": [
@@ -2083,7 +2083,7 @@
             },
             {
               "letter": "d",
-              "text": "u savčích buněk se nikdy bičíky nevyskytují, stavba bičíků prvoků (pro- tistů) a bakterií je téměř shodná"
+              "text": "u savčích buněk se nikdy bičíky nevyskytují, stavba bičíků prvoků (protistů) a bakterií je téměř shodná"
             }
           ],
           "correct": [
@@ -2109,7 +2109,7 @@
             },
             {
               "letter": "d",
-              "text": "znamená, že samci mají dva stejné pohlavní chromozomy, zatímco u sa- mic se pohlavní chromozomy výrazně morfologicky liší"
+              "text": "znamená, že samci mají dva stejné pohlavní chromozomy, zatímco u samic se pohlavní chromozomy výrazně morfologicky liší"
             }
           ],
           "correct": [
@@ -2122,7 +2122,11 @@
           "options": [
             {
               "letter": "a",
-              "text": "samice XY, samci XX 202110401, afc92a0a-cb9ba-4cc4-9)745-6c3 1467cs07d8, 03.a10.2021 1m7:29:29 ice XX, samci XY"
+              "text": "samice XY, samci XX"
+            },
+            {
+              "letter": "b",
+              "text": "samice XX, samci XY"
             },
             {
               "letter": "c",
@@ -2143,7 +2147,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "jsou z genetického hlediska zcela odlišné a neobsahují žádný homolo- gický úsek"
+              "text": "jsou z genetického hlediska zcela odlišné a neobsahují žádný homologický úsek"
             },
             {
               "letter": "b",
@@ -2259,7 +2263,7 @@
             },
             {
               "letter": "d",
-              "text": "vzniká při překřížení homologických chromozomů během meiózy a pro- bíhá zde crossing-over"
+              "text": "vzniká při překřížení homologických chromozomů během meiózy a probíhá zde crossing-over"
             }
           ],
           "correct": [
@@ -2336,7 +2340,7 @@
             },
             {
               "letter": "d",
-              "text": "komplexem proteinů a lipidů jaderného obalu; DNA je rozpuštěna v ka- ryoplazmě, a proto není integrální součástí chromozomů"
+              "text": "komplexem proteinů a lipidů jaderného obalu; DNA je rozpuštěna v karyoplazmě, a proto není integrální součástí chromozomů"
             }
           ],
           "correct": [
@@ -2462,7 +2466,7 @@
             },
             {
               "letter": "c",
-              "text": "vznikají dvakrát opakovaným mitotickým dělením diploidních prekur- zorových buněk"
+              "text": "vznikají dvakrát opakovaným mitotickým dělením diploidních prekurzorových buněk"
             },
             {
               "letter": "d",
@@ -2487,7 +2491,7 @@
             },
             {
               "letter": "c",
-              "text": "pouze z M fáze, ostatní fáze tvoří tzv. interfázi, která není součástí bu- něčného cyklu"
+              "text": "pouze z M fáze, ostatní fáze tvoří tzv. interfázi, která není součástí buněčného cyklu"
             },
             {
               "letter": "d",
@@ -2504,7 +2508,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "proteinová vláknitá částice (typ mikrotubulu), na kterou se teprve v prů- běhu mitózy naváže DNA"
+              "text": "proteinová vláknitá částice (typ mikrotubulu), na kterou se teprve v průběhu mitózy naváže DNA"
             },
             {
               "letter": "b",
@@ -2516,7 +2520,7 @@
             },
             {
               "letter": "d",
-              "text": "struktura obsahující velký podíl funkčních molekul RNA, která je slo- žena ze dvou podjednotek, malé a velké"
+              "text": "struktura obsahující velký podíl funkčních molekul RNA, která je složena ze dvou podjednotek, malé a velké"
             }
           ],
           "correct": [
@@ -2559,11 +2563,11 @@
             },
             {
               "letter": "b",
-              "text": "jsou jednotlivé konkrétní geny vlivem crossing-overu zpřeházeny (tak- že je každý člověk má v jiném pořadí), ale vždy zůstávají na jednom chromozomu"
+              "text": "jsou jednotlivé konkrétní geny vlivem crossing-overu zpřeházeny (takže je každý člověk má v jiném pořadí), ale vždy zůstávají na jednom chromozomu"
             },
             {
               "letter": "c",
-              "text": "se nacházejí různé geny, které mohou být vlivem crossing-overu přítom- ny i na jiných chromozomech"
+              "text": "se nacházejí různé geny, které mohou být vlivem crossing-overu přítomny i na jiných chromozomech"
             },
             {
               "letter": "d",
@@ -3022,7 +3026,7 @@
             },
             {
               "letter": "b",
-              "text": "je u buněk rýhujících se zárodků zpravidla kratší než u buněk procháze- jících závěrečnými fázemi diferenciace"
+              "text": "je u buněk rýhujících se zárodků zpravidla kratší než u buněk procházejících závěrečnými fázemi diferenciace"
             },
             {
               "letter": "c",
@@ -3108,7 +3112,7 @@
             },
             {
               "letter": "d",
-              "text": "vždy po skončení činnosti reparačních mechanismů v různých fázích bu- něčného cyklu"
+              "text": "vždy po skončení činnosti reparačních mechanismů v různých fázích buněčného cyklu"
             }
           ],
           "correct": [
@@ -3227,7 +3231,7 @@
             },
             {
               "letter": "b",
-              "text": "tabulka obsahující vyobrazení (např. fotografie) identifikovaných chro- mozomů seřazených podle tvaru a velikosti"
+              "text": "tabulka obsahující vyobrazení (např. fotografie) identifikovaných chromozomů seřazených podle tvaru a velikosti"
             },
             {
               "letter": "c",
@@ -3329,7 +3333,7 @@
             },
             {
               "letter": "b",
-              "text": "je obecné označení pro všechny chromozomy, jejichž krátká (p-) ramén- ka a dlouhá (q-) raménka mají stejnou délku"
+              "text": "je obecné označení pro všechny chromozomy, jejichž krátká (p-) raménka a dlouhá (q-) raménka mají stejnou délku"
             },
             {
               "letter": "c",
@@ -3563,7 +3567,7 @@
             },
             {
               "letter": "b",
-              "text": "bičík u eukaryot obsahuje 9 párů mikrofilament na periferii a dvě jed- notlivá centrální mikrofilamenta"
+              "text": "bičík u eukaryot obsahuje 9 párů mikrofilament na periferii a dvě jednotlivá centrální mikrofilamenta"
             },
             {
               "letter": "c",
@@ -3656,7 +3660,7 @@
         },
         {
           "id": 142,
-          "text": "K rekombinaci genetického materiálu v průběhu meiotického dělení do- chází u lidských buněk zpravidla:",
+          "text": "K rekombinaci genetického materiálu v průběhu meiotického dělení dochází u lidských buněk zpravidla:",
           "options": [
             {
               "letter": "a",
@@ -3818,7 +3822,7 @@
             },
             {
               "letter": "b",
-              "text": "nacházíme většinou více chromozomů než 46, protože při vývinu ery- trocytu dochází k polyploidizaci buňky"
+              "text": "nacházíme většinou více chromozomů než 46, protože při vývinu erytrocytu dochází k polyploidizaci buňky"
             },
             {
               "letter": "c",
@@ -3941,7 +3945,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "dva typy: epitelová a pojivová; ostatní tkáně jsou pouze zvláštními for- mami těchto dvou typů"
+              "text": "dva typy: epitelová a pojivová; ostatní tkáně jsou pouze zvláštními formami těchto dvou typů"
             },
             {
               "letter": "b",
@@ -3978,7 +3982,7 @@
             },
             {
               "letter": "d",
-              "text": "je obecné označení pro velmi malý chrozom, který nelze pozorovat optickým mikroskopem Molekulární biologie"
+              "text": "je obecné označení pro velmi malý chrozom, který nelze pozorovat optickým mikroskopem"
             }
           ],
           "correct": [
@@ -4002,7 +4006,7 @@
             },
             {
               "letter": "b",
-              "text": "tvorba krátkých úseků DNA (Okazakiho fragmentů), které jsou spojo- vány DNA-ligázou"
+              "text": "tvorba krátkých úseků DNA (Okazakiho fragmentů), které jsou spojovány DNA-ligázou"
             },
             {
               "letter": "c",
@@ -4076,7 +4080,7 @@
         },
         {
           "id": 158,
-          "text": "Vyberte pravidla, která ve dvoušroubovici DNA platí pro poměr- né zastoupení jednotlivých bází (A – adenin, G – guanin, C – cytosin, T – thymin):",
+          "text": "Vyberte pravidla, která ve dvoušroubovici DNA platí pro poměrné zastoupení jednotlivých bází (A – adenin, G – guanin, C – cytosin, T – thymin):",
           "options": [
             {
               "letter": "a",
@@ -4205,7 +4209,7 @@
         },
         {
           "id": 163,
-          "text": "Polypeptidový řetězec bakteriální bílkoviny je tvořen 202 aminokyse- linami. Jaká bude délka příslušné kódující sekvence příslušné mRNA (bez STOP kodonu)?",
+          "text": "Polypeptidový řetězec bakteriální bílkoviny je tvořen 202 aminokyselinami. Jaká bude délka příslušné kódující sekvence příslušné mRNA (bez STOP kodonu)?",
           "options": [
             {
               "letter": "a",
@@ -4370,7 +4374,7 @@
             },
             {
               "letter": "c",
-              "text": "v DNA se purinové báze vždy párují s purinovými bázemi a pyrimidi- nové s pyrimidinovými"
+              "text": "v DNA se purinové báze vždy párují s purinovými bázemi a pyrimidinové s pyrimidinovými"
             },
             {
               "letter": "d",
@@ -4436,7 +4440,7 @@
         },
         {
           "id": 172,
-          "text": "Které z uvedených procesů jsou zahrnuty v ústředním dogmatu mo- lekulární biologie?",
+          "text": "Které z uvedených procesů jsou zahrnuty v ústředním dogmatu molekulární biologie?",
           "options": [
             {
               "letter": "a",
@@ -4589,7 +4593,7 @@
         },
         {
           "id": 178,
-          "text": "Aminokyseliny určené pro syntézu polypeptidového řetězce jsou spe- cificky navázány na molekuly:",
+          "text": "Aminokyseliny určené pro syntézu polypeptidového řetězce jsou specificky navázány na molekuly:",
           "options": [
             {
               "letter": "a",
@@ -4706,7 +4710,7 @@
             },
             {
               "letter": "c",
-              "text": "Triplet nukleotidů v mRNA, který určuje zařazení jedné aminokyseliny do p2021o10401, afc9l2a0a-yc9ba-4cc4-9p745-6c3146e7c07d8, 0p3.10.2021 1t7:29:2i9dového řetězce."
+              "text": "Triplet nukleotidů v mRNA, který určuje zařazení jedné aminokyseliny do polypeptidového řetězce."
             },
             {
               "letter": "d",
@@ -4761,7 +4765,7 @@
             },
             {
               "letter": "d",
-              "text": "Primární struktura proteinů je dána sekvencí aminokyselin ."
+              "text": "Primární struktura proteinů je dána sekvencí aminokyselin."
             }
           ],
           "correct": [
@@ -4804,7 +4808,7 @@
             },
             {
               "letter": "b",
-              "text": "tento děj se odehrává většinou v jádře, v menší míře také v mitochon- driích a plastidech"
+              "text": "tento děj se odehrává většinou v jádře, v menší míře také v mitochondriích a plastidech"
             },
             {
               "letter": "c",
@@ -4978,11 +4982,11 @@
           "options": [
             {
               "letter": "a",
-              "text": "mRNA, na níž komplementárním kodonem nasedá tRNA nesoucí spe- cifickou aminokyselinu"
+              "text": "mRNA, na níž komplementárním kodonem nasedá tRNA nesoucí specifickou aminokyselinu"
             },
             {
               "letter": "b",
-              "text": "tRNA, na níž komplementárním kodonem nasedá mRNA nesoucí spe- cifickou aminokyselinu"
+              "text": "tRNA, na níž komplementárním kodonem nasedá mRNA nesoucí specifickou aminokyselinu"
             },
             {
               "letter": "c",
@@ -5007,7 +5011,7 @@
             },
             {
               "letter": "b",
-              "text": "počtu a pořadí nepostradatelných aminokyselin a na vzájemném uspořá- dání fosfodiesterovýchvazeb v polypeptidovém řetězci"
+              "text": "počtu a pořadí nepostradatelných aminokyselin a na vzájemném uspořádání fosfodiesterovýchvazeb v polypeptidovém řetězci"
             },
             {
               "letter": "c",
@@ -5111,7 +5115,7 @@
             },
             {
               "letter": "c",
-              "text": "jsou nové molekuly DNA složeny z úseků dvouřetězců nové a dvouře- tězců staré DNA"
+              "text": "jsou nové molekuly DNA složeny z úseků dvouřetězců nové a dvouřetězců staré DNA"
             },
             {
               "letter": "d",
@@ -5128,11 +5132,11 @@
           "options": [
             {
               "letter": "a",
-              "text": "mRNA na ribozomu, na niž komplementárně nasedá tRNA nesoucí spe- cifickou aminokyselinu"
+              "text": "mRNA na ribozomu, na niž komplementárně nasedá tRNA nesoucí specifickou aminokyselinu"
             },
             {
               "letter": "b",
-              "text": "mRNA na ribozomu, na niž antikodonem nasedá tRNA nesoucí speci- fickou aminokyselinu"
+              "text": "mRNA na ribozomu, na niž antikodonem nasedá tRNA nesoucí specifickou aminokyselinu"
             },
             {
               "letter": "c",
@@ -5168,7 +5172,7 @@
             },
             {
               "letter": "d",
-              "text": "dusíkaté báze guanin (G), adenin (A), uracil (U), thymin (T), cukr deo- xyribózu a fosfátovou skupinu"
+              "text": "dusíkaté báze guanin (G), adenin (A), uracil (U), thymin (T), cukr deoxyribózu a fosfátovou skupinu"
             }
           ],
           "correct": [
@@ -5202,7 +5206,7 @@
         },
         {
           "id": 202,
-          "text": "Kolik různých typů dusíkatých bazí nacházíme v nukleových kyseli- nách (tj. v DNA i v RNA dohromady)? (Neuvažujte tzv. minoritní báze.)",
+          "text": "Kolik různých typů dusíkatých bazí nacházíme v nukleových kyselinách (tj. v DNA i v RNA dohromady)? (Neuvažujte tzv. minoritní báze.)",
           "options": [
             {
               "letter": "a",
@@ -5328,7 +5332,7 @@
         },
         {
           "id": 207,
-          "text": "Známe-li percentuální podíl thyminu mezi ostatními bázemi ve dvoj- řetězcové DNA, můžeme z něj vypočítat:",
+          "text": "Známe-li percentuální podíl thyminu mezi ostatními bázemi ve dvojřetězcové DNA, můžeme z něj vypočítat:",
           "options": [
             {
               "letter": "a",
@@ -5353,7 +5357,7 @@
         },
         {
           "id": 208,
-          "text": "Jaká minimální informace o prvním řetězci postačuje k jednoznač- nému odvození sekvence druhého řetězce dvouřetězcové DNA?",
+          "text": "Jaká minimální informace o prvním řetězci postačuje k jednoznačnému odvození sekvence druhého řetězce dvouřetězcové DNA?",
           "options": [
             {
               "letter": "a",
@@ -5365,7 +5369,7 @@
             },
             {
               "letter": "c",
-              "text": "je třeba znát délku řetězce a v něm přesné pozice bází guaninu (G), cy- tosinu (C) a adeninu (A)"
+              "text": "je třeba znát délku řetězce a v něm přesné pozice bází guaninu (G), cytosinu (C) a adeninu (A)"
             },
             {
               "letter": "d",
@@ -5611,7 +5615,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "se může podle jedné molekuly mRNA syntetizovat mnoho různých pro- teinů s odlišnou sekvencí aminokyselin"
+              "text": "se může podle jedné molekuly mRNA syntetizovat mnoho různých proteinů s odlišnou sekvencí aminokyselin"
             },
             {
               "letter": "b",
@@ -5772,7 +5776,7 @@
             },
             {
               "letter": "c",
-              "text": "je sekvence tří nukleotidů, která vzniká výhradně následkem muta- ce; v normálních (nemutovaných) molekulách nukleových kyselin ji nenalézáme"
+              "text": "je sekvence tří nukleotidů, která vzniká výhradně následkem mutace; v normálních (nemutovaných) molekulách nukleových kyselin ji nenalézáme"
             },
             {
               "letter": "d",
@@ -5917,7 +5921,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "části sekvence genu, které jsou vyštěpeny v procesu úprav, jejichž vý- sledkem je mRNA"
+              "text": "části sekvence genu, které jsou vyštěpeny v procesu úprav, jejichž výsledkem je mRNA"
             },
             {
               "letter": "b",
@@ -5964,7 +5968,7 @@
         },
         {
           "id": 232,
-          "text": "Srovnáme-li aminokyselinovou sekvenci určitého proteinu, např. sva- lového myosinu, člověka a myši:",
+          "text": "Srovnáme-li aminokyselinovou sekvenci určitého proteinu, např. svalového myosinu, člověka a myši:",
           "options": [
             {
               "letter": "a",
@@ -6150,7 +6154,7 @@
             },
             {
               "letter": "b",
-              "text": "jev, kdy dochází k opakování podobných sekvencí DNA u různých or- ganismů, zejména evolučně příbuzných"
+              "text": "jev, kdy dochází k opakování podobných sekvencí DNA u různých organismů, zejména evolučně příbuzných"
             },
             {
               "letter": "c",
@@ -6208,7 +6212,7 @@
             },
             {
               "letter": "d",
-              "text": "typ chromozomové aberace, při které dochází k vzájemné výměně gene- tického materiálu mezi dvěma i více různými chromozomy"
+              "text": "typ chromozomové aberace, při které dochází k vzájemné výměně genetického materiálu mezi dvěma i více různými chromozomy"
             }
           ],
           "correct": [
@@ -6246,7 +6250,11 @@
           "options": [
             {
               "letter": "a",
-              "text": "ne, protože sekvence aminokyselin není závislá na sekvenci mRNA ale na sekvenci tRNA no, protože se jedná o mutaci"
+              "text": "ne, protože sekvence aminokyselin není závislá na sekvenci mRNA ale na sekvenci tRNA"
+            },
+            {
+              "letter": "b",
+              "text": "ano, protože se jedná o mutaci"
             },
             {
               "letter": "c",
@@ -6504,7 +6512,7 @@
         },
         {
           "id": 253,
-          "text": "Proteiny, které plní nějakou funkci v buněčném jádře, jsou syntetizo- vány:",
+          "text": "Proteiny, které plní nějakou funkci v buněčném jádře, jsou syntetizovány:",
           "options": [
             {
               "letter": "a",
@@ -6529,7 +6537,7 @@
         },
         {
           "id": 254,
-          "text": "Při párování purinových a pyrimidinových bazí mezi protilehlými po- lynukleotidovými řetězci v dvoušroubovicové molekule DNA platí princip:",
+          "text": "Při párování purinových a pyrimidinových bazí mezi protilehlými polynukleotidovými řetězci v dvoušroubovicové molekule DNA platí princip:",
           "options": [
             {
               "letter": "a",
@@ -6656,7 +6664,7 @@
         },
         {
           "id": 259,
-          "text": "Vyberte správné, popř. správná tvrzení o hybridizaci (míněna je mo- lekulárně genetická technika, nikoli křížení organismů):",
+          "text": "Vyberte správné, popř. správná tvrzení o hybridizaci (míněna je molekulárně genetická technika, nikoli křížení organismů):",
           "options": [
             {
               "letter": "a",
@@ -6668,7 +6676,7 @@
             },
             {
               "letter": "c",
-              "text": "Ke každé hybridizaci potřebujeme minimálně dvojici primerů a termo- stabilní DNA polymerázu."
+              "text": "Ke každé hybridizaci potřebujeme minimálně dvojici primerů a termostabilní DNA polymerázu."
             },
             {
               "letter": "d",
@@ -6682,7 +6690,7 @@
         },
         {
           "id": 260,
-          "text": "Která (popř. které) sekvence není (popř. nejsou) typické pro standard- ní molekulu mRNA?",
+          "text": "Která (popř. které) sekvence není (popř. nejsou) typické pro standardní molekulu mRNA?",
           "options": [
             {
               "letter": "a",
@@ -6814,7 +6822,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "je převod genetické informace uložené v makromolekule DNA do feno- typového znaku organismu"
+              "text": "je převod genetické informace uložené v makromolekule DNA do fenotypového znaku organismu"
             },
             {
               "letter": "b",
@@ -6929,7 +6937,7 @@
             },
             {
               "letter": "c",
-              "text": "jsou úseky DNA tvořené mnohonásobným opakováním poměrně krátké- ho motivu sekvence nukleotidů"
+              "text": "jsou úseky DNA tvořené mnohonásobným opakováním poměrně krátkého motivu sekvence nukleotidů"
             },
             {
               "letter": "d",
@@ -7072,7 +7080,7 @@
         },
         {
           "id": 275,
-          "text": "Mezi komplementárními bázemi v normální, nemutované dvoušrou- bovici DNA se navzájem vytvářejí:",
+          "text": "Mezi komplementárními bázemi v normální, nemutované dvoušroubovici DNA se navzájem vytvářejí:",
           "options": [
             {
               "letter": "a",
@@ -7485,7 +7493,7 @@
         },
         {
           "id": 291,
-          "text": "Přerušení vodíkových vazeb mezi bázemi v komplementárních řetěz- cích molekul DNA se nazývá:",
+          "text": "Přerušení vodíkových vazeb mezi bázemi v komplementárních řetězcích molekul DNA se nazývá:",
           "options": [
             {
               "letter": "a",
@@ -7725,11 +7733,11 @@
             },
             {
               "letter": "c",
-              "text": "mRNA, na níž svým antikodonem komplementárně nasedá tRNA nesou- cí specifickou aminokyselinu"
+              "text": "mRNA, na níž svým antikodonem komplementárně nasedá tRNA nesoucí specifickou aminokyselinu"
             },
             {
               "letter": "d",
-              "text": "tRNA, na níž svým antikodonem komplementárně nasedá mRNA nesou- cí specifickou aminokyselinu"
+              "text": "tRNA, na níž svým antikodonem komplementárně nasedá mRNA nesoucí specifickou aminokyselinu"
             }
           ],
           "correct": [
@@ -7767,7 +7775,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "jsou cirkulární proteinové molekuly, které se vyskytují v cytoplazmě bak- teriálních buněk"
+              "text": "jsou cirkulární proteinové molekuly, které se vyskytují v cytoplazmě bakteriálních buněk"
             },
             {
               "letter": "b",
@@ -7830,7 +7838,7 @@
             },
             {
               "letter": "d",
-              "text": "Transkripce končí v oblasti DNA zvané dominátor. Poznámky Obecná, populační a lékařská genetika"
+              "text": "Transkripce končí v oblasti DNA zvané dominátor."
             }
           ],
           "correct": [
@@ -7899,7 +7907,7 @@
         },
         {
           "id": 307,
-          "text": "Otec má krevní skupinu M, matka krevní skupinu N. Kterou krevní skupinu může mít jejich potomek? (Uvědomte si, že u MN systému neexis- tuje recesivní alela.)",
+          "text": "Otec má krevní skupinu M, matka krevní skupinu N. Kterou krevní skupinu může mít jejich potomek? (Uvědomte si, že u MN systému neexistuje recesivní alela.)",
           "options": [
             {
               "letter": "a",
@@ -7976,7 +7984,7 @@
         },
         {
           "id": 310,
-          "text": "Frekvence heterozygotů lze podle Hardy – Weinbergova zákona vyjád- řit vztahem (p – frekvence dominantní alely; q – frekvence recesivní alely):",
+          "text": "Frekvence heterozygotů lze podle Hardy – Weinbergova zákona vyjádřit vztahem (p – frekvence dominantní alely; q – frekvence recesivní alely):",
           "options": [
             {
               "letter": "a",
@@ -8014,7 +8022,7 @@
             },
             {
               "letter": "c",
-              "text": "se jedná o situaci, kdy se ve fenotypu projevuje funkce obou alel nezá- visle na sobě"
+              "text": "se jedná o situaci, kdy se ve fenotypu projevuje funkce obou alel nezávisle na sobě"
             },
             {
               "letter": "d",
@@ -8044,7 +8052,7 @@
             },
             {
               "letter": "d",
-              "text": "se výrazně projevují ve fenotypu jedince, přičemž faktory zevního pro- středí mají na jejich expresi poměrně malý vliv"
+              "text": "se výrazně projevují ve fenotypu jedince, přičemž faktory zevního prostředí mají na jejich expresi poměrně malý vliv"
             }
           ],
           "correct": [
@@ -8054,7 +8062,7 @@
         },
         {
           "id": 313,
-          "text": "Přenašečka hemofilie očekává dítě se zdravým mužem. Vypočtěte pravděpodobnost, že narozené dítě bude zdravý syn (předpokládejte, že pohlaví plodu není známo, proto do výpočtu zahrňte i obecnou pravdě- podobnost narození dítěte mužského pohlaví):",
+          "text": "Přenašečka hemofilie očekává dítě se zdravým mužem. Vypočtěte pravděpodobnost, že narozené dítě bude zdravý syn (předpokládejte, že pohlaví plodu není známo, proto do výpočtu zahrňte i obecnou pravděpodobnost narození dítěte mužského pohlaví):",
           "options": [
             {
               "letter": "a",
@@ -8144,7 +8152,7 @@
             },
             {
               "letter": "c",
-              "text": "se výrazně projevují ve fenotypu jedince, přičemž faktory zevního pro- středí se na jejich expresi podílejí minimálně"
+              "text": "se výrazně projevují ve fenotypu jedince, přičemž faktory zevního prostředí se na jejich expresi podílejí minimálně"
             },
             {
               "letter": "d",
@@ -8225,7 +8233,7 @@
             },
             {
               "letter": "c",
-              "text": "tok genů, jenž způsobuje stírání rozdílů mezi populacemi vlivem mezi- populačního křížení"
+              "text": "tok genů, jenž způsobuje stírání rozdílů mezi populacemi vlivem mezipopulačního křížení"
             },
             {
               "letter": "d",
@@ -8445,7 +8453,7 @@
         },
         {
           "id": 328,
-          "text": "Kolik genotypových kombinací mohou u žen tvořit alely genu „A“ (A – dominantní alela, a – recesivní alela), který je vázán na heterochro- mozom X?",
+          "text": "Kolik genotypových kombinací mohou u žen tvořit alely genu „A“ (A – dominantní alela, a – recesivní alela), který je vázán na heterochromozom X?",
           "options": [
             {
               "letter": "a",
@@ -8457,11 +8465,11 @@
             },
             {
               "letter": "c",
-              "text": "u chromozomově zdravých žen pouze dvě – Aa nebo aa; výskyt domi- nantních homozygotek je teoreticky možný jen v přítomnosti vyššího počtu chromozomů X než 2 (např. u syndromu superfemale)"
+              "text": "u chromozomově zdravých žen pouze dvě – Aa nebo aa; výskyt dominantních homozygotek je teoreticky možný jen v přítomnosti vyššího počtu chromozomů X než 2 (např. u syndromu superfemale)"
             },
             {
               "letter": "d",
-              "text": "pouze 1 – Aa; jiná kombinace není v případě gonozomově vázané dě- dičnosti možná"
+              "text": "pouze 1 – Aa; jiná kombinace není v případě gonozomově vázané dědičnosti možná"
             }
           ],
           "correct": [
@@ -8535,7 +8543,7 @@
             },
             {
               "letter": "c",
-              "text": "2 párů alel (A, a; B, b); při křížení dvojnásobných heterozygotů je v po- tomstvu (F2 generaci) genotypový i fenotypový štěpný poměr 9:3:3:1, pokud geny nejsou ve vazbě"
+              "text": "2 párů alel (A, a; B, b); při křížení dvojnásobných heterozygotů je v potomstvu (F2 generaci) genotypový i fenotypový štěpný poměr 9:3:3:1, pokud geny nejsou ve vazbě"
             },
             {
               "letter": "d",
@@ -8606,7 +8614,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "Alela je konkrétní forma genu ."
+              "text": "Alela je konkrétní forma genu."
             },
             {
               "letter": "b",
@@ -8614,7 +8622,7 @@
             },
             {
               "letter": "c",
-              "text": "Pokud je gen lokalizován na autozomu, je v normální somatické buňce přítomen ve dvou alelách, které mohou být stejné nebo různé ."
+              "text": "Pokud je gen lokalizován na autozomu, je v normální somatické buňce přítomen ve dvou alelách, které mohou být stejné nebo různé."
             },
             {
               "letter": "d",
@@ -8638,7 +8646,7 @@
             },
             {
               "letter": "b",
-              "text": "na dvou nehomologických chromozomech, přičemž geny segregují spo- lečně, pokud je mezi nimi silná vazba"
+              "text": "na dvou nehomologických chromozomech, přičemž geny segregují společně, pokud je mezi nimi silná vazba"
             },
             {
               "letter": "c",
@@ -8655,7 +8663,7 @@
         },
         {
           "id": 336,
-          "text": "Jak se může vlivem genetického posunu (driftu) měnit genofond v po- četně malé populaci po určitém počtu generací? (Neuvažujte jiné procesy měnící frekvenci alel.)",
+          "text": "Jak se může vlivem genetického posunu (driftu) měnit genofond v početně malé populaci po určitém počtu generací? (Neuvažujte jiné procesy měnící frekvenci alel.)",
           "options": [
             {
               "letter": "a",
@@ -8681,7 +8689,7 @@
         },
         {
           "id": 337,
-          "text": "Pro lidské autozomově dominantně dědičné choroby s plnou pene- trancí platí:",
+          "text": "Pro lidské autozomově dominantně dědičné choroby s plnou penetrancí platí:",
           "options": [
             {
               "letter": "a",
@@ -8689,7 +8697,7 @@
             },
             {
               "letter": "b",
-              "text": "postižení jedinci jsou většinou heterozygoti, u mnohých autozomově dominantních chorob je dominantně homozygotní konstituce dokonce pre- natálně či perinatálně letální"
+              "text": "postižení jedinci jsou většinou heterozygoti, u mnohých autozomově dominantních chorob je dominantně homozygotní konstituce dokonce prenatálně či perinatálně letální"
             },
             {
               "letter": "c",
@@ -8742,7 +8750,7 @@
             },
             {
               "letter": "b",
-              "text": "žena, která je přenašečka (heterozygotka), má se zdravým mužem polo- vinu postižených dcer"
+              "text": "žena, která je přenašečka (heterozygotka), má se zdravým mužem polovinu postižených dcer"
             },
             {
               "letter": "c",
@@ -8824,7 +8832,7 @@
             },
             {
               "letter": "c",
-              "text": "66.7% pro každé dítě; postižené děti budou mít s nepostiženým partne- rem 50% postižených potomků"
+              "text": "66.7% pro každé dítě; postižené děti budou mít s nepostiženým partnerem 50% postižených potomků"
             },
             {
               "letter": "d",
@@ -8838,7 +8846,7 @@
         },
         {
           "id": 343,
-          "text": "Při sňatku muže postiženého autozomově recesivně podmíněnou cho- robou s nepostiženou ženou, která je však přenašečka (heterozygot), má každé dítě pravděpodobnost postižení:",
+          "text": "Při sňatku muže postiženého autozomově recesivně podmíněnou chorobou s nepostiženou ženou, která je však přenašečka (heterozygot), má každé dítě pravděpodobnost postižení:",
           "options": [
             {
               "letter": "a",
@@ -8888,23 +8896,23 @@
         },
         {
           "id": 345,
-          "text": "Při dihybridním křížení dvojnásobného dominantního homozygota (AABB) s dvojnásobným heterozygotem (AaBb), budou fenotypové štěp- né poměry v potomstvu (písmena A, a, resp B, b v následujících tvrzeních označují fenotypovou přítomnost příslušného znaku):",
+          "text": "Při dihybridním křížení dvojnásobného dominantního homozygota (AABB) s dvojnásobným heterozygotem (AaBb), budou fenotypové štěpné poměry v potomstvu (písmena A, a, resp B, b v následujících tvrzeních označují fenotypovou přítomnost příslušného znaku):",
           "options": [
             {
               "letter": "a",
-              "text": "9AB : 3Ab : 3aB : 1ab"
+              "text": "9AB: 3Ab: 3aB: 1ab"
             },
             {
               "letter": "b",
-              "text": "12AB : 2Ab : 2aB : 0ab"
+              "text": "12AB: 2Ab: 2aB: 0ab"
             },
             {
               "letter": "c",
-              "text": "16AB : 0Ab : 0aB : 0ab"
+              "text": "16AB: 0Ab: 0aB: 0ab"
             },
             {
               "letter": "d",
-              "text": "8AB : 0Ab : 0aB : 8ab"
+              "text": "8AB: 0Ab: 0aB: 8ab"
             }
           ],
           "correct": [
@@ -8913,7 +8921,7 @@
         },
         {
           "id": 346,
-          "text": "Zdravým rodičům se narodili dva synové postižení hemofilií (gonozo- mově recesivní choroba), jeden zdravý syn a jedna zdravá dcera. Jaké jsou genotypy členů rodiny?",
+          "text": "Zdravým rodičům se narodili dva synové postižení hemofilií (gonozomově recesivní choroba), jeden zdravý syn a jedna zdravá dcera. Jaké jsou genotypy členů rodiny?",
           "options": [
             {
               "letter": "a",
@@ -8966,7 +8974,7 @@
         },
         {
           "id": 348,
-          "text": "Předpokládejme, že brachydaktylie (krátkoprstost) je autozomově dominantně dědičný znak s úplnou penetrancí. Při sňatku muže postiže- ného brachydaktylií s nepostiženou ženou bude riziko postižení u každého narozeného dítěte 50% za předpokladu že:",
+          "text": "Předpokládejme, že brachydaktylie (krátkoprstost) je autozomově dominantně dědičný znak s úplnou penetrancí. Při sňatku muže postiženého brachydaktylií s nepostiženou ženou bude riziko postižení u každého narozeného dítěte 50% za předpokladu že:",
           "options": [
             {
               "letter": "a",
@@ -9024,7 +9032,7 @@
             },
             {
               "letter": "b",
-              "text": "genotypový poměr 1AA : 2Aa : 1aa"
+              "text": "genotypový poměr 1AA: 2Aa: 1aa"
             },
             {
               "letter": "c",
@@ -9060,7 +9068,7 @@
             },
             {
               "letter": "d",
-              "text": "postižený muž má nepostižené syny, nenese-li žena na žádném chromo- zomu X mutovanou alelu"
+              "text": "postižený muž má nepostižené syny, nenese-li žena na žádném chromozomu X mutovanou alelu"
             }
           ],
           "correct": [
@@ -9075,11 +9083,11 @@
           "options": [
             {
               "letter": "a",
-              "text": "postižená žena (heterozygotka) a nepostižený muž mají polovinu zdra- vých synů"
+              "text": "postižená žena (heterozygotka) a nepostižený muž mají polovinu zdravých synů"
             },
             {
               "letter": "b",
-              "text": "postižený muž a postižená žena (heterozygotka) mohou mít 3/4 posti- žených dětí"
+              "text": "postižený muž a postižená žena (heterozygotka) mohou mít 3/4 postižených dětí"
             },
             {
               "letter": "c",
@@ -9230,7 +9238,7 @@
         },
         {
           "id": 358,
-          "text": "Při neúplné dominanci alely „A“ vůči alele „a“ má heterozygot feno- typový projev:",
+          "text": "Při neúplné dominanci alely „A“ vůči alele „a“ má heterozygot fenotypový projev:",
           "options": [
             {
               "letter": "a",
@@ -9281,7 +9289,7 @@
         },
         {
           "id": 360,
-          "text": "U lidské recesivně dědičné choroby vázané na chromozom X je ty- pické, že:",
+          "text": "U lidské recesivně dědičné choroby vázané na chromozom X je typické, že:",
           "options": [
             {
               "letter": "a",
@@ -9434,7 +9442,7 @@
         },
         {
           "id": 366,
-          "text": "Alternativní formy genů na stejných lokusech homologických chro- mozomů se nazývají:",
+          "text": "Alternativní formy genů na stejných lokusech homologických chromozomů se nazývají:",
           "options": [
             {
               "letter": "a",
@@ -9615,7 +9623,7 @@
         },
         {
           "id": 373,
-          "text": "Podle Mendelových zákonů (předpokládejte, že jde o dědičnost s úpl- nou dominancí a generace P: AA × aa):",
+          "text": "Podle Mendelových zákonů (předpokládejte, že jde o dědičnost s úplnou dominancí a generace P: AA × aa):",
           "options": [
             {
               "letter": "a",
@@ -9832,7 +9840,7 @@
             },
             {
               "letter": "b",
-              "text": "U polygenní dědičnosti mají vlivy prostředí při utváření fenotypu zane- dbatelný význam."
+              "text": "U polygenní dědičnosti mají vlivy prostředí při utváření fenotypu zanedbatelný význam."
             },
             {
               "letter": "c",
@@ -9987,7 +9995,7 @@
         },
         {
           "id": 387,
-          "text": "V ideální panmiktické populaci, jejíž příslušníci se rozmnožují vý- hradně pohlavní cestou, je frekvence recesivních homozygotů 0,01. Na základě Hardy-Weinbergovy rovnováhy určete frekvenci dominantních homozygotů:",
+          "text": "V ideální panmiktické populaci, jejíž příslušníci se rozmnožují výhradně pohlavní cestou, je frekvence recesivních homozygotů 0,01. Na základě Hardy-Weinbergovy rovnováhy určete frekvenci dominantních homozygotů:",
           "options": [
             {
               "letter": "a",
@@ -10012,7 +10020,7 @@
         },
         {
           "id": 388,
-          "text": "V ideální panmiktické populaci, jejíž příslušníci se rozmnožují vý- hradně pohlavní cestou, je frekvence dominantních homozygotů 0,01. Na základě Hardy-Weinbergovy rovnováhy určete frekvenci recesivních homozygotů:",
+          "text": "V ideální panmiktické populaci, jejíž příslušníci se rozmnožují výhradně pohlavní cestou, je frekvence dominantních homozygotů 0,01. Na základě Hardy-Weinbergovy rovnováhy určete frekvenci recesivních homozygotů:",
           "options": [
             {
               "letter": "a",
@@ -10037,7 +10045,7 @@
         },
         {
           "id": 389,
-          "text": "V ideální panmiktické populaci, jejíž příslušníci se rozmnožují výhrad- ně pohlavní cestou, je frekvence recesivních homozygotů 0,01. Na základě Hardy-Weinbergova zákona určete frekvenci dominantní alely (Pozor! Nikoliv dominantních homozygotů!):",
+          "text": "V ideální panmiktické populaci, jejíž příslušníci se rozmnožují výhradně pohlavní cestou, je frekvence recesivních homozygotů 0,01. Na základě Hardy-Weinbergova zákona určete frekvenci dominantní alely (Pozor! Nikoliv dominantních homozygotů!):",
           "options": [
             {
               "letter": "a",
@@ -10087,7 +10095,7 @@
         },
         {
           "id": 391,
-          "text": "V ideální panmiktické populaci, jejíž příslušníci se rozmnožují vý- hradně pohlavní cestou, je frekvence dominantních homozygotů 0,09. Na základě Hardy-Weinbergovy rovnováhy určete frekvenci heterozygotů:",
+          "text": "V ideální panmiktické populaci, jejíž příslušníci se rozmnožují výhradně pohlavní cestou, je frekvence dominantních homozygotů 0,09. Na základě Hardy-Weinbergovy rovnováhy určete frekvenci heterozygotů:",
           "options": [
             {
               "letter": "a",
@@ -10137,7 +10145,7 @@
         },
         {
           "id": 393,
-          "text": "Pacient mužského pohlaví je postižen geneticky podmíněným one- mocněním. Která z následujících situací není typická pro recesivní dědič- nost vázanou na chromozom X?",
+          "text": "Pacient mužského pohlaví je postižen geneticky podmíněným onemocněním. Která z následujících situací není typická pro recesivní dědičnost vázanou na chromozom X?",
           "options": [
             {
               "letter": "a",
@@ -10163,7 +10171,7 @@
         },
         {
           "id": 394,
-          "text": "Okulokutánní albinismus je autozomově recesivní choroba s úplnou penetrancí. Jestliže dva nepostižení rodiče mají dítě albína, pak jejich ge- notypy jsou:",
+          "text": "Okulokutánní albinismus je autozomově recesivní choroba s úplnou penetrancí. Jestliže dva nepostižení rodiče mají dítě albína, pak jejich genotypy jsou:",
           "options": [
             {
               "letter": "a",
@@ -10343,7 +10351,7 @@
         },
         {
           "id": 401,
-          "text": "V panmiktické mendelovské populaci, která je v Hardy-Weinbergově rovnováze, jsou tři genotypy přítomny v následujících zastoupeních: AA – 81%, Aa – 18% a aa – 1%. Jaké jsou frekvence alel „A“ a „a“ ?",
+          "text": "V panmiktické mendelovské populaci, která je v Hardy-Weinbergově rovnováze, jsou tři genotypy přítomny v následujících zastoupeních: AA – 81%, Aa – 18% a aa – 1%. Jaké jsou frekvence alel „A“ a „a“?",
           "options": [
             {
               "letter": "a",
@@ -10462,7 +10470,7 @@
             },
             {
               "letter": "d",
-              "text": "Pacienti s Downovým syndromem mají v karyotypu pouze 45 chromo- zomů, neboť jim chybí jeden chromozom 21."
+              "text": "Pacienti s Downovým syndromem mají v karyotypu pouze 45 chromozomů, neboť jim chybí jeden chromozom 21."
             }
           ],
           "correct": [
@@ -10787,7 +10795,7 @@
         },
         {
           "id": 418,
-          "text": "Je-li vzdálenost mezi geny „A“ a „B“ (Morganovo číslo) 10 centimor- ganů, znamená to, že:",
+          "text": "Je-li vzdálenost mezi geny „A“ a „B“ (Morganovo číslo) 10 centimorganů, znamená to, že:",
           "options": [
             {
               "letter": "a",
@@ -10838,7 +10846,7 @@
         },
         {
           "id": 420,
-          "text": "Pokud geny nejsou ve vazbě, tvoří dvojnásobný dominantní homozy- got s dvojnásobným recesivním homozygotem (P: AABB × aabb):",
+          "text": "Pokud geny nejsou ve vazbě, tvoří dvojnásobný dominantní homozygot s dvojnásobným recesivním homozygotem (P: AABB × aabb):",
           "options": [
             {
               "letter": "a",
@@ -10890,7 +10898,7 @@
         },
         {
           "id": 422,
-          "text": "Zcela zdravým rodičům se narodil syn postižený autozomálně domi- nantně dědičnou chorobou s plnou penetrancí. Jaké je možné vysvětlení?",
+          "text": "Zcela zdravým rodičům se narodil syn postižený autozomálně dominantně dědičnou chorobou s plnou penetrancí. Jaké je možné vysvětlení?",
           "options": [
             {
               "letter": "a",
@@ -10902,11 +10910,11 @@
             },
             {
               "letter": "c",
-              "text": "Choroba u syna zřejmě vznikla na podkladě mutace de novo ."
+              "text": "Choroba u syna zřejmě vznikla na podkladě mutace de novo."
             },
             {
               "letter": "d",
-              "text": "Matka je prokazatelně přenašečka mutantní alely, zatímco otec je bez- pochyby genotypově zdráv."
+              "text": "Matka je prokazatelně přenašečka mutantní alely, zatímco otec je bezpochyby genotypově zdráv."
             }
           ],
           "correct": [
@@ -10915,7 +10923,7 @@
         },
         {
           "id": 423,
-          "text": "Náhodná změna četnosti alel v malých izolovaných populacích v dů- sledku úzkého výběru alel z generace na generaci se nazývá:",
+          "text": "Náhodná změna četnosti alel v malých izolovaných populacích v důsledku úzkého výběru alel z generace na generaci se nazývá:",
           "options": [
             {
               "letter": "a",
@@ -10994,7 +11002,7 @@
         },
         {
           "id": 426,
-          "text": "Matka má krevní skupinu AB, její dítě B. Tři muži, podezřelí z otcov- ství, mají krevní skupinu A (muž č.1), krevní skupinu B (muž č.2) a krevní skupinu 0 (muž č.3). Vyberte správné (popř. správná) tvrzení:",
+          "text": "Matka má krevní skupinu AB, její dítě B. Tři muži, podezřelí z otcovství, mají krevní skupinu A (muž č.1), krevní skupinu B (muž č.2) a krevní skupinu 0 (muž č.3). Vyberte správné (popř. správná) tvrzení:",
           "options": [
             {
               "letter": "a",
@@ -11006,7 +11014,7 @@
             },
             {
               "letter": "c",
-              "text": "není vyloučeno, že otcem dítěte může být muž č . 1"
+              "text": "není vyloučeno, že otcem dítěte může být muž č. 1"
             },
             {
               "letter": "d",
@@ -11071,7 +11079,7 @@
         },
         {
           "id": 429,
-          "text": "U morčat je hrubá srst dominantní (R) nad hladkou srsti (r) a černá barva (B) je dominantní nad bílou (b). Byli zkříženi černí hrubosrstí ho- mozygoti (RRBB) s bílými hladkosrstými. Měli černé, hrubosrsté potom- stvo. Protože geny nejsou ve vazbě, vzniknou po zkřížení těchto potomků vzájemně mezi sebou následující fenotypy v těchto poměrech:",
+          "text": "U morčat je hrubá srst dominantní (R) nad hladkou srsti (r) a černá barva (B) je dominantní nad bílou (b). Byli zkříženi černí hrubosrstí homozygoti (RRBB) s bílými hladkosrstými. Měli černé, hrubosrsté potomstvo. Protože geny nejsou ve vazbě, vzniknou po zkřížení těchto potomků vzájemně mezi sebou následující fenotypy v těchto poměrech:",
           "options": [
             {
               "letter": "a",
@@ -11083,11 +11091,11 @@
             },
             {
               "letter": "c",
-              "text": "9 hrubosrstých černých ku 3 hrubosrstým bílým ku 3 hladkosrstým čer- ným ku 1 hladkosrstému bílému"
+              "text": "9 hrubosrstých černých ku 3 hrubosrstým bílým ku 3 hladkosrstým černým ku 1 hladkosrstému bílému"
             },
             {
               "letter": "d",
-              "text": "1 hrubosrstý černý ku 1 hrubosrstému bílému ku 1 hladkosrstému čer- nému ku 1 hladkosrstému bílému"
+              "text": "1 hrubosrstý černý ku 1 hrubosrstému bílému ku 1 hladkosrstému černému ku 1 hladkosrstému bílému"
             }
           ],
           "correct": [
@@ -11096,7 +11104,7 @@
         },
         {
           "id": 430,
-          "text": "Určitá lidská populace je v Hardy-Weinbergově rovnováze. Frekven- ce alely pro modrou barvu očí je 0,6. Předpokládejme zjednodušeně, že modré oči jsou autozomově recesivně dědičný znak, zatímco černé oči jsou znakem dominantním. Jiné fenotypy se ve sledované populaci nevyskytují. Frekvence černookých lidí v této populaci je:",
+          "text": "Určitá lidská populace je v Hardy-Weinbergově rovnováze. Frekvence alely pro modrou barvu očí je 0,6. Předpokládejme zjednodušeně, že modré oči jsou autozomově recesivně dědičný znak, zatímco černé oči jsou znakem dominantním. Jiné fenotypy se ve sledované populaci nevyskytují. Frekvence černookých lidí v této populaci je:",
           "options": [
             {
               "letter": "a",
@@ -11121,7 +11129,7 @@
         },
         {
           "id": 431,
-          "text": "Předpokládejme zjednodušeně, že modré oči jsou autozomově recesiv- ně dědičný znak (alela „b“), zatímco hnědé oči jsou znakem dominantním (alela „B“). V populaci je 36% modrookých jedinců a 64% hnědookých jedinců. Vypočtěte percentuální zastoupení jednotlivých genotypů:",
+          "text": "Předpokládejme zjednodušeně, že modré oči jsou autozomově recesivně dědičný znak (alela „b“), zatímco hnědé oči jsou znakem dominantním (alela „B“). V populaci je 36% modrookých jedinců a 64% hnědookých jedinců. Vypočtěte percentuální zastoupení jednotlivých genotypů:",
           "options": [
             {
               "letter": "a",
@@ -11147,7 +11155,7 @@
         },
         {
           "id": 432,
-          "text": "Dominantní homozygoti mají v populaci četnost 16%. Četnost hete- rozygotů je:",
+          "text": "Dominantní homozygoti mají v populaci četnost 16%. Četnost heterozygotů je:",
           "options": [
             {
               "letter": "a",
@@ -11199,11 +11207,11 @@
         },
         {
           "id": 434,
-          "text": "Krátkoprstost neboli brachydaktylie je autozomově dominantně dědič- ná porucha s úplnou penetrancí (viz též otázky 325 a 348). Krátkoprstý muž má zdravou sestru, jejíž manžel je také zdráv. Jaká je pravděpodobnost, že se sestře a jejímu manželovi narodí krátkoprsté dítě?",
+          "text": "Krátkoprstost neboli brachydaktylie je autozomově dominantně dědičná porucha s úplnou penetrancí (viz též otázky 325 a 348). Krátkoprstý muž má zdravou sestru, jejíž manžel je také zdráv. Jaká je pravděpodobnost, že se sestře a jejímu manželovi narodí krátkoprsté dítě?",
           "options": [
             {
               "letter": "a",
-              "text": "riziko narození postiženého dítěte je zhruba stejné jako u většiny ostat- ních zdravých párů v populaci"
+              "text": "riziko narození postiženého dítěte je zhruba stejné jako u většiny ostatních zdravých párů v populaci"
             },
             {
               "letter": "b",
@@ -11224,7 +11232,7 @@
         },
         {
           "id": 435,
-          "text": "Dědivost neboli heritabilita (h2) určitého znaku má hodnotu 1. Zna- mená to, že:",
+          "text": "Dědivost neboli heritabilita (h2) určitého znaku má hodnotu 1. Znamená to, že:",
           "options": [
             {
               "letter": "a",
@@ -11236,7 +11244,7 @@
             },
             {
               "letter": "c",
-              "text": "genetické faktory mají při utváření znaku velmi malý, téměř zanedba- telný vliv"
+              "text": "genetické faktory mají při utváření znaku velmi malý, téměř zanedbatelný vliv"
             },
             {
               "letter": "d",
@@ -11249,7 +11257,7 @@
         },
         {
           "id": 436,
-          "text": "V rodině je syn hemofilik a dcera zdravá homozygotka (XHXH). Určete možné genotypy rodičů (XH – chromozom X s normální alelou, Xh – chro- mozom X s alelou pro hemofilii):",
+          "text": "V rodině je syn hemofilik a dcera zdravá homozygotka (XHXH). Určete možné genotypy rodičů (XH – chromozom X s normální alelou, Xh – chromozom X s alelou pro hemofilii):",
           "options": [
             {
               "letter": "a",
@@ -11274,7 +11282,7 @@
         },
         {
           "id": 437,
-          "text": "Vypočtěte riziko pro potomky muže, který trpí gonozomově domi- nantní chorobou. Předpokládejte, že jeho manželka je zdráva. Jaký bude závěr genetické konzultace?",
+          "text": "Vypočtěte riziko pro potomky muže, který trpí gonozomově dominantní chorobou. Předpokládejte, že jeho manželka je zdráva. Jaký bude závěr genetické konzultace?",
           "options": [
             {
               "letter": "a",
@@ -11454,7 +11462,7 @@
         },
         {
           "id": 444,
-          "text": "Který z následujících nálezů je charakteristický pro rodiče dětí postiže- ných autozomově recesivně dědičným onemocněním?",
+          "text": "Který z následujících nálezů je charakteristický pro rodiče dětí postižených autozomově recesivně dědičným onemocněním?",
           "options": [
             {
               "letter": "a",
@@ -11554,7 +11562,7 @@
         },
         {
           "id": 448,
-          "text": "Postižení manželé, kteří jsou oba heterozygoti pro autozomově dominant- ně podmíněné onemocnění, plánují těhotenství. S jakou pravděpodobností bude jejich jejich dítě postiženo stejnou chorobou? Předpokládejte, že homozygoti i heterozygoti jsou plně životaschopní.",
+          "text": "Postižení manželé, kteří jsou oba heterozygoti pro autozomově dominantně podmíněné onemocnění, plánují těhotenství. S jakou pravděpodobností bude jejich jejich dítě postiženo stejnou chorobou? Předpokládejte, že homozygoti i heterozygoti jsou plně životaschopní.",
           "options": [
             {
               "letter": "a",
@@ -11706,7 +11714,7 @@
         },
         {
           "id": 454,
-          "text": "V ideální panmiktické populaci je frekvence dominantních homozy- gotů 1%. S využitím Hardy-Weinbergova zákona vypočtěte frekvenci heterozygotů:",
+          "text": "V ideální panmiktické populaci je frekvence dominantních homozygotů 1%. S využitím Hardy-Weinbergova zákona vypočtěte frekvenci heterozygotů:",
           "options": [
             {
               "letter": "a",
@@ -11888,7 +11896,7 @@
         },
         {
           "id": 461,
-          "text": "Ke genetickému vyšetření se dostavila 16-letá dívka s nápadnou retardací růstu a vrozenou kardiovaskulární vadou (zúžením aorty). Pediatr žádá gene- tické vyšetření také proto, že u dívky dosud nedošlo k nástupu menstruace. Její matka uvádí, že dcera měla v základní škole vždy průměrný prospěch, nyní studuje s uspokojivými výsledky střední školu. Kterým z chromozomově podmíněných syndromů by mohla dívka trpět?",
+          "text": "Ke genetickému vyšetření se dostavila 16-letá dívka s nápadnou retardací růstu a vrozenou kardiovaskulární vadou (zúžením aorty). Pediatr žádá genetické vyšetření také proto, že u dívky dosud nedošlo k nástupu menstruace. Její matka uvádí, že dcera měla v základní škole vždy průměrný prospěch, nyní studuje s uspokojivými výsledky střední školu. Kterým z chromozomově podmíněných syndromů by mohla dívka trpět?",
           "options": [
             {
               "letter": "a",
@@ -12112,7 +12120,7 @@
             },
             {
               "letter": "c",
-              "text": "velký virus obalený membránou a podobný bakterii, který napadá živo- čišné buňky"
+              "text": "velký virus obalený membránou a podobný bakterii, který napadá živočišné buňky"
             },
             {
               "letter": "d",
@@ -12141,7 +12149,7 @@
             },
             {
               "letter": "d",
-              "text": "zánět mozkových blan, cholera, spalničky, infekční žloutenka (hepa- titida A)"
+              "text": "zánět mozkových blan, cholera, spalničky, infekční žloutenka (hepatitida A)"
             }
           ],
           "correct": [
@@ -12233,7 +12241,7 @@
             },
             {
               "letter": "b",
-              "text": "obsahují RNA, podle níž se v buňkách hostitele syntetizuje komplemen- tární DNA"
+              "text": "obsahují RNA, podle níž se v buňkách hostitele syntetizuje komplementární DNA"
             },
             {
               "letter": "c",
@@ -12417,7 +12425,7 @@
             },
             {
               "letter": "b",
-              "text": "spojení dvou buněk, přičemž z jedné buňky do druhé přechází část ge- netické informace"
+              "text": "spojení dvou buněk, přičemž z jedné buňky do druhé přechází část genetické informace"
             },
             {
               "letter": "c",
@@ -12501,7 +12509,7 @@
             },
             {
               "letter": "d",
-              "text": "při použití optického mikroskopu s vysokým zvětšením jádro i ostatní bu- něčné organely"
+              "text": "při použití optického mikroskopu s vysokým zvětšením jádro i ostatní buněčné organely"
             }
           ],
           "correct": [
@@ -12560,7 +12568,7 @@
         },
         {
           "id": 487,
-          "text": "Likvidace virů v hostitelském organismu působením imunitních mecha- nismů nebo podáním medikamentů je často obtížná, neboť:",
+          "text": "Likvidace virů v hostitelském organismu působením imunitních mechanismů nebo podáním medikamentů je často obtížná, neboť:",
           "options": [
             {
               "letter": "a",
@@ -12747,7 +12755,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "vzniká ze semeníku žita působením konidií stopkovýtrusé houby palič- kovice nachové"
+              "text": "vzniká ze semeníku žita působením konidií stopkovýtrusé houby paličkovice nachové"
             },
             {
               "letter": "b",
@@ -12820,7 +12828,7 @@
         },
         {
           "id": 497,
-          "text": "Která z následujících tvrzení o světelné části (primárních dějích) fo- tosyntézy jsou pravdivá?",
+          "text": "Která z následujících tvrzení o světelné části (primárních dějích) fotosyntézy jsou pravdivá?",
           "options": [
             {
               "letter": "a",
@@ -12996,7 +13004,7 @@
             },
             {
               "letter": "d",
-              "text": "k výrazné redukci gametofytu dochází zejména u jehličnanů a krytose- menných rostlin"
+              "text": "k výrazné redukci gametofytu dochází zejména u jehličnanů a krytosemenných rostlin"
             }
           ],
           "correct": [
@@ -14002,7 +14010,7 @@
             },
             {
               "letter": "d",
-              "text": "průduchy (stigmata) na povrchu článků těla hmyzu jsou vyústěním vy- lučovací soustavy"
+              "text": "průduchy (stigmata) na povrchu článků těla hmyzu jsou vyústěním vylučovací soustavy"
             }
           ],
           "correct": [
@@ -14266,7 +14274,7 @@
         },
         {
           "id": 553,
-          "text": "Kteří původci nemocí jsou většinou přenášeni hmyzem nebo pavou- kovci?",
+          "text": "Kteří původci nemocí jsou většinou přenášeni hmyzem nebo pavoukovci?",
           "options": [
             {
               "letter": "a",
@@ -14711,7 +14719,7 @@
             },
             {
               "letter": "d",
-              "text": "Obě patří mezi Eukaryota ."
+              "text": "Obě patří mezi Eukaryota."
             }
           ],
           "correct": [
@@ -14859,7 +14867,7 @@
             },
             {
               "letter": "c",
-              "text": "tělo každého partenogenetického jedince obsahuje samčí i samičí roz- množovací orgány"
+              "text": "tělo každého partenogenetického jedince obsahuje samčí i samičí rozmnožovací orgány"
             },
             {
               "letter": "d",
@@ -15104,7 +15112,7 @@
         },
         {
           "id": 586,
-          "text": "Vyberte skupinu, která obsahuje pouze čeledi patřící do podřádu pře- žvýkavců (Ruminantia):",
+          "text": "Vyberte skupinu, která obsahuje pouze čeledi patřící do podřádu přežvýkavců (Ruminantia):",
           "options": [
             {
               "letter": "a",
@@ -15477,7 +15485,7 @@
             },
             {
               "letter": "d",
-              "text": "některá jednobuněčná eukaryota řazená mezi protista (nazývá se též svět- ločivná skvrna)"
+              "text": "některá jednobuněčná eukaryota řazená mezi protista (nazývá se též světločivná skvrna)"
             }
           ],
           "correct": [
@@ -15703,7 +15711,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "z Bowmanova pouzdra, glomerulu, proximálního tubulu, Henleovy klič- ky, distálního tubulu a ze sběrných kanálků"
+              "text": "z Bowmanova pouzdra, glomerulu, proximálního tubulu, Henleovy kličky, distálního tubulu a ze sběrných kanálků"
             },
             {
               "letter": "b",
@@ -15938,7 +15946,7 @@
             },
             {
               "letter": "b",
-              "text": "pro řízení životně důležitých funkcí, např. srdeční činnosti nebo obran- ných reflexů"
+              "text": "pro řízení životně důležitých funkcí, např. srdeční činnosti nebo obranných reflexů"
             },
             {
               "letter": "c",
@@ -16399,11 +16407,11 @@
             },
             {
               "letter": "c",
-              "text": "bílkoviny cytotoxické povahy vytvářené B lymfocyty po styku s cizo- rodými buňkami"
+              "text": "bílkoviny cytotoxické povahy vytvářené B lymfocyty po styku s cizorodými buňkami"
             },
             {
               "letter": "d",
-              "text": "bílkoviny cytotoxické povahy vytvářené T lymfocyty po styku s cizo- rodými buňkami"
+              "text": "bílkoviny cytotoxické povahy vytvářené T lymfocyty po styku s cizorodými buňkami"
             }
           ],
           "correct": [
@@ -16420,7 +16428,7 @@
             },
             {
               "letter": "b",
-              "text": "součásti svalových buněk; skládají se ze silnějších vláken aktinu a slab- ších vláken tubulinu"
+              "text": "součásti svalových buněk; skládají se ze silnějších vláken aktinu a slabších vláken tubulinu"
             },
             {
               "letter": "c",
@@ -16562,7 +16570,7 @@
         },
         {
           "id": 643,
-          "text": "Zjištění sedimentačních schopností červených krvinek (tzv. „sedimen- tace“, ve zkratce FW) se běžně provádí především při sledování průběhu:",
+          "text": "Zjištění sedimentačních schopností červených krvinek (tzv. „sedimentace“, ve zkratce FW) se běžně provádí především při sledování průběhu:",
           "options": [
             {
               "letter": "a",
@@ -17119,7 +17127,7 @@
         },
         {
           "id": 665,
-          "text": "Který z uvedených orgánových systémů za normálních okolností ne- komunikuje přímo s vnějším prostředím?",
+          "text": "Který z uvedených orgánových systémů za normálních okolností nekomunikuje přímo s vnějším prostředím?",
           "options": [
             {
               "letter": "a",
@@ -17246,7 +17254,7 @@
         },
         {
           "id": 670,
-          "text": "Po chirurgickém odstranění žlučníku musí být pacient opatrný pře- devším v přijímání:",
+          "text": "Po chirurgickém odstranění žlučníku musí být pacient opatrný především v přijímání:",
           "options": [
             {
               "letter": "a",
@@ -18080,7 +18088,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "je soustava neuronů, jejíž centrum leží v prodloužené míše, odkud pře- chází do míchy páteřní"
+              "text": "je soustava neuronů, jejíž centrum leží v prodloužené míše, odkud přechází do míchy páteřní"
             },
             {
               "letter": "b",
@@ -18362,7 +18370,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "hrtan přechází v průdušnici (trachea), jejíž stěna je zpevněna podkovo- vitými chrupavkami"
+              "text": "hrtan přechází v průdušnici (trachea), jejíž stěna je zpevněna podkovovitými chrupavkami"
             },
             {
               "letter": "b",
@@ -18608,7 +18616,7 @@
             },
             {
               "letter": "c",
-              "text": "se skládají z ledvinových kalichů, pánvičky, močovodu, močového mě- chýře a močové trubice"
+              "text": "se skládají z ledvinových kalichů, pánvičky, močovodu, močového měchýře a močové trubice"
             },
             {
               "letter": "d",
@@ -18987,7 +18995,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "dozrávají spermie2021 10401p, afc92a0a-cř9ba-4cci4-974 5-6c31n467c07d8, i03.10.2ž021 17:29š:29í teplotě, než je teplota těla"
+              "text": "dozrávají spermie při nižší teplotě, než je teplota těla"
             },
             {
               "letter": "b",
@@ -19263,7 +19271,7 @@
         },
         {
           "id": 748,
-          "text": "Jestliže se obrázek předmětu tvoří až za sítnicí, jedná se o (vyberte nej- přesnější pojem):",
+          "text": "Jestliže se obrázek předmětu tvoří až za sítnicí, jedná se o (vyberte nejpřesnější pojem):",
           "options": [
             {
               "letter": "a",
@@ -19588,7 +19596,7 @@
         },
         {
           "id": 761,
-          "text": "Sluchově rovnovážný nerv (Nervus vestibulocochlearis seu statoacusti- cus) u člověka:",
+          "text": "Sluchově rovnovážný nerv (Nervus vestibulocochlearis seu statoacusticus) u člověka:",
           "options": [
             {
               "letter": "a",
@@ -20116,7 +20124,7 @@
         },
         {
           "id": 782,
-          "text": "V chorobopisu pacienta je uveden tlak krve 160 / 80. Výše systolic- kého tlaku:",
+          "text": "V chorobopisu pacienta je uveden tlak krve 160 / 80. Výše systolického tlaku:",
           "options": [
             {
               "letter": "a",
@@ -20321,7 +20329,7 @@
         },
         {
           "id": 790,
-          "text": "Ve které dvojici je správně spojen fyziologický proces a obvyklá (prů- měrná) délka jeho trvání?",
+          "text": "Ve které dvojici je správně spojen fyziologický proces a obvyklá (průměrná) délka jeho trvání?",
           "options": [
             {
               "letter": "a",
@@ -20569,7 +20577,7 @@
             },
             {
               "letter": "d",
-              "text": "je na alkoholu již natolik závislý, že není schopen upustit od jeho konzu- mace, třebaže je svým okolím varován a sám si nebezpečnost alkoholismu uvědomuje"
+              "text": "je na alkoholu již natolik závislý, že není schopen upustit od jeho konzumace, třebaže je svým okolím varován a sám si nebezpečnost alkoholismu uvědomuje"
             }
           ],
           "correct": [
@@ -20678,7 +20686,7 @@
             },
             {
               "letter": "d",
-              "text": "jsou specifické změny u některých živočichů vedoucí k přeměně gono- choristy na hermafrodita v malých populacích, kde se nevyskytují jedinci opačného pohlaví"
+              "text": "jsou specifické změny u některých živočichů vedoucí k přeměně gonochoristy na hermafrodita v malých populacích, kde se nevyskytují jedinci opačného pohlaví"
             }
           ],
           "correct": [
@@ -20894,7 +20902,7 @@
         },
         {
           "id": 812,
-          "text": "Které z uvedených konceptů nejlépe charakterizují Darwinovu evo- luční teorii (v podobě, v jaké byla zformulována samotným Darwinem)?",
+          "text": "Které z uvedených konceptů nejlépe charakterizují Darwinovu evoluční teorii (v podobě, v jaké byla zformulována samotným Darwinem)?",
           "options": [
             {
               "letter": "a",
@@ -20906,7 +20914,7 @@
             },
             {
               "letter": "c",
-              "text": "Základním předpokladem evoluce je nadprodukce a variabilita potom- stva; dochází k boji o život; nejlépe adaptovaní jedinci jsou selektováni přírodním výběrem."
+              "text": "Základním předpokladem evoluce je nadprodukce a variabilita potomstva; dochází k boji o život; nejlépe adaptovaní jedinci jsou selektováni přírodním výběrem."
             },
             {
               "letter": "d",
@@ -20931,7 +20939,7 @@
             },
             {
               "letter": "c",
-              "text": "evoluční teorie, která vychází ze syntézy poznatků klasického darwinis- mu a mendelovské, resp. populační genetiky"
+              "text": "evoluční teorie, která vychází ze syntézy poznatků klasického darwinismu a mendelovské, resp. populační genetiky"
             },
             {
               "letter": "d",
@@ -20944,7 +20952,7 @@
         },
         {
           "id": 814,
-          "text": "Z uvedených fosilních zástupců rodu Homo je podle současných zjiš- tění fylogeneticky nejstarší:",
+          "text": "Z uvedených fosilních zástupců rodu Homo je podle současných zjištění fylogeneticky nejstarší:",
           "options": [
             {
               "letter": "a",
@@ -21070,7 +21078,7 @@
         },
         {
           "id": 819,
-          "text": "Teorie mitochondriální Evy, resp. výsledky současného studia mito- chondriální DNA u různých lidských populací:",
+          "text": "Teorie mitochondriální Evy, resp. výsledky současného studia mitochondriální DNA u různých lidských populací:",
           "options": [
             {
               "letter": "a",
@@ -21099,7 +21107,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "způsobuje, že jedinci, kteří mají horší schopnost přežít v daných pod- mínkách, mají také menší šanci vytvořit potomstvo"
+              "text": "způsobuje, že jedinci, kteří mají horší schopnost přežít v daných podmínkách, mají také menší šanci vytvořit potomstvo"
             },
             {
               "letter": "b",
@@ -21239,7 +21247,7 @@
             },
             {
               "letter": "d",
-              "text": "možnost vzniku složitějších (včetně biochemicky významných) organic- kých látek z jednoduchých anorganických molekul"
+              "text": "možnost vzniku složitějších (včetně biochemicky významných) organických látek z jednoduchých anorganických molekul"
             }
           ],
           "correct": [
@@ -21386,7 +21394,7 @@
             },
             {
               "letter": "c",
-              "text": "vývojově pokročilý lidoop, žijící koncem třetihor na území střední a se- verní Afriky"
+              "text": "vývojově pokročilý lidoop, žijící koncem třetihor na území střední a severní Afriky"
             },
             {
               "letter": "d",
@@ -21611,7 +21619,7 @@
           "options": [
             {
               "letter": "a",
-              "text": "mají pouze zápornou úlohu, neboť zvyšují frekvenci vrozených vývo- jových vad"
+              "text": "mají pouze zápornou úlohu, neboť zvyšují frekvenci vrozených vývojových vad"
             },
             {
               "letter": "b",
@@ -22000,7 +22008,7 @@
             },
             {
               "letter": "d",
-              "text": "Během dávné i nedávné doby dochází k míšení lidských plemen ."
+              "text": "Během dávné i nedávné doby dochází k míšení lidských plemen."
             }
           ],
           "correct": [
@@ -22111,7 +22119,7 @@
             },
             {
               "letter": "d",
-              "text": "je biomasa konzume2021104n01, afc92a0ta-c9bůa-4cc4-9745 -6c3146d7c07d8, 03.r10.2021u 17:29:29hého řádu nižší než biomasa konzumentů prvého řádu"
+              "text": "je biomasa konzumentů druhého řádu nižší než biomasa konzumentů prvého řádu"
             }
           ],
           "correct": [
@@ -22234,7 +22242,11 @@
             },
             {
               "letter": "c",
-              "text": "soubor živočichů trvale žijících v půdě e) soubor organismů trvale obývajících koruny stromů a keřů"
+              "text": "soubor živočichů trvale žijících v půdě"
+            },
+            {
+              "letter": "d",
+              "text": "soubor organismů trvale obývajících koruny stromů a keřů"
             }
           ],
           "correct": [
@@ -22740,7 +22752,7 @@
             },
             {
               "letter": "b",
-              "text": "je jeden z organismů výrazně negativně ovlivněn, zatímco druhému organi- smu tento vztah prospívá"
+              "text": "je jeden z organismů výrazně negativně ovlivněn, zatímco druhému organismu tento vztah prospívá"
             },
             {
               "letter": "c",
@@ -22748,7 +22760,7 @@
             },
             {
               "letter": "d",
-              "text": "jeden z organismů není nijak výrazně pozitivně či negativně ovlivněn, za- tímco druhému organismu uvedený vztah prospívá"
+              "text": "jeden z organismů není nijak výrazně pozitivně či negativně ovlivněn, zatímco druhému organismu uvedený vztah prospívá"
             }
           ],
           "correct": [
@@ -22773,7 +22785,7 @@
             },
             {
               "letter": "d",
-              "text": "v rámci populace jednoho druhu Historie biologie a medicíny"
+              "text": "v rámci populace jednoho druhu"
             }
           ],
           "correct": [
@@ -22891,7 +22903,7 @@
         },
         {
           "id": 890,
-          "text": "Třebaže moderní poznatky jsou k tzv. biogenetickému zákonu (zfor- mulovanému roku 1866 Ernstem Haeckelem) velmi kritické, nelze popřít, že ve své době významně ovlivnil vývoj biologie. Podle tohoto zákona:",
+          "text": "Třebaže moderní poznatky jsou k tzv. biogenetickému zákonu (zformulovanému roku 1866 Ernstem Haeckelem) velmi kritické, nelze popřít, že ve své době významně ovlivnil vývoj biologie. Podle tohoto zákona:",
           "options": [
             {
               "letter": "a",
@@ -23070,7 +23082,7 @@
         },
         {
           "id": 897,
-          "text": "Jedna z teorií vzniku života (tzv. teorie primordiální polévky nebo pra- polévky propagovaná např. A.I. Oparinem nebo J. S. B. Haldanem) předpo- kládala, že ke vzniku prvních biologicky významných makromolekul došlo v teplých lagunách prahorního moře. Podle uvedené teorie byla k vytvoření těchto makromolekul nutná přítomnost:",
+          "text": "Jedna z teorií vzniku života (tzv. teorie primordiální polévky nebo prapolévky propagovaná např. A.I. Oparinem nebo J. S. B. Haldanem) předpokládala, že ke vzniku prvních biologicky významných makromolekul došlo v teplých lagunách prahorního moře. Podle uvedené teorie byla k vytvoření těchto makromolekul nutná přítomnost:",
           "options": [
             {
               "letter": "a",
@@ -23104,7 +23116,7 @@
             },
             {
               "letter": "b",
-              "text": "eticky nepřijatelné učení o nutnosti preferenčního rozmnožování zdravých a rasově vhodných osob, prakticky uplatňované zejména v nacistickém Němec- ku v tzv. programu Lebensborn"
+              "text": "eticky nepřijatelné učení o nutnosti preferenčního rozmnožování zdravých a rasově vhodných osob, prakticky uplatňované zejména v nacistickém Německu v tzv. programu Lebensborn"
             },
             {
               "letter": "c",
@@ -23112,7 +23124,7 @@
             },
             {
               "letter": "d",
-              "text": "teorie vysvětlující původ druhu Homo sapiens opakovaným křížením růz- ných druhů a plemen rodu Homo na různých místech zeměkoule"
+              "text": "teorie vysvětlující původ druhu Homo sapiens opakovaným křížením různých druhů a plemen rodu Homo na různých místech zeměkoule"
             }
           ],
           "correct": [
@@ -23222,7 +23234,7 @@
         },
         {
           "id": 903,
-          "text": "Který z uvedených našich badatelů přispěl významnou měrou k zformu- lování buněčné teorie?",
+          "text": "Který z uvedených našich badatelů přispěl významnou měrou k zformulování buněčné teorie?",
           "options": [
             {
               "letter": "a",
@@ -23247,7 +23259,7 @@
         },
         {
           "id": 904,
-          "text": "Autorem mnoha českých názvů rostlin a zakladatelem českého botanic- kého názvosloví je:",
+          "text": "Autorem mnoha českých názvů rostlin a zakladatelem českého botanického názvosloví je:",
           "options": [
             {
               "letter": "a",
@@ -23476,7 +23488,7 @@
         },
         {
           "id": 913,
-          "text": "Podle současných archeologických i dalších historických pramenů jsou nestaršími lázněmi na území České republiky (otázka se netýká stáří přísluš- ného sídla, ale stáří lázní):",
+          "text": "Podle současných archeologických i dalších historických pramenů jsou nestaršími lázněmi na území České republiky (otázka se netýká stáří příslušného sídla, ale stáří lázní):",
           "options": [
             {
               "letter": "a",
@@ -23501,7 +23513,7 @@
         },
         {
           "id": 914,
-          "text": "Které lázně jsou spjaty se jménem svérázného léčitele Vinzenze Priess- nitze (1799 – 1851), od něhož pochází dodnes používaný pojem „Priessnitzův zábal“?",
+          "text": "Které lázně jsou spjaty se jménem svérázného léčitele Vinzenze Priessnitze (1799 – 1851), od něhož pochází dodnes používaný pojem „Priessnitzův zábal“?",
           "options": [
             {
               "letter": "a",
@@ -23637,7 +23649,7 @@
             },
             {
               "letter": "b",
-              "text": "Pracoval pro tajnou komunistickou policii v bývalé NDR a podával psycho- tropní látky vyslýchaným vězňům."
+              "text": "Pracoval pro tajnou komunistickou policii v bývalé NDR a podával psychotropní látky vyslýchaným vězňům."
             },
             {
               "letter": "c",
