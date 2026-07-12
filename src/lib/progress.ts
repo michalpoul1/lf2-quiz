@@ -102,19 +102,42 @@ export function recordAnswer(
   if (!fp[subject]) fp[subject] = {};
   const key = String(chapterId);
   if (!fp[subject][key]) {
-    fp[subject][key] = { answered: 0, correct: 0, wrongIds: [] };
+    fp[subject][key] = { answered: 0, correct: 0, wrongIds: [], correctIds: [] };
   }
   const ch = fp[subject][key];
+  if (!ch.correctIds) ch.correctIds = [];
   ch.answered += 1;
+  const qidStr = String(questionId);
   if (isCorrect) {
     ch.correct += 1;
-    ch.wrongIds = ch.wrongIds.filter((id) => String(id) !== String(questionId));
+    ch.wrongIds = ch.wrongIds.filter((id) => String(id) !== qidStr);
+    if (!ch.correctIds.some((id) => String(id) === qidStr)) {
+      ch.correctIds.push(questionId);
+    }
   } else {
-    if (!ch.wrongIds.some((id) => String(id) === String(questionId))) {
+    ch.correctIds = ch.correctIds.filter((id) => String(id) !== qidStr);
+    if (!ch.wrongIds.some((id) => String(id) === qidStr)) {
       ch.wrongIds.push(questionId);
     }
   }
   saveAll(all);
+}
+
+/**
+ * Return whether a question has been answered correctly, incorrectly, or not at all.
+ * Works even on legacy records missing `correctIds` — those questions will look
+ * as "unanswered" for the correct-branch until the user answers again.
+ */
+export function getQuestionStatus(
+  subject: string,
+  chapterId: number | string,
+  questionId: number | string
+): "correct" | "wrong" | "unanswered" {
+  const cp = getChapterProgress(subject, chapterId);
+  const qidStr = String(questionId);
+  if ((cp.correctIds ?? []).some((id) => String(id) === qidStr)) return "correct";
+  if (cp.wrongIds.some((id) => String(id) === qidStr)) return "wrong";
+  return "unanswered";
 }
 
 export function resetProgress(subject: string) {

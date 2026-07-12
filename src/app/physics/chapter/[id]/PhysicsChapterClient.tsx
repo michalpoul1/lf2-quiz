@@ -3,7 +3,7 @@
 import { use } from "react";
 import QuestionList from "@/components/QuestionList";
 
-export default function ChemistryChapterClient({
+export default function PhysicsChapterClient({
   paramsPromise,
 }: {
   paramsPromise: Promise<{ id: string }>;
@@ -12,10 +12,10 @@ export default function ChemistryChapterClient({
   const chapterId = Number(params.id);
   return (
     <QuestionList
-      subject="chemistry"
-      subjectPath="chemistry"
+      subject="physics"
+      subjectPath="physics"
       chapterId={chapterId}
-      backHref="/chemistry"
+      backHref="/physics"
     />
   );
 }

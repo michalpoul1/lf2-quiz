@@ -36,6 +36,9 @@ export interface ChapterProgress {
   answered: number;
   correct: number;
   wrongIds: (number | string)[];
+  /** IDs of questions answered correctly. Missing on legacy records — always
+   * read via a nullish coalescing to `[]`. */
+  correctIds?: (number | string)[];
 }
 
 export type SubjectProgress = Record<string, ChapterProgress>;

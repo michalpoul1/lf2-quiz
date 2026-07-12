@@ -252,9 +252,9 @@ export default function ChapterList({ subject, subjectName }: Props) {
             {data.chapters.map((ch) => {
               const cp = chapterProgress[ch.id] || { answered: 0, correct: 0, wrongIds: [] };
               const validCount = countValidQuestions(getChapterQuestions(subject, ch.id));
-              const href = hasSubchapters
-                ? `/${subject}/chapter/${ch.id}`
-                : `/${subject}/quiz?chapter=${ch.id}`;
+              // All chapters open the question list; from there the user
+              // starts practice at any question (or "from the beginning").
+              const href = `/${subject}/chapter/${ch.id}`;
 
               return (
                 <Link
@@ -277,11 +277,9 @@ export default function ChapterList({ subject, subjectName }: Props) {
                       <span className="text-xs text-gray-400 whitespace-nowrap">
                         {validCount} ot.
                       </span>
-                      {hasSubchapters && (
-                        <svg className="w-4 h-4 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                      )}
+                      <svg className="w-4 h-4 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
                     </div>
                   </div>
                   {cp.answered > 0 && (
