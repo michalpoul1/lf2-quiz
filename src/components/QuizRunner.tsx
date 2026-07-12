@@ -65,6 +65,10 @@ export default function QuizRunner({
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set());
   const [modalQuestionId, setModalQuestionId] = useState<number | string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  // Track which questions have already been recorded to progress in this run.
+  // Prevents double-counting when user navigates back with the arrow and answers
+  // the same question again — stats stay honest.
+  const [recordedIds, setRecordedIds] = useState<Set<string>>(new Set());
 
   const sourceQuestions = useMemo(() => {
     if (subchapterParam && chapterId !== "all") {
@@ -167,12 +171,30 @@ export default function QuizRunner({
       selectedArr.length === correctSet.size &&
       selectedArr.every((s) => correctSet.has(s));
 
-    const key = findProgressKey(currentQuestion.id);
-    recordAnswer(subject, key, currentQuestion.id, isCorrect);
-    setResults((prev) => [
-      ...prev,
-      { questionId: currentQuestion.id, correct: isCorrect },
-    ]);
+    // Only record once per question per run — return-visits via the prev
+    // arrow followed by re-answering must not inflate `answered`.
+    const qidStr = String(currentQuestion.id);
+    if (!recordedIds.has(qidStr)) {
+      const key = findProgressKey(currentQuestion.id);
+      recordAnswer(subject, key, currentQuestion.id, isCorrect);
+      setRecordedIds((prev) => {
+        const next = new Set(prev);
+        next.add(qidStr);
+        return next;
+      });
+      setResults((prev) => [
+        ...prev,
+        { questionId: currentQuestion.id, correct: isCorrect },
+      ]);
+    }
+  };
+
+  /** Reset per-question UI state (used when moving to a different question,
+   *  either forward via check→next or via the prev/next arrows). */
+  const resetQuestionUi = () => {
+    setSelected(new Set());
+    setChecked(false);
+    setShowExplanation(false);
   };
 
   const handleNext = () => {
@@ -180,10 +202,22 @@ export default function QuizRunner({
       setQuizState("results");
     } else {
       setCurrentIndex((i) => i + 1);
-      setSelected(new Set());
-      setChecked(false);
-      setShowExplanation(false);
+      resetQuestionUi();
     }
+  };
+
+  /** Skip forward without recording anything. Disabled on last question. */
+  const handleSkipForward = () => {
+    if (currentIndex + 1 >= totalQuestions) return;
+    setCurrentIndex((i) => i + 1);
+    resetQuestionUi();
+  };
+
+  /** Go back to the previous question. Disabled on first question. */
+  const handleSkipBack = () => {
+    if (currentIndex <= 0) return;
+    setCurrentIndex((i) => i - 1);
+    resetQuestionUi();
   };
 
   const toggleOption = (letter: string) => {
@@ -357,7 +391,7 @@ export default function QuizRunner({
   return (
     <main className="pt-4 pb-4">
       {/* Progress bar */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-3">
         <Link
           href={backHref}
           className="text-gray-400 tap-highlight p-1"
@@ -375,9 +409,43 @@ export default function QuizRunner({
             }}
           />
         </div>
-        <span className="text-xs text-gray-400 whitespace-nowrap min-w-[3.5rem] text-right">
+      </div>
+
+      {/* Prev / counter / Next */}
+      <div className="flex items-center justify-between gap-2 mb-4 px-1">
+        <button
+          type="button"
+          onClick={handleSkipBack}
+          disabled={currentIndex <= 0}
+          aria-label="Předchozí otázka"
+          className={`p-2 rounded-lg tap-highlight transition-colors ${
+            currentIndex <= 0
+              ? "text-gray-300 dark:text-gray-700 cursor-not-allowed"
+              : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+          }`}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
           {currentIndex + 1} / {totalQuestions}
         </span>
+        <button
+          type="button"
+          onClick={handleSkipForward}
+          disabled={currentIndex + 1 >= totalQuestions}
+          aria-label="Další otázka"
+          className={`p-2 rounded-lg tap-highlight transition-colors ${
+            currentIndex + 1 >= totalQuestions
+              ? "text-gray-300 dark:text-gray-700 cursor-not-allowed"
+              : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+          }`}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
 
       {/* Question */}
