@@ -1,7 +1,7 @@
 "use client";
 
 import { use } from "react";
-import QuestionList from "@/components/QuestionList";
+import SubchapterList from "@/components/SubchapterList";
 
 export default function ChemistryChapterClient({
   paramsPromise,
@@ -11,7 +11,7 @@ export default function ChemistryChapterClient({
   const params = use(paramsPromise);
   const chapterId = Number(params.id);
   return (
-    <QuestionList
+    <SubchapterList
       subject="chemistry"
       subjectPath="chemistry"
       chapterId={chapterId}

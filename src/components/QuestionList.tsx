@@ -10,6 +10,8 @@ interface Props {
   subject: string;
   subjectPath: string; // e.g. "biology", "chemistry" — used in URLs
   chapterId: number;
+  /** When set (chemistry two-level nav), show only this subchapter's questions. */
+  subchapterId?: string;
   backHref: string;
 }
 
@@ -33,10 +35,14 @@ export default function QuestionList({
   subject,
   subjectPath,
   chapterId,
+  subchapterId,
   backHref,
 }: Props) {
   const data = getSubjectData(subject);
   const chapter = data?.chapters.find((ch) => ch.id === chapterId);
+  const focusedSub = subchapterId && chapter?.subchapters
+    ? chapter.subchapters.find((s) => s.id === subchapterId)
+    : undefined;
 
   // Rebuild status map after mount (localStorage is client-only, avoids
   // hydration mismatch).
@@ -45,6 +51,21 @@ export default function QuestionList({
 
   const groups = useMemo<Group[]>(() => {
     if (!chapter) return [];
+    // Case A: a specific subchapter is focused — show just its questions, no group heading.
+    if (focusedSub) {
+      return [
+        {
+          id: focusedSub.id,
+          items: filterValidQuestions(focusedSub.questions).map((q) => ({
+            question: q,
+            progressKey: focusedSub.id,
+            subchapterId: focusedSub.id,
+            status: "unanswered" as const,
+          })),
+        },
+      ];
+    }
+    // Case B: chapter has subchapters and no focus — show all questions grouped by subchapter.
     if (chapter.subchapters && chapter.subchapters.length > 0) {
       return chapter.subchapters.map((sub) => ({
         id: sub.id,
@@ -57,6 +78,7 @@ export default function QuestionList({
         })),
       }));
     }
+    // Case C: flat chapter — one group, no heading.
     const flat = chapter.questions ? filterValidQuestions(chapter.questions) : [];
     return [
       {
@@ -68,7 +90,7 @@ export default function QuestionList({
         })),
       },
     ];
-  }, [chapter]);
+  }, [chapter, focusedSub]);
 
   useEffect(() => {
     if (!chapter) return;
@@ -98,7 +120,13 @@ export default function QuestionList({
   }
 
   const totalCount = groups.reduce((sum, g) => sum + g.items.length, 0);
-  const startAllHref = `/${subjectPath}/quiz?chapter=${chapterId}`;
+  const startAllHref = focusedSub
+    ? `/${subjectPath}/quiz?chapter=${chapterId}&sub=${focusedSub.id}`
+    : `/${subjectPath}/quiz?chapter=${chapterId}`;
+  const startAllLabel = focusedSub
+    ? "Procvičit celou podkapitolu"
+    : "Procvičit celou kapitolu od začátku";
+  const backLabel = focusedSub ? "Zpět na podkapitoly" : "Zpět na kapitoly";
 
   function itemHref(it: Item): string {
     const p = new URLSearchParams();
@@ -123,11 +151,13 @@ export default function QuestionList({
         <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        Zpět na kapitoly
+        {backLabel}
       </Link>
 
       <h1 className="text-xl font-bold text-[var(--color-primary)] dark:text-blue-400 mb-1">
-        {chapter.id}. {chapter.name}
+        {focusedSub
+          ? `${focusedSub.id} ${focusedSub.name}`
+          : `${chapter.id}. ${chapter.name}`}
       </h1>
       <p className="text-sm text-gray-500 mb-5">
         {totalCount} otázek
@@ -137,7 +167,7 @@ export default function QuestionList({
         href={startAllHref}
         className="block w-full text-center bg-[var(--color-primary)] text-white font-semibold py-3.5 rounded-xl mb-5 tap-highlight active:opacity-80 transition-opacity"
       >
-        Procvičit celou kapitolu od začátku
+        {startAllLabel}
       </Link>
 
       <div className="space-y-6">

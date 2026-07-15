@@ -1,4 +1,4 @@
-const CACHE_NAME = "lf2-quiz-v1";
+const CACHE_NAME = "lf2-quiz-v2";
 
 const PRECACHE_URLS = ["/", "/biology"];
 
