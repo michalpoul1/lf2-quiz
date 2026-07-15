@@ -54,9 +54,25 @@ export default function QuizRunner({
     ? `/${subject}/chapter/${chapterParam}`
     : `/${subject}`;
 
+  const sourceQuestions = useMemo(() => {
+    if (subchapterParam && chapterId !== "all") {
+      return filterValidQuestions(
+        getSubchapterQuestions(subject, chapterId as number, subchapterParam)
+      );
+    }
+    return filterValidQuestions(getChapterQuestions(subject, chapterId));
+  }, [subject, chapterId, subchapterParam]);
+
   const [shuffle, setShuffle] = useState(!startId);
   const [quizState, setQuizState] = useState<QuizState>(startId ? "active" : "setup");
-  const [currentIndex, setCurrentIndex] = useState(0);
+  // When startId is set, jump to that question's natural position so the
+  // prev/next arrows and the "X / N" counter are anchored to the real
+  // ordering of the source list.
+  const [currentIndex, setCurrentIndex] = useState<number>(() => {
+    if (!startId) return 0;
+    const idx = sourceQuestions.findIndex((q) => String(q.id) === startId);
+    return idx >= 0 ? idx : 0;
+  });
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [checked, setChecked] = useState(false);
   const [results, setResults] = useState<
@@ -69,15 +85,6 @@ export default function QuizRunner({
   // Prevents double-counting when user navigates back with the arrow and answers
   // the same question again — stats stay honest.
   const [recordedIds, setRecordedIds] = useState<Set<string>>(new Set());
-
-  const sourceQuestions = useMemo(() => {
-    if (subchapterParam && chapterId !== "all") {
-      return filterValidQuestions(
-        getSubchapterQuestions(subject, chapterId as number, subchapterParam)
-      );
-    }
-    return filterValidQuestions(getChapterQuestions(subject, chapterId));
-  }, [subject, chapterId, subchapterParam]);
 
   const questions = useMemo(() => {
     let qs: Question[];
@@ -102,12 +109,11 @@ export default function QuizRunner({
       qs = sourceQuestions;
     }
 
-    // When startId is present: move target question to front, don't shuffle
+    // When starting at a specific question, keep the natural order — the
+    // navigation arrows work off currentIndex, so the surrounding questions
+    // must stay in their original chapter/subchapter positions. Shuffle
+    // is intentionally ignored in that case.
     if (startId) {
-      const idx = qs.findIndex((q) => String(q.id) === startId);
-      if (idx > 0) {
-        qs = [qs[idx], ...qs.slice(0, idx), ...qs.slice(idx + 1)];
-      }
       return qs;
     }
 
