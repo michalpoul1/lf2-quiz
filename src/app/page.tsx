@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getSubjectData } from "@/lib/data";
 import { getTotalProgress } from "@/lib/progress";
+import { useRefreshOnReturn } from "@/lib/useRefreshOnReturn";
 import GlobalSearch from "@/components/GlobalSearch";
 
 const SUBJECTS = [
@@ -17,13 +18,13 @@ export default function Home() {
     Record<string, { answered: number; correct: number }>
   >({});
 
-  useEffect(() => {
+  useRefreshOnReturn(() => {
     const p: Record<string, { answered: number; correct: number }> = {};
     for (const s of SUBJECTS) {
       p[s.id] = getTotalProgress(s.id);
     }
     setProgress(p);
-  }, []);
+  });
 
   return (
     <main className="pt-6">

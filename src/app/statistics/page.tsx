@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useRefreshOnReturn } from "@/lib/useRefreshOnReturn";
 import { useRouter } from "next/navigation";
 import { getSubjectData, getChapterQuestions, countValidQuestions } from "@/lib/data";
 import { getChapterProgress, getTotalProgress, resetProgress } from "@/lib/progress";
@@ -138,10 +139,12 @@ export default function StatisticsPage() {
     setLoaded(true);
   };
 
-  useEffect(() => {
+  // Re-run whenever the user returns to this page (client-side nav from a
+  // quiz where they answered more questions, or from a subject reset) so
+  // counts stay fresh without needing a hard reload.
+  useRefreshOnReturn(() => {
     loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   // Aggregate totals across all subjects
   const globalAnswered = Object.values(data).reduce((s, d) => s + d.total.answered, 0);

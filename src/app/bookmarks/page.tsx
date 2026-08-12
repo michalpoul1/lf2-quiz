@@ -12,6 +12,7 @@ import {
   setCollectionColor,
   unpinCollection,
 } from "@/lib/collections";
+import { useRefreshOnReturn } from "@/lib/useRefreshOnReturn";
 
 const SUBJECT_SHORT: Record<string, string> = {
   biology: "Bio",
@@ -44,10 +45,13 @@ export default function BookmarksPage() {
 
   const reload = () => setCollections(getCollections());
 
-  useEffect(() => {
+  // Recompute on mount and any time the user returns to this page (client-side
+  // nav from a collection detail where they removed a question, or focusing
+  // the tab after cross-tab edits). See useRefreshOnReturn for details.
+  useRefreshOnReturn(() => {
     reload();
     setLoaded(true);
-  }, []);
+  });
 
   // Close menu on outside click
   useEffect(() => {
