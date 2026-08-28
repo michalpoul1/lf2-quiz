@@ -1,4 +1,5 @@
 import type { SubjectProgress, ChapterProgress } from "./types";
+import { bumpTodayCount } from "./streak";
 
 const STORAGE_KEY = "lf2-quiz-progress";
 const LEGACY_SUBJECT_KEYS = new Set(["biology", "chemistry", "physics"]);
@@ -121,6 +122,8 @@ export function recordAnswer(
     }
   }
   saveAll(all);
+  // Every recorded answer counts toward today's daily-goal streak.
+  bumpTodayCount();
 }
 
 /**

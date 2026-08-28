@@ -5,6 +5,9 @@ const STREAK_KEY = "lf2-quiz-streak";
 // history. Internally we always tag new entries with the 2lf namespace.
 const FACULTY = "2lf";
 
+// Streak logic moved to src/lib/streak.ts. Individual answers already fire
+// bumpTodayCount() via recordAnswer(); we no longer touch the streak here.
+
 export interface TestRecord {
   id: string;
   type: "quick" | "simulation";
@@ -14,11 +17,6 @@ export interface TestRecord {
   totalQuestions: number;
   correctAnswers: number;
   timeSeconds: number;
-}
-
-interface StreakData {
-  current: number;
-  lastDate: string; // YYYY-MM-DD
 }
 
 function genId(): string {
@@ -74,65 +72,7 @@ export function saveTestResult(
   // Keep last 50 entries
   if (history.length > 50) history.length = 50;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-  updateStreak();
-}
-
-function todayStr(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-function yesterdayStr(): string {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-function getStreakData(): StreakData {
-  if (typeof window === "undefined") return { current: 0, lastDate: "" };
-  try {
-    const raw = localStorage.getItem(STREAK_KEY);
-    if (!raw) return { current: 0, lastDate: "" };
-    return JSON.parse(raw);
-  } catch {
-    return { current: 0, lastDate: "" };
-  }
-}
-
-function updateStreak(): void {
-  if (typeof window === "undefined") return;
-  const data = getStreakData();
-  const today = todayStr();
-  if (data.lastDate === today) return; // Already counted today
-  if (data.lastDate === yesterdayStr()) {
-    data.current += 1;
-  } else {
-    data.current = 1;
-  }
-  data.lastDate = today;
-  localStorage.setItem(STREAK_KEY, JSON.stringify(data));
-}
-
-export function getStreak(): number {
-  const data = getStreakData();
-  const today = todayStr();
-  const yesterday = yesterdayStr();
-  if (data.lastDate === today || data.lastDate === yesterday) {
-    return data.current;
-  }
-  return 0; // Streak broken
-}
-
-export function getTodayAnswered(): number {
-  const history = getTestHistory();
-  const today = todayStr();
-  let count = 0;
-  for (const t of history) {
-    if (t.date.startsWith(today)) {
-      count += t.totalQuestions;
-    }
-  }
-  return count;
+  // Streak is maintained per-answer inside recordAnswer(), not here.
 }
 
 export function clearTestHistory(): void {

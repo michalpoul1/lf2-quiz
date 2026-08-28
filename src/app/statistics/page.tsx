@@ -5,7 +5,8 @@ import { useRefreshOnReturn } from "@/lib/useRefreshOnReturn";
 import { useRouter } from "next/navigation";
 import { getSubjectData, getChapterQuestions, countValidQuestions } from "@/lib/data";
 import { getChapterProgress, getTotalProgress, resetProgress } from "@/lib/progress";
-import { getTestHistory, getStreak, getTodayAnswered, clearTestHistory } from "@/lib/testHistory";
+import { getTestHistory, clearTestHistory } from "@/lib/testHistory";
+import { getStreak, getTodayCount, getDailyGoal } from "@/lib/streak";
 import type { ChapterProgress } from "@/lib/types";
 import type { TestRecord } from "@/lib/testHistory";
 import DonutChart from "@/components/DonutChart";
@@ -90,6 +91,7 @@ export default function StatisticsPage() {
   const [testHistory, setTestHistory] = useState<TestRecord[]>([]);
   const [streak, setStreak] = useState(0);
   const [todayCount, setTodayCount] = useState(0);
+  const [dailyGoal, setDailyGoalValue] = useState(10);
 
   const loadData = () => {
     const result: Record<string, SubjectStat> = {};
@@ -135,7 +137,8 @@ export default function StatisticsPage() {
     setData(result);
     setTestHistory(getTestHistory().slice(0, 10));
     setStreak(getStreak());
-    setTodayCount(getTodayAnswered());
+    setTodayCount(getTodayCount());
+    setDailyGoalValue(getDailyGoal());
     setLoaded(true);
   };
 
@@ -209,7 +212,9 @@ export default function StatisticsPage() {
             <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-tight">dní<br />v řadě</p>
           </div>
           <div className="bg-gray-50 dark:bg-[#0f172a] rounded-xl p-3 text-center">
-            <p className="text-lg font-bold text-emerald-500">{todayCount}</p>
+            <p className="text-lg font-bold text-emerald-500">
+              {todayCount}/{dailyGoal}
+            </p>
             <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-tight">dnes<br />otázek</p>
           </div>
         </div>

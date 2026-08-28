@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { getSubjectData } from "@/lib/data";
 import { getTotalProgress } from "@/lib/progress";
+import { getStreak, getTodayCount, getDailyGoal } from "@/lib/streak";
 import { useRefreshOnReturn } from "@/lib/useRefreshOnReturn";
 import GlobalSearch from "@/components/GlobalSearch";
 
@@ -17,6 +18,9 @@ export default function Home() {
   const [progress, setProgress] = useState<
     Record<string, { answered: number; correct: number }>
   >({});
+  const [streak, setStreak] = useState(0);
+  const [todayCount, setTodayCount] = useState(0);
+  const [goal, setGoal] = useState(10);
 
   useRefreshOnReturn(() => {
     const p: Record<string, { answered: number; correct: number }> = {};
@@ -24,7 +28,16 @@ export default function Home() {
       p[s.id] = getTotalProgress(s.id);
     }
     setProgress(p);
+    setStreak(getStreak());
+    setTodayCount(getTodayCount());
+    setGoal(getDailyGoal());
   });
+
+  const goalPct = goal > 0 ? Math.min(100, Math.round((todayCount / goal) * 100)) : 0;
+  // Compact SVG ring: r=18, C=2πr≈113.1
+  const ringR = 18;
+  const ringC = 2 * Math.PI * ringR;
+  const ringDash = (goalPct / 100) * ringC;
 
   return (
     <main className="pt-6">
@@ -41,6 +54,52 @@ export default function Home() {
       </div>
 
       <GlobalSearch />
+
+      {/* Streak + daily-goal card */}
+      <div className="flex items-center gap-4 bg-white dark:bg-[#1e293b] rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl leading-none" aria-hidden="true">🔥</span>
+          <div>
+            <p className="text-xl font-bold leading-tight text-gray-800 dark:text-gray-100">
+              {streak}
+            </p>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-tight">
+              {streak === 1 ? "den v řadě" : streak < 5 ? "dny v řadě" : "dní v řadě"}
+            </p>
+          </div>
+        </div>
+        <div className="flex-1" />
+        <div className="flex items-center gap-2">
+          <div className="relative w-11 h-11" aria-label={`Dnes ${todayCount} z ${goal}`}>
+            <svg viewBox="0 0 44 44" className="w-11 h-11 -rotate-90">
+              <circle cx="22" cy="22" r={ringR} className="fill-none stroke-gray-200 dark:stroke-gray-700" strokeWidth="4" />
+              <circle
+                cx="22"
+                cy="22"
+                r={ringR}
+                className="fill-none stroke-[var(--color-correct)] transition-all"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray={`${ringDash} ${ringC}`}
+              />
+            </svg>
+            <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-gray-700 dark:text-gray-200">
+              {Math.min(todayCount, goal)}
+            </span>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-700 dark:text-gray-200">
+              Dnes {todayCount} / {goal}
+            </p>
+            <Link
+              href="/settings"
+              className="text-[11px] text-gray-400 dark:text-gray-500 hover:text-[var(--color-primary)] dark:hover:text-blue-400"
+            >
+              Změnit cíl
+            </Link>
+          </div>
+        </div>
+      </div>
 
       <div className="grid grid-cols-2 gap-3 mb-5">
         <Link
