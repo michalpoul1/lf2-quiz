@@ -310,12 +310,26 @@ function BookmarkQuizInner() {
         )}
 
         <div className="space-y-2.5">
-          <Link
-            href={`/bookmarks/quiz?collection=${collectionId}`}
+          <button
+            type="button"
+            onClick={() => {
+              // Restart in place — the target URL is the current URL, so a
+              // <Link> would not re-run any effects. Reset all run state and
+              // re-shuffle the pool from the current collection.
+              setCurrentIndex(0);
+              setSelected(new Set());
+              setChecked(false);
+              setResults([]);
+              setRecordedIds(new Set());
+              setRemoveCorrect(false);
+              setRemovalDone(false);
+              setQuestions((prev) => shuffleArray(prev) as BmQuestion[]);
+              setQuizState("active");
+            }}
             className="block w-full text-center bg-white dark:bg-transparent text-[var(--color-primary)] dark:text-blue-400 font-semibold py-3.5 rounded-xl border-2 border-[var(--color-primary)] dark:border-blue-400 tap-highlight"
           >
             Zopakovat
-          </Link>
+          </button>
           <Link
             href={backHref}
             className="block w-full text-center text-gray-500 font-medium py-3.5 tap-highlight"

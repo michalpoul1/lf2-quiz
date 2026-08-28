@@ -89,10 +89,15 @@ export default function QuizRunner({
   // vanish from the visible list and their ids get removed from wrongIds in
   // storage so the counter on the subject page reflects it too.
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  // Effective mode + a run counter so "Zopakovat vše" / "Zopakovat chybné"
+  // buttons on the results screen can restart the quiz in-place (URL stays
+  // the same, so a plain <Link> to it wouldn't re-run any effects).
+  const [effectiveMode, setEffectiveMode] = useState(mode);
+  const [runId, setRunId] = useState(0);
 
   const questions = useMemo(() => {
     let qs: Question[];
-    if (mode === "wrong") {
+    if (effectiveMode === "wrong") {
       const progress = getSubjectProgress(subject);
       const wrongIds = new Set<string>();
       if (chapterId === "all") {
@@ -123,7 +128,7 @@ export default function QuizRunner({
 
     return shuffle ? shuffleArray(qs) : qs;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quizState]);
+  }, [quizState, effectiveMode, runId]);
 
   // Initialize bookmark state from localStorage (after mount, to avoid hydration mismatch)
   useEffect(() => {
@@ -232,6 +237,25 @@ export default function QuizRunner({
     if (currentIndex <= 0) return;
     setCurrentIndex((i) => i - 1);
     resetQuestionUi();
+  };
+
+  /**
+   * Restart the quiz in place from the results screen. Zeroes every piece
+   * of run state, bumps runId so the questions useMemo rebuilds, then flips
+   * quizState back to "active". Called by both "Zopakovat vše" and
+   * "Zopakovat chybné" buttons.
+   */
+  const restartQuiz = (newMode: "normal" | "wrong") => {
+    setEffectiveMode(newMode);
+    setRunId((n) => n + 1);
+    setCurrentIndex(0);
+    setSelected(new Set());
+    setChecked(false);
+    setResults([]);
+    setRecordedIds(new Set());
+    setDismissedIds(new Set());
+    setShowExplanation(false);
+    setQuizState("active");
   };
 
   /**
@@ -385,19 +409,21 @@ export default function QuizRunner({
 
         <div className="space-y-2.5">
           {wrongCount > 0 && (
-            <Link
-              href={`${quizUrl}&mode=wrong`}
+            <button
+              type="button"
+              onClick={() => restartQuiz("wrong")}
               className="block w-full text-center bg-[var(--color-primary)] text-white font-semibold py-3.5 rounded-xl tap-highlight active:opacity-80 transition-opacity"
             >
               Zopakovat chybné ({wrongCount})
-            </Link>
+            </button>
           )}
-          <Link
-            href={quizUrl}
+          <button
+            type="button"
+            onClick={() => restartQuiz("normal")}
             className="block w-full text-center bg-white dark:bg-transparent text-[var(--color-primary)] dark:text-blue-400 font-semibold py-3.5 rounded-xl border-2 border-[var(--color-primary)] dark:border-blue-400 tap-highlight active:bg-gray-50 dark:active:bg-gray-800 transition-colors"
           >
             Zopakovat vše
-          </Link>
+          </button>
           <Link
             href={backHref}
             className="block w-full text-center text-gray-500 font-medium py-3.5 tap-highlight"
