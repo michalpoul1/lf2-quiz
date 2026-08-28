@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo } from "react";
 import { getSubjectData, getChapterQuestions, countValidQuestions } from "@/lib/data";
 import { getChapterProgress, getTotalProgress, getSubjectProgress } from "@/lib/progress";
 import { normalizeText, getHighlightedSegments } from "@/lib/searchUtils";
+import { useRefreshOnReturn } from "@/lib/useRefreshOnReturn";
 import type { ChapterProgress, Question } from "@/lib/types";
 
 function HighlightedText({ text, term }: { text: string; term: string }) {
@@ -37,7 +38,9 @@ export default function ChapterList({ subject, subjectName }: Props) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  useEffect(() => {
+  // Refresh on mount and every return to this page so the wrong-count reflects
+  // "Už umím" removals done in the wrong-mode quiz without needing a reload.
+  useRefreshOnReturn(() => {
     if (!data) return;
     const cp: Record<string, ChapterProgress> = {};
     for (const ch of data.chapters) {
@@ -53,7 +56,7 @@ export default function ChapterList({ subject, subjectName }: Props) {
       wrongCount += cp.wrongIds.length;
     }
     setTotalWrong(wrongCount);
-  }, [data, subject]);
+  });
 
   // Debounce search
   useEffect(() => {

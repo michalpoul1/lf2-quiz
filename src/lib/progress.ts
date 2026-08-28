@@ -143,6 +143,29 @@ export function getQuestionStatus(
   return "unanswered";
 }
 
+/**
+ * Manually remove a question from the wrongIds list for a given subject +
+ * chapter/subchapter key. Used by the "Už umím" button in wrong-mode quiz.
+ * Does NOT touch correctIds, counters or the daily-goal streak.
+ */
+export function removeFromWrong(
+  subject: string,
+  chapterId: number | string,
+  questionId: number | string
+): void {
+  const all = getAll();
+  const fp = all[FACULTY];
+  if (!fp) return;
+  const sp = fp[subject];
+  if (!sp) return;
+  const cp = sp[String(chapterId)];
+  if (!cp) return;
+  const qidStr = String(questionId);
+  const before = cp.wrongIds.length;
+  cp.wrongIds = cp.wrongIds.filter((id) => String(id) !== qidStr);
+  if (cp.wrongIds.length !== before) saveAll(all);
+}
+
 export function resetProgress(subject: string) {
   const all = getAll();
   if (all[FACULTY]) {

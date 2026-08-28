@@ -10,7 +10,7 @@ import {
   shuffleArray,
   getExplanation,
 } from "@/lib/data";
-import { recordAnswer, getSubjectProgress } from "@/lib/progress";
+import { recordAnswer, getSubjectProgress, removeFromWrong } from "@/lib/progress";
 import { isQuestionSaved } from "@/lib/collections";
 import SaveToCollectionModal from "@/components/SaveToCollectionModal";
 import type { Question } from "@/lib/types";
@@ -85,6 +85,10 @@ export default function QuizRunner({
   // Prevents double-counting when user navigates back with the arrow and answers
   // the same question again — stats stay honest.
   const [recordedIds, setRecordedIds] = useState<Set<string>>(new Set());
+  // "Už umím" — questions the user dismissed from wrong-mode this run. They
+  // vanish from the visible list and their ids get removed from wrongIds in
+  // storage so the counter on the subject page reflects it too.
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
   const questions = useMemo(() => {
     let qs: Question[];
@@ -144,8 +148,12 @@ export default function QuizRunner({
     });
   };
 
-  const currentQuestion = questions[currentIndex];
-  const totalQuestions = questions.length;
+  const visibleQuestions = useMemo(
+    () => questions.filter((q) => !dismissedIds.has(String(q.id))),
+    [questions, dismissedIds]
+  );
+  const currentQuestion = visibleQuestions[currentIndex];
+  const totalQuestions = visibleQuestions.length;
 
   const findProgressKey = useCallback(
     (qId: number | string): string => {
@@ -224,6 +232,33 @@ export default function QuizRunner({
     if (currentIndex <= 0) return;
     setCurrentIndex((i) => i - 1);
     resetQuestionUi();
+  };
+
+  /**
+   * Mark the current wrong-mode question as "Už umím" — remove its id from
+   * wrongIds in storage and hide it from the visible list. Adjusts
+   * currentIndex to stay within bounds; ends the quiz when the list empties.
+   */
+  const handleAlreadyKnow = () => {
+    if (!currentQuestion) return;
+    const qId = currentQuestion.id;
+    const key = findProgressKey(qId);
+    removeFromWrong(subject, key, qId);
+    setDismissedIds((prev) => {
+      const next = new Set(prev);
+      next.add(String(qId));
+      return next;
+    });
+    // If we just dismissed the last remaining question, jump to results.
+    // Otherwise stay at the same index (the next question slides in) but
+    // clamp to length - 1 if we were at the end.
+    const remaining = totalQuestions - 1;
+    if (remaining <= 0) {
+      setQuizState("results");
+    } else {
+      if (currentIndex >= remaining) setCurrentIndex(remaining - 1);
+      resetQuestionUi();
+    }
   };
 
   const toggleOption = (letter: string) => {
@@ -453,6 +488,23 @@ export default function QuizRunner({
           </svg>
         </button>
       </div>
+
+      {/* "Už umím" — only shown in wrong-mode; removes the current question
+          from wrongIds and hides it from this run. */}
+      {mode === "wrong" && (
+        <div className="flex justify-end mb-3">
+          <button
+            type="button"
+            onClick={handleAlreadyKnow}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-correct)] bg-green-50 dark:bg-green-950/30 hover:bg-green-100 dark:hover:bg-green-950/50 border border-green-200 dark:border-green-900/50 px-3 py-1.5 rounded-full tap-highlight transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            Už umím
+          </button>
+        </div>
+      )}
 
       {/* Question */}
       <div key={String(currentQuestion.id)} className="fade-in">
