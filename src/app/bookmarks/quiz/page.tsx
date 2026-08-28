@@ -84,6 +84,10 @@ function BookmarkQuizInner() {
   const [modalSubject, setModalSubject] = useState<string>("");
   const [removeCorrect, setRemoveCorrect] = useState(false);
   const [removalDone, setRemovalDone] = useState(false);
+  // Per-run set of already-recorded question ids so navigating back with
+  // the arrow and answering again doesn't double-count in stats. Matches
+  // QuizRunner. Key = `${subject}::${questionId}` since bookmarks mix subjects.
+  const [recordedIds, setRecordedIds] = useState<Set<string>>(new Set());
 
   // Resolve the question pool from the chosen collection (after mount, so localStorage
   // reads don't cause hydration mismatches).
@@ -134,6 +138,11 @@ function BookmarkQuizInner() {
     });
   };
 
+  const resetQuestionUi = () => {
+    setSelected(new Set());
+    setChecked(false);
+  };
+
   const handleCheck = () => {
     if (!currentQuestion || selected.size === 0) return;
     setChecked(true);
@@ -142,16 +151,26 @@ function BookmarkQuizInner() {
     const isCorrect =
       selectedArr.length === correctSet.size &&
       selectedArr.every((s) => correctSet.has(s));
-    const key = findProgressKey(currentQuestion._subject, currentQuestion.id);
-    recordAnswer(currentQuestion._subject, key, currentQuestion.id, isCorrect);
-    setResults((prev) => [
-      ...prev,
-      {
-        questionId: currentQuestion.id,
-        subject: currentQuestion._subject,
-        correct: isCorrect,
-      },
-    ]);
+    // Guard against double-count if the user navigates back via the arrow
+    // and answers the same question again.
+    const recordKey = `${currentQuestion._subject}::${currentQuestion.id}`;
+    if (!recordedIds.has(recordKey)) {
+      const key = findProgressKey(currentQuestion._subject, currentQuestion.id);
+      recordAnswer(currentQuestion._subject, key, currentQuestion.id, isCorrect);
+      setRecordedIds((prev) => {
+        const next = new Set(prev);
+        next.add(recordKey);
+        return next;
+      });
+      setResults((prev) => [
+        ...prev,
+        {
+          questionId: currentQuestion.id,
+          subject: currentQuestion._subject,
+          correct: isCorrect,
+        },
+      ]);
+    }
   };
 
   const handleNext = () => {
@@ -159,9 +178,22 @@ function BookmarkQuizInner() {
       setQuizState("results");
     } else {
       setCurrentIndex((i) => i + 1);
-      setSelected(new Set());
-      setChecked(false);
+      resetQuestionUi();
     }
+  };
+
+  /** Skip forward without recording. Disabled on last question. */
+  const handleSkipForward = () => {
+    if (currentIndex + 1 >= totalQuestions) return;
+    setCurrentIndex((i) => i + 1);
+    resetQuestionUi();
+  };
+
+  /** Go back to previous question. Disabled on first. */
+  const handleSkipBack = () => {
+    if (currentIndex <= 0) return;
+    setCurrentIndex((i) => i - 1);
+    resetQuestionUi();
   };
 
   const toggleOption = (letter: string) => {
@@ -305,7 +337,7 @@ function BookmarkQuizInner() {
 
   return (
     <main className="pt-4 pb-4">
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-3">
         <Link
           href="/bookmarks"
           className="text-gray-400 tap-highlight p-1"
@@ -333,9 +365,43 @@ function BookmarkQuizInner() {
             }}
           />
         </div>
-        <span className="text-xs text-gray-400 whitespace-nowrap min-w-[3.5rem] text-right">
+      </div>
+
+      {/* Prev / counter / Next — same UX as chapter QuizRunner */}
+      <div className="flex items-center justify-between gap-2 mb-4 px-1">
+        <button
+          type="button"
+          onClick={handleSkipBack}
+          disabled={currentIndex <= 0}
+          aria-label="Předchozí otázka"
+          className={`p-2 rounded-lg tap-highlight transition-colors ${
+            currentIndex <= 0
+              ? "text-gray-300 dark:text-gray-700 cursor-not-allowed"
+              : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+          }`}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
           {currentIndex + 1} / {totalQuestions}
         </span>
+        <button
+          type="button"
+          onClick={handleSkipForward}
+          disabled={currentIndex + 1 >= totalQuestions}
+          aria-label="Další otázka"
+          className={`p-2 rounded-lg tap-highlight transition-colors ${
+            currentIndex + 1 >= totalQuestions
+              ? "text-gray-300 dark:text-gray-700 cursor-not-allowed"
+              : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+          }`}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
 
       <div key={String(currentQuestion.id)} className="fade-in">
