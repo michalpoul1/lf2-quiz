@@ -234,7 +234,7 @@ export default function ChapterList({ subject, subjectName }: Props) {
             </Link>
             {totalWrong > 0 && (
               <Link
-                href={`/${subject}/quiz?chapter=all&mode=wrong`}
+                href={`/${subject}/wrong`}
                 className="flex-1 text-center bg-[var(--color-wrong)] text-white font-semibold py-3.5 rounded-xl tap-highlight active:opacity-80 transition-opacity"
               >
                 Chyby ({totalWrong})
