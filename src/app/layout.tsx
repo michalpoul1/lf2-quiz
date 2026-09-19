@@ -31,18 +31,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="cs" className="h-full" suppressHydrationWarning>
+    <html lang="cs" suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <Script id="theme-init" strategy="beforeInteractive">
           {`(function(){try{var t=localStorage.getItem('lf2-quiz-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`}
         </Script>
       </head>
-      <body className="min-h-full flex flex-col safe-area-top">
+      <body className="safe-area-top">
         <ThemeProvider>
           <SWRegister />
           <ThemeToggle />
-          <div className="flex-1 w-full max-w-[640px] mx-auto px-4 pb-20">
+          <div className="w-full max-w-[640px] mx-auto px-4 pb-20">
             {children}
           </div>
           <BottomNav />
