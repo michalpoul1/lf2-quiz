@@ -584,6 +584,18 @@ export default function ExamSimulationPage() {
                       {q.text}
                     </p>
                   </div>
+                  {q.image && (
+                    <div className="pl-9 mb-3">
+                      <div className="inline-block rounded-lg bg-white p-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={q.image}
+                          alt="Strukturní vzorec"
+                          className="max-w-full h-auto"
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div className="space-y-1.5 pl-9">
                     {q.options.map((opt) => {
                       const isSelected = selected.includes(opt.letter);
@@ -615,7 +627,20 @@ export default function ExamSimulationPage() {
                               opt.letter
                             )}
                           </div>
-                          <span className="leading-snug">{opt.text}</span>
+                          <span className="leading-snug">
+                            {opt.image ? (
+                              <span className="inline-block rounded-md bg-white p-2">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={opt.image}
+                                  alt={`Možnost ${opt.letter}`}
+                                  className="max-h-24 w-auto"
+                                />
+                              </span>
+                            ) : (
+                              opt.text
+                            )}
+                          </span>
                         </button>
                       );
                     })}
@@ -790,6 +815,18 @@ export default function ExamSimulationPage() {
                       </span>
                       <p className="text-sm leading-snug flex-1">{s.question.text}</p>
                     </div>
+                    {s.question.image && (
+                      <div className="pl-8 mb-2">
+                        <div className="inline-block rounded-lg bg-white p-2">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={s.question.image}
+                            alt="Strukturní vzorec"
+                            className="max-w-full h-auto"
+                          />
+                        </div>
+                      </div>
+                    )}
                     <div className="pl-8 space-y-1">
                       {s.question.options.map((opt) => {
                         const isCorrect = correctLetters.includes(opt.letter);
@@ -816,7 +853,20 @@ export default function ExamSimulationPage() {
                             >
                               {opt.letter}
                             </span>
-                            <span>{opt.text}</span>
+                            <span>
+                              {opt.image ? (
+                                <span className="inline-block rounded bg-white p-1">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={opt.image}
+                                    alt={`Možnost ${opt.letter}`}
+                                    className="max-h-12 w-auto"
+                                  />
+                                </span>
+                              ) : (
+                                opt.text
+                              )}
+                            </span>
                           </div>
                         );
                       })}

@@ -445,6 +445,16 @@ export default function QuickTestPage() {
                     </button>
                     {expanded && (
                       <div className="px-4 pb-4 space-y-1.5">
+                        {r.question.image && (
+                          <div className="mb-2 inline-block rounded-lg bg-white p-2">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={r.question.image}
+                              alt="Strukturní vzorec"
+                              className="max-w-full h-auto"
+                            />
+                          </div>
+                        )}
                         {r.question.options.map((opt) => {
                           const isCorrect = r.question.correct.includes(opt.letter);
                           const wasSelected = r.userAnswer.includes(opt.letter);
@@ -470,7 +480,20 @@ export default function QuickTestPage() {
                               >
                                 {opt.letter}
                               </span>
-                              <span className={isCorrect ? "font-medium" : ""}>{opt.text}</span>
+                              <span className={isCorrect ? "font-medium" : ""}>
+                                {opt.image ? (
+                                  <span className="inline-block rounded bg-white p-1">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                      src={opt.image}
+                                      alt={`Možnost ${opt.letter}`}
+                                      className="max-h-12 w-auto"
+                                    />
+                                  </span>
+                                ) : (
+                                  opt.text
+                                )}
+                              </span>
                             </div>
                           );
                         })}
@@ -572,6 +595,16 @@ export default function QuickTestPage() {
             </button>
           </div>
           <p className="text-base font-medium leading-relaxed">{currentQuestion.text}</p>
+          {currentQuestion.image && (
+            <div className="mt-3 inline-block rounded-lg bg-white p-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={currentQuestion.image}
+                alt="Strukturní vzorec"
+                className="max-w-full h-auto"
+              />
+            </div>
+          )}
         </div>
 
         <p className="text-xs text-gray-400 mb-3 px-1">Vyberte 1 nebo více správných odpovědí</p>
@@ -619,7 +652,18 @@ export default function QuickTestPage() {
                   )}
                 </div>
                 <span className="text-base leading-snug pt-0.5">
-                  {opt.text}
+                  {opt.image ? (
+                    <span className="inline-block rounded-md bg-white p-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={opt.image}
+                        alt={`Možnost ${opt.letter}`}
+                        className="max-h-24 w-auto"
+                      />
+                    </span>
+                  ) : (
+                    opt.text
+                  )}
                   {checked && textExtra && <span className="text-[var(--color-missed)] text-sm font-medium">{textExtra}</span>}
                 </span>
               </button>
