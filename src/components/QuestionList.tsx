@@ -2,10 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { getSubjectData, filterValidQuestions } from "@/lib/data";
+import { getSubjectData, filterValidQuestions, getWrongQuestions } from "@/lib/data";
 import {
   getQuestionStatus,
-  getSubjectProgress,
   removeFromWrong,
 } from "@/lib/progress";
 import { useRefreshOnReturn } from "@/lib/useRefreshOnReturn";
@@ -77,16 +76,16 @@ export default function QuestionList({
   const groups = useMemo<Group[]>(() => {
     if (wrongOnly) {
       if (!data) return [];
-      const progress = getSubjectProgress(subject);
+      // Single source of truth — dedupes across all progress keys and keeps
+      // only questions that still exist in current data.
+      const wrongIdSet = new Set(getWrongQuestions(subject).map((q) => String(q.id)));
+      if (wrongIdSet.size === 0) return [];
       const out: Group[] = [];
       for (const ch of data.chapters) {
         if (ch.subchapters && ch.subchapters.length > 0) {
           for (const sub of ch.subchapters) {
-            const cp = progress[sub.id];
-            const wrongSet = new Set((cp?.wrongIds ?? []).map(String));
-            if (wrongSet.size === 0) continue;
             const items = filterValidQuestions(sub.questions)
-              .filter((q) => wrongSet.has(String(q.id)))
+              .filter((q) => wrongIdSet.has(String(q.id)))
               .map((q) => ({
                 question: q,
                 chapterId: ch.id,
@@ -99,11 +98,8 @@ export default function QuestionList({
             }
           }
         } else if (ch.questions) {
-          const cp = progress[String(ch.id)];
-          const wrongSet = new Set((cp?.wrongIds ?? []).map(String));
-          if (wrongSet.size === 0) continue;
           const items = filterValidQuestions(ch.questions)
-            .filter((q) => wrongSet.has(String(q.id)))
+            .filter((q) => wrongIdSet.has(String(q.id)))
             .map((q) => ({
               question: q,
               chapterId: ch.id,

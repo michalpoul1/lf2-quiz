@@ -4,6 +4,7 @@ import chemistryData2lf from "../../data/2lf/chemistry.json";
 import explanationsBiology2lf from "../../data/2lf/explanations-biology.json";
 import explanationsChemistry2lf from "../../data/2lf/explanations-chemistry.json";
 import explanationsPhysics2lf from "../../data/2lf/explanations-physics.json";
+import { getSubjectProgress } from "./progress";
 import type { SubjectData, Question } from "./types";
 
 // Internal namespace — kept under "2lf" so localStorage shape (which is
@@ -83,6 +84,25 @@ export function countValidQuestions(questions: Question[]): number {
 
 export function filterValidQuestions(questions: Question[]): Question[] {
   return questions.filter((q) => q.correct.length > 0);
+}
+
+/**
+ * Single source of truth for "wrong questions" in a subject. Dedupes IDs
+ * across all progress keys (Set-union), then intersects with valid questions
+ * present in current data. Used by the wrong-count badge on the subject page,
+ * the "Moje chyby" list, and the "Procvičit všechny chybné" quiz — all three
+ * must show the same number.
+ */
+export function getWrongQuestions(subject: string): Question[] {
+  const data = getSubjectData(subject);
+  if (!data) return [];
+  const progress = getSubjectProgress(subject);
+  const wrongSet = new Set<string>();
+  for (const cp of Object.values(progress)) {
+    (cp?.wrongIds ?? []).forEach((id) => wrongSet.add(String(id)));
+  }
+  const all = filterValidQuestions(getChapterQuestions(subject, "all"));
+  return all.filter((q) => wrongSet.has(String(q.id)));
 }
 
 export function shuffleArray<T>(array: T[]): T[] {

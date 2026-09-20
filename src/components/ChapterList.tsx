@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
-import { getSubjectData, getChapterQuestions, countValidQuestions } from "@/lib/data";
-import { getChapterProgress, getTotalProgress, getSubjectProgress } from "@/lib/progress";
+import { getSubjectData, getChapterQuestions, countValidQuestions, getWrongQuestions } from "@/lib/data";
+import { getChapterProgress, getTotalProgress } from "@/lib/progress";
+import { dumpWrongIdsDiagnostics, diagnoseWrongIds } from "@/lib/wrongIdsDiagnostics";
 import { normalizeText, getHighlightedSegments } from "@/lib/searchUtils";
 import { useRefreshOnReturn } from "@/lib/useRefreshOnReturn";
 import type { ChapterProgress, Question } from "@/lib/types";
@@ -49,14 +50,16 @@ export default function ChapterList({ subject, subjectName }: Props) {
     setChapterProgress(cp);
     setTotal(getTotalProgress(subject));
 
-    // Count total wrong answers
-    const progress = getSubjectProgress(subject);
-    let wrongCount = 0;
-    for (const cp of Object.values(progress)) {
-      wrongCount += cp.wrongIds.length;
-    }
-    setTotalWrong(wrongCount);
+    // Wrong count via single source of truth — see getWrongQuestions.
+    setTotalWrong(getWrongQuestions(subject).length);
   });
+
+  // Expose read-only wrongIds diagnostics on window for manual inspection.
+  useEffect(() => {
+    const w = window as unknown as Record<string, unknown>;
+    w.dumpWrongIds = dumpWrongIdsDiagnostics;
+    w.diagnoseWrongIds = diagnoseWrongIds;
+  }, []);
 
   // Debounce search
   useEffect(() => {

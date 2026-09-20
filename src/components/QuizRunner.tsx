@@ -9,6 +9,7 @@ import {
   filterValidQuestions,
   shuffleArray,
   getExplanation,
+  getWrongQuestions,
 } from "@/lib/data";
 import { recordAnswer, getSubjectProgress, removeFromWrong } from "@/lib/progress";
 import { isQuestionSaved } from "@/lib/collections";
@@ -98,22 +99,23 @@ export default function QuizRunner({
   const questions = useMemo(() => {
     let qs: Question[];
     if (effectiveMode === "wrong") {
-      const progress = getSubjectProgress(subject);
-      const wrongIds = new Set<string>();
       if (chapterId === "all") {
-        for (const cp of Object.values(progress)) {
-          cp.wrongIds.forEach((id) => wrongIds.add(String(id)));
-        }
+        // Single source of truth — must equal the wrong-count badge and the
+        // "Moje chyby" list length.
+        qs = getWrongQuestions(subject);
       } else {
-        // Collect from chapter and any subchapters
+        // Per-chapter wrong-mode: still scoped to keys of this chapter/sub,
+        // and intersected with sourceQuestions so stale ids get dropped.
+        const progress = getSubjectProgress(subject);
+        const wrongIds = new Set<string>();
         const cp = progress[String(chapterId)];
         if (cp) cp.wrongIds.forEach((id) => wrongIds.add(String(id)));
         if (subchapterParam) {
           const scp = progress[subchapterParam];
           if (scp) scp.wrongIds.forEach((id) => wrongIds.add(String(id)));
         }
+        qs = sourceQuestions.filter((q) => wrongIds.has(String(q.id)));
       }
-      qs = sourceQuestions.filter((q) => wrongIds.has(String(q.id)));
     } else {
       qs = sourceQuestions;
     }
