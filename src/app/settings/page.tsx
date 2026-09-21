@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import { useTheme } from "@/lib/theme";
 import { getDailyGoal, setDailyGoal } from "@/lib/streak";
 import { diagnoseWrongIds } from "@/lib/wrongIdsDiagnostics";
+import {
+  buildBackup,
+  backupFilename,
+  validateBackup,
+  restoreBackup,
+  countBackupKeys,
+  type BackupFile,
+} from "@/lib/backup";
 
 const GOAL_PRESETS = [5, 10, 15, 20, 30, 50];
 
@@ -51,6 +59,64 @@ export default function SettingsPage() {
       setCopyMsg("Zkopírováno do schránky ✓");
     } catch {
       setCopyMsg("Kopírování selhalo — označ text prstem a použij Kopírovat.");
+    }
+  };
+
+  // ── Backup / restore ──────────────────────────────────────────────────────
+  const [importStatus, setImportStatus] = useState<
+    | { kind: "idle" }
+    | { kind: "error"; message: string }
+    | { kind: "success"; message: string }
+  >({ kind: "idle" });
+
+  const exportBackup = () => {
+    const backup = buildBackup();
+    const text = JSON.stringify(backup, null, 2);
+    const filename = backupFilename();
+    const blob = new Blob([text], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  };
+
+  const handleImportFile = async (file: File) => {
+    setImportStatus({ kind: "idle" });
+    let backup: BackupFile;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      backup = validateBackup(parsed);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Neznámá chyba.";
+      setImportStatus({ kind: "error", message: `Import selhal: ${msg}` });
+      return;
+    }
+    const keyCount = countBackupKeys(backup);
+    const when = backup.exportedAt
+      ? new Date(backup.exportedAt).toLocaleString("cs-CZ")
+      : "neznámé datum";
+    const ok = window.confirm(
+      `Opravdu chcete přepsat současná data zálohou?\n\n` +
+        `Záloha: ${when}\nPoložek: ${keyCount}\n\nTato akce je nevratná.`
+    );
+    if (!ok) {
+      setImportStatus({ kind: "idle" });
+      return;
+    }
+    try {
+      restoreBackup(backup);
+      setImportStatus({
+        kind: "success",
+        message: `Import proběhl (${keyCount} položek). Načtěte stránku pro projevení změn.`,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Neznámá chyba.";
+      setImportStatus({ kind: "error", message: `Uložení selhalo: ${msg}` });
     }
   };
 
@@ -168,6 +234,48 @@ export default function SettingsPage() {
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
           Aktuální cíl: <span className="font-medium text-gray-700 dark:text-gray-200">{goal} otázek / den</span>
         </p>
+      </div>
+
+      {/* Backup / restore — pojistka před migrací dat. */}
+      <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mt-4">
+        <p className="font-medium">Záloha dat</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5 mb-3">
+          Uloží všechen postup, chyby, záložky a nastavení do souboru. Import
+          soubor přepíše současná data — nejdřív se zeptá o potvrzení.
+        </p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={exportBackup}
+            className="flex-1 px-3 py-3 rounded-lg text-sm font-medium bg-[var(--color-primary)] text-white tap-highlight active:opacity-80 transition-opacity"
+          >
+            Exportovat data
+          </button>
+          <label className="flex-1 px-3 py-3 rounded-lg text-sm font-medium text-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 tap-highlight active:opacity-80 cursor-pointer">
+            Importovat data
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleImportFile(f);
+                // Reset so selecting the same file twice still triggers change.
+                e.target.value = "";
+              }}
+            />
+          </label>
+        </div>
+        {importStatus.kind === "error" && (
+          <p className="text-xs text-[var(--color-wrong)] mt-3">
+            {importStatus.message}
+          </p>
+        )}
+        {importStatus.kind === "success" && (
+          <p className="text-xs text-[var(--color-correct)] mt-3">
+            {importStatus.message}
+          </p>
+        )}
       </div>
 
       {/* Temporary diagnostic tool — remove once wrongIds bug is fully cleaned up. */}
