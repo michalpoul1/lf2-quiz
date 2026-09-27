@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "@/lib/theme";
 import { getDailyGoal, setDailyGoal } from "@/lib/streak";
 import { diagnoseWrongIds } from "@/lib/wrongIdsDiagnostics";
+import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
   buildBackup,
   backupFilename,
@@ -36,6 +37,31 @@ export default function SettingsPage() {
   };
 
   const isPreset = GOAL_PRESETS.includes(goal);
+
+  // ── Supabase connection smoke test ────────────────────────────────────────
+  const [supabaseStatus, setSupabaseStatus] = useState<string>("");
+
+  const testSupabase = async () => {
+    setSupabaseStatus("Testuji…");
+    if (!isSupabaseConfigured()) {
+      setSupabaseStatus("Chyba: chybí NEXT_PUBLIC_SUPABASE_URL / _ANON_KEY.");
+      return;
+    }
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        setSupabaseStatus(`Chyba getSession: ${error.message}`);
+        return;
+      }
+      setSupabaseStatus(
+        `OK — klient inicializován. Aktivní session: ${data.session ? "ano" : "ne"}.`
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setSupabaseStatus(`Chyba: ${msg}`);
+    }
+  };
 
   // ── Wrong-ids diagnostics (temporary tool) ────────────────────────────────
   const [diagText, setDiagText] = useState<string>("");
@@ -274,6 +300,35 @@ export default function SettingsPage() {
         {importStatus.kind === "success" && (
           <p className="text-xs text-[var(--color-correct)] mt-3">
             {importStatus.message}
+          </p>
+        )}
+      </div>
+
+      {/* Supabase smoke test — Krok 2 přihlašování. Odstranit až bude auth UI. */}
+      <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mt-4">
+        <p className="font-medium">Supabase (test připojení)</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5 mb-3">
+          Ověří, že se klient inicializuje a zavolá auth.getSession(). Žádné
+          přihlášení se neděje.
+        </p>
+        <button
+          type="button"
+          onClick={testSupabase}
+          className="w-full px-4 py-3 rounded-lg text-sm font-medium bg-[var(--color-primary)] text-white tap-highlight active:opacity-80 transition-opacity"
+        >
+          Otestovat připojení
+        </button>
+        {supabaseStatus && (
+          <p
+            className={`text-xs mt-3 ${
+              supabaseStatus.startsWith("OK")
+                ? "text-[var(--color-correct)]"
+                : supabaseStatus.startsWith("Chyba")
+                ? "text-[var(--color-wrong)]"
+                : "text-gray-500 dark:text-gray-400"
+            }`}
+          >
+            {supabaseStatus}
           </p>
         )}
       </div>
