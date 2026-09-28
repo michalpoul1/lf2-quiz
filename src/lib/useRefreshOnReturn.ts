@@ -33,14 +33,18 @@ export function useRefreshOnReturn(callback: () => void): void {
     };
     const onFocus = () => cbRef.current();
     const onStorage = () => cbRef.current();
+    const onProgress = () => cbRef.current();
 
     document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener("focus", onFocus);
     window.addEventListener("storage", onStorage);
+    // Fires when the in-memory progress store mutates (cloud hydrate, record).
+    window.addEventListener("lf2-progress-updated", onProgress);
     return () => {
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("focus", onFocus);
       window.removeEventListener("storage", onStorage);
+      window.removeEventListener("lf2-progress-updated", onProgress);
     };
   }, [pathname]);
 }

@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/lib/theme";
 import { AuthProvider } from "@/lib/auth";
 import BottomNav from "@/components/BottomNav";
 import ThemeToggle from "@/components/ThemeToggle";
+import MigrationDialog from "@/components/MigrationDialog";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -48,6 +49,7 @@ export default function RootLayout({
               {children}
             </div>
             <BottomNav />
+            <MigrationDialog />
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -20,7 +20,7 @@ const GOAL_PRESETS = [5, 10, 15, 20, 30, 50];
 
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading, signOut, syncMode, syncError } = useAuth();
   const [goal, setGoalState] = useState<number>(10);
   const [customValue, setCustomValue] = useState<string>("");
 
@@ -193,8 +193,25 @@ export default function SettingsPage() {
           <p className="text-sm text-gray-400 dark:text-gray-500">Načítám…</p>
         ) : user ? (
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 break-all">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 break-all">
               Přihlášen jako <span className="font-medium text-gray-800 dark:text-gray-200">{user.email}</span>
+            </p>
+            <p
+              className={`text-xs mb-3 ${
+                syncMode === "cloud"
+                  ? "text-[var(--color-correct)]"
+                  : syncMode === "loading"
+                  ? "text-gray-500 dark:text-gray-400"
+                  : syncMode === "error"
+                  ? "text-[var(--color-wrong)]"
+                  : "text-gray-500 dark:text-gray-400"
+              }`}
+            >
+              {syncMode === "cloud" && "✓ Postup synchronizován s cloudem"}
+              {syncMode === "loading" && "Synchronizuji postup…"}
+              {syncMode === "error" &&
+                `Sync selhal (${syncError ?? "neznámá chyba"}). Data jsou v pořádku lokálně.`}
+              {syncMode === "local" && "Postup se ukládá jen lokálně (sync není aktivní)."}
             </p>
             <button
               type="button"

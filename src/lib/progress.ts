@@ -1,73 +1,27 @@
 import type { SubjectProgress, ChapterProgress } from "./types";
 import { bumpTodayCount } from "./streak";
+import {
+  FACULTY_KEY,
+  getStoreState,
+  hydrateFromLocalOnce,
+  mutate,
+} from "./progressStore";
 
-const STORAGE_KEY = "lf2-quiz-progress";
-const LEGACY_SUBJECT_KEYS = new Set(["biology", "chemistry", "physics"]);
+/**
+ * Read/write facade over the progress store. All functions stay synchronous
+ * so the existing callsites (ChapterList, QuizRunner, statistics, …) didn't
+ * have to change. Under the hood the store persists to either localStorage
+ * (logged out) or Supabase (logged in) via a debounced flush.
+ */
 
-// Storage shape stays nested under the 2lf namespace so existing users keep
-// their progress. Don't flatten without a migration.
-const FACULTY = "2lf";
-
-type FacultyProgress = Record<string, SubjectProgress>;
-type AllProgress = Record<string, FacultyProgress>;
-
-let migrationDone = false;
-
-function migrateIfNeeded(raw: unknown): AllProgress {
-  if (!raw || typeof raw !== "object") return {};
-  const obj = raw as Record<string, unknown>;
-  // Detect legacy shape: top-level keys are subject names.
-  const topKeys = Object.keys(obj);
-  const looksLegacy = topKeys.some((k) => LEGACY_SUBJECT_KEYS.has(k));
-  if (!looksLegacy) return obj as AllProgress;
-  // Move top-level subject entries under the 2lf bucket.
-  const migrated: AllProgress = {};
-  const legacyFacultyBucket: FacultyProgress = {};
-  for (const [k, v] of Object.entries(obj)) {
-    if (LEGACY_SUBJECT_KEYS.has(k)) {
-      legacyFacultyBucket[k] = v as SubjectProgress;
-    } else {
-      // Preserve any non-subject top-level entries that might already be faculty-keyed.
-      migrated[k] = v as FacultyProgress;
-    }
-  }
-  if (Object.keys(legacyFacultyBucket).length > 0) {
-    migrated[FACULTY] = {
-      ...(migrated[FACULTY] || {}),
-      ...legacyFacultyBucket,
-    };
-  }
-  return migrated;
-}
-
-function getAll(): AllProgress {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : {};
-    if (!migrationDone) {
-      const migrated = migrateIfNeeded(parsed);
-      migrationDone = true;
-      // Persist migration if it changed shape.
-      if (JSON.stringify(migrated) !== JSON.stringify(parsed)) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-      }
-      return migrated;
-    }
-    return parsed;
-  } catch {
-    return {};
-  }
-}
-
-function saveAll(data: AllProgress) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+function ensureHydrated() {
+  hydrateFromLocalOnce();
 }
 
 export function getSubjectProgress(subject: string): SubjectProgress {
-  const all = getAll();
-  return all[FACULTY]?.[subject] || {};
+  ensureHydrated();
+  const all = getStoreState().data;
+  return all[FACULTY_KEY]?.[subject] || {};
 }
 
 export function getChapterProgress(
@@ -97,40 +51,35 @@ export function recordAnswer(
   questionId: number | string,
   isCorrect: boolean
 ) {
-  const all = getAll();
-  if (!all[FACULTY]) all[FACULTY] = {};
-  const fp = all[FACULTY];
-  if (!fp[subject]) fp[subject] = {};
-  const key = String(chapterId);
-  if (!fp[subject][key]) {
-    fp[subject][key] = { answered: 0, correct: 0, wrongIds: [], correctIds: [] };
-  }
-  const ch = fp[subject][key];
-  if (!ch.correctIds) ch.correctIds = [];
-  ch.answered += 1;
-  const qidStr = String(questionId);
-  if (isCorrect) {
-    ch.correct += 1;
-    ch.wrongIds = ch.wrongIds.filter((id) => String(id) !== qidStr);
-    if (!ch.correctIds.some((id) => String(id) === qidStr)) {
-      ch.correctIds.push(questionId);
+  ensureHydrated();
+  mutate((all) => {
+    if (!all[FACULTY_KEY]) all[FACULTY_KEY] = {};
+    const fp = all[FACULTY_KEY];
+    if (!fp[subject]) fp[subject] = {};
+    const key = String(chapterId);
+    if (!fp[subject][key]) {
+      fp[subject][key] = { answered: 0, correct: 0, wrongIds: [], correctIds: [] };
     }
-  } else {
-    ch.correctIds = ch.correctIds.filter((id) => String(id) !== qidStr);
-    if (!ch.wrongIds.some((id) => String(id) === qidStr)) {
-      ch.wrongIds.push(questionId);
+    const ch = fp[subject][key];
+    if (!ch.correctIds) ch.correctIds = [];
+    ch.answered += 1;
+    const qidStr = String(questionId);
+    if (isCorrect) {
+      ch.correct += 1;
+      ch.wrongIds = ch.wrongIds.filter((id) => String(id) !== qidStr);
+      if (!ch.correctIds.some((id) => String(id) === qidStr)) {
+        ch.correctIds.push(questionId);
+      }
+    } else {
+      ch.correctIds = ch.correctIds.filter((id) => String(id) !== qidStr);
+      if (!ch.wrongIds.some((id) => String(id) === qidStr)) {
+        ch.wrongIds.push(questionId);
+      }
     }
-  }
-  saveAll(all);
-  // Every recorded answer counts toward today's daily-goal streak.
+  });
   bumpTodayCount();
 }
 
-/**
- * Return whether a question has been answered correctly, incorrectly, or not at all.
- * Works even on legacy records missing `correctIds` — those questions will look
- * as "unanswered" for the correct-branch until the user answers again.
- */
 export function getQuestionStatus(
   subject: string,
   chapterId: number | string,
@@ -143,39 +92,37 @@ export function getQuestionStatus(
   return "unanswered";
 }
 
-/**
- * Manually remove a question from the wrongIds list for a given subject +
- * chapter/subchapter key. Used by the "Už umím" button in wrong-mode quiz.
- * Does NOT touch correctIds, counters or the daily-goal streak.
- */
 export function removeFromWrong(
   subject: string,
   chapterId: number | string,
   questionId: number | string
 ): void {
-  const all = getAll();
-  const fp = all[FACULTY];
-  if (!fp) return;
-  const sp = fp[subject];
-  if (!sp) return;
-  const cp = sp[String(chapterId)];
-  if (!cp) return;
-  const qidStr = String(questionId);
-  const before = cp.wrongIds.length;
-  cp.wrongIds = cp.wrongIds.filter((id) => String(id) !== qidStr);
-  if (cp.wrongIds.length !== before) saveAll(all);
+  ensureHydrated();
+  mutate((all) => {
+    const fp = all[FACULTY_KEY];
+    if (!fp) return;
+    const sp = fp[subject];
+    if (!sp) return;
+    const cp = sp[String(chapterId)];
+    if (!cp) return;
+    const qidStr = String(questionId);
+    cp.wrongIds = cp.wrongIds.filter((id) => String(id) !== qidStr);
+  });
 }
 
 export function resetProgress(subject: string) {
-  const all = getAll();
-  if (all[FACULTY]) {
-    delete all[FACULTY][subject];
-    if (Object.keys(all[FACULTY]).length === 0) delete all[FACULTY];
-  }
-  saveAll(all);
+  ensureHydrated();
+  mutate((all) => {
+    if (all[FACULTY_KEY]) {
+      delete all[FACULTY_KEY][subject];
+      if (Object.keys(all[FACULTY_KEY]).length === 0) delete all[FACULTY_KEY];
+    }
+  });
 }
 
 export function resetAllProgress() {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(STORAGE_KEY);
+  ensureHydrated();
+  mutate((all) => {
+    for (const k of Object.keys(all)) delete all[k];
+  });
 }
