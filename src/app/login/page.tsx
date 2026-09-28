@@ -69,8 +69,8 @@ function LoginForm() {
     e.preventDefault();
     setFlashError("");
     const token = code.replace(/\s+/g, "").trim();
-    if (!/^\d{6}$/.test(token)) {
-      setPhase({ kind: "error", message: "Kód musí být 6místné číslo." });
+    if (!/^\d{4,12}$/.test(token)) {
+      setPhase({ kind: "error", message: "Kód z emailu musí obsahovat jen číslice." });
       return;
     }
     if (!isSupabaseConfigured()) {
@@ -135,29 +135,29 @@ function LoginForm() {
           <>
             <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-3 text-sm text-gray-700 dark:text-gray-200">
               Poslali jsme kód na <span className="font-medium">{email}</span>.
-              Otevři email a zadej 6místné číslo níže.
+              Otevři email a zadej číselný kód níže.
             </div>
 
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              6místný kód z emailu
+              Kód z emailu
               <input
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
                 autoComplete="one-time-code"
-                maxLength={6}
+                maxLength={12}
                 required
                 value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 12))}
                 disabled={isBusy}
-                placeholder="123456"
-                className="mt-1 w-full px-3 py-3 rounded-lg text-center text-2xl font-mono tracking-[0.5em] bg-gray-50 dark:bg-[#0f172a] border border-gray-200 dark:border-gray-700 focus:outline-none focus:border-[var(--color-primary)] disabled:opacity-60"
+                placeholder="Např. 123456"
+                className="mt-1 w-full px-3 py-3 rounded-lg text-center text-2xl font-mono tracking-[0.3em] bg-gray-50 dark:bg-[#0f172a] border border-gray-200 dark:border-gray-700 focus:outline-none focus:border-[var(--color-primary)] disabled:opacity-60"
               />
             </label>
 
             <button
               type="submit"
-              disabled={isBusy || code.length !== 6}
+              disabled={isBusy || code.length < 4}
               className="w-full px-4 py-3 rounded-lg text-sm font-semibold bg-[var(--color-primary)] text-white tap-highlight active:opacity-80 transition-opacity disabled:opacity-50"
             >
               {phase.kind === "verifying" ? "Ověřuji…" : "Potvrdit"}
@@ -222,7 +222,7 @@ export default function LoginPage() {
         Přihlášení
       </h1>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
-        Zadejte email a pošleme vám 6místný kód.
+        Zadejte email a pošleme vám přihlašovací kód.
       </p>
 
       <Suspense fallback={<div className="text-sm text-gray-400">Načítám…</div>}>
