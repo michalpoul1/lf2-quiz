@@ -37,12 +37,26 @@ async function fetchRow(
   userId: string
 ): Promise<{ exists: boolean; data: AllProgress }> {
   const supabase = getSupabase();
+  // Defensive sanity check — auth client sometimes lags a tick after
+  // verifyOtp on cold PWA loads; the request would then go out without a
+  // Bearer token and Supabase would return "permission denied for table".
+  // A quick getSession() forces the client to settle.
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) {
+    throw new Error("Session not ready yet");
+  }
   const { data, error } = await supabase
     .from(TABLE)
     .select("data")
     .eq("user_id", userId)
     .maybeSingle();
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw new Error(
+      `${error.message}${error.code ? ` (code ${error.code})` : ""}${
+        error.details ? ` — ${error.details}` : ""
+      }`
+    );
+  }
   if (!data) return { exists: false, data: {} };
   return { exists: true, data: (data.data as AllProgress) || {} };
 }
@@ -52,7 +66,13 @@ async function upsertRow(userId: string, data: AllProgress): Promise<void> {
   const { error } = await supabase
     .from(TABLE)
     .upsert({ user_id: userId, data, updated_at: new Date().toISOString() });
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw new Error(
+      `${error.message}${error.code ? ` (code ${error.code})` : ""}${
+        error.details ? ` — ${error.details}` : ""
+      }`
+    );
+  }
 }
 
 function installAdapter(userId: string) {
