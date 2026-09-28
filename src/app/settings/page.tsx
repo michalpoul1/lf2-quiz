@@ -5,6 +5,8 @@ import { useTheme } from "@/lib/theme";
 import { getDailyGoal, setDailyGoal } from "@/lib/streak";
 import { diagnoseWrongIds } from "@/lib/wrongIdsDiagnostics";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
+import Link from "next/link";
 import {
   buildBackup,
   backupFilename,
@@ -18,6 +20,7 @@ const GOAL_PRESETS = [5, 10, 15, 20, 30, 50];
 
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
+  const { user, loading: authLoading, signOut } = useAuth();
   const [goal, setGoalState] = useState<number>(10);
   const [customValue, setCustomValue] = useState<string>("");
 
@@ -183,6 +186,38 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-bold text-[var(--color-primary)] dark:text-blue-400 mb-5">
         Nastavení
       </h1>
+
+      <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mb-4">
+        <p className="font-medium mb-3">Účet</p>
+        {authLoading ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500">Načítám…</p>
+        ) : user ? (
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 break-all">
+              Přihlášen jako <span className="font-medium text-gray-800 dark:text-gray-200">{user.email}</span>
+            </p>
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="w-full px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 tap-highlight active:opacity-80 transition-opacity"
+            >
+              Odhlásit se
+            </button>
+          </div>
+        ) : (
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+              Nejste přihlášeni. Přihlášení zatím není povinné.
+            </p>
+            <Link
+              href="/login"
+              className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-[var(--color-primary)] text-white tap-highlight active:opacity-80 transition-opacity"
+            >
+              Přihlásit se
+            </Link>
+          </div>
+        )}
+      </div>
 
       <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-4">
         <div className="flex items-center justify-between p-4">

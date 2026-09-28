@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 import SWRegister from "./sw-register";
 import { ThemeProvider } from "@/lib/theme";
+import { AuthProvider } from "@/lib/auth";
 import BottomNav from "@/components/BottomNav";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -40,12 +41,14 @@ export default function RootLayout({
       </head>
       <body className="safe-area-top">
         <ThemeProvider>
-          <SWRegister />
-          <ThemeToggle />
-          <div className="w-full max-w-[640px] mx-auto px-4 pb-20">
-            {children}
-          </div>
-          <BottomNav />
+          <AuthProvider>
+            <SWRegister />
+            <ThemeToggle />
+            <div className="w-full max-w-[640px] mx-auto px-4 pb-20">
+              {children}
+            </div>
+            <BottomNav />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
