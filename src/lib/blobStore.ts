@@ -55,6 +55,12 @@ export interface BlobStore<T> {
   setCloudData(data: T): void;
   setCloudDataAndFlush(data: T): Promise<void>;
   mutate(updater: (draft: T) => void): void;
+  /**
+   * Wipe the localStorage mirror AND reset in-memory data to empty, in
+   * "local" mode. Used on logout from a cloud session so no trace of the
+   * previous user's data remains locally. Cloud data is untouched.
+   */
+  resetAndClearLocal(): void;
 }
 
 export function createBlobStore<T>(opts: BlobStoreOptions<T>): BlobStore<T> {
@@ -205,6 +211,27 @@ export function createBlobStore<T>(opts: BlobStoreOptions<T>): BlobStore<T> {
       state = { ...state, data: draft, version: state.version + 1 };
       emit();
       scheduleFlush();
+    },
+    resetAndClearLocal() {
+      if (flushTimer) {
+        clearTimeout(flushTimer);
+        flushTimer = null;
+      }
+      flushDirty = false;
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem(opts.storageKey);
+        } catch {
+          /* ignore */
+        }
+      }
+      state = {
+        data: opts.empty(),
+        mode: "local",
+        syncError: null,
+        version: state.version + 1,
+      };
+      emit();
     },
   };
 }

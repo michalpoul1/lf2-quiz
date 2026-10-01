@@ -141,6 +141,33 @@ export function reloadFromLocal() {
   emit();
 }
 
+/**
+ * Wipe the localStorage mirror AND reset in-memory data to empty, in "local"
+ * mode. Used on logout from a cloud session so no trace of the previous
+ * user's data remains visible on this device. Cloud data stays untouched.
+ */
+export function resetAndClearLocal() {
+  if (flushTimer) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
+  }
+  flushDirty = false;
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
+  state = {
+    data: {},
+    mode: "local",
+    syncError: null,
+    version: state.version + 1,
+  };
+  emit();
+}
+
 /** Read-only snapshot of what's currently in localStorage (for migration UI). */
 export function peekLocal(): AllProgress {
   return readLocal();

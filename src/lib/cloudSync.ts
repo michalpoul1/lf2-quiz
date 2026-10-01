@@ -2,8 +2,10 @@
 
 import { getSupabase } from "./supabase";
 import {
+  getStoreState as getProgressState,
   peekLocal as peekProgressLocal,
   reloadFromLocal as reloadProgressFromLocal,
+  resetAndClearLocal as resetProgressAndClearLocal,
   setCloudAdapter as setProgressCloudAdapter,
   setCloudData as setProgressCloudData,
   setCloudDataAndFlush as setProgressCloudDataAndFlush,
@@ -354,9 +356,40 @@ export function stopSync(): void {
   setProgressCloudAdapter(null);
   collectionsStore.setCloudAdapter(null);
   streakStore.setCloudAdapter(null);
-  reloadProgressFromLocal();
-  collectionsStore.reloadFromLocal();
-  streakStore.reloadFromLocal();
+
+  // If this store was tied to a cloud session (cloud / loading / error),
+  // wipe its local cache and reset to empty so a shared device doesn't
+  // show the previous user's data to the next person. For stores that
+  // were purely local (never signed in), do nothing — we don't touch
+  // offline-only usage.
+  const wasCloud = (mode: string) =>
+    mode === "cloud" || mode === "loading" || mode === "error";
+
+  if (wasCloud(getProgressState().mode)) {
+    resetProgressAndClearLocal();
+  } else {
+    reloadProgressFromLocal();
+  }
+  if (wasCloud(collectionsStore.getState().mode)) {
+    collectionsStore.resetAndClearLocal();
+  } else {
+    collectionsStore.reloadFromLocal();
+  }
+  if (wasCloud(streakStore.getState().mode)) {
+    streakStore.resetAndClearLocal();
+    // Legacy standalone key — streakStore itself doesn't know about it, so
+    // wipe it here or the pre-logout daily goal would resurface on reload
+    // via hydrateLegacyStreakGoal.
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("lf2-quiz-daily-goal");
+      } catch {
+        /* ignore */
+      }
+    }
+  } else {
+    streakStore.reloadFromLocal();
+  }
 }
 
 // Aggregate sync mode for the Settings indicator — "cloud" only when all
