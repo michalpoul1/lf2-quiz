@@ -4,22 +4,27 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { getSupabase, isSupabaseConfigured } from "./supabase";
 import {
+  aggregateSyncMode,
   finishMigrationDiscard,
   finishMigrationUpload,
   startSyncFor,
   stopSync,
-} from "./progressSync";
-import type { AllProgress } from "./progressStore";
+  type AggregateSyncMode,
+} from "./cloudSync";
 import {
-  getStoreState,
-  hydrateFromLocalOnce,
-  subscribe as subscribeStore,
-  type StoreMode,
+  getStoreState as getProgressState,
+  hydrateFromLocalOnce as hydrateProgressLocalOnce,
+  subscribe as subscribeProgress,
 } from "./progressStore";
+import { collectionsStore } from "./collectionsStore";
+import { streakStore } from "./streakStore";
 
-interface PendingMigration {
-  userId: string;
-  localData: AllProgress;
+export interface PendingMigrationCounts {
+  progressKeys: number;
+  collections: number;
+  streakCurrent: number;
+  streakLongest: number;
+  dailyGoal: number;
 }
 
 interface AuthContextValue {
@@ -27,11 +32,9 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
-  /** Live sync mode from the progress store, for the settings indicator. */
-  syncMode: StoreMode;
+  syncMode: AggregateSyncMode;
   syncError: string | null;
-  /** Non-null when the migration dialog should be shown. */
-  pendingMigration: PendingMigration | null;
+  pendingMigration: PendingMigrationCounts | null;
   confirmMigrationUpload: () => Promise<void>;
   confirmMigrationDiscard: () => Promise<void>;
 }
@@ -55,21 +58,38 @@ export function useAuth(): AuthContextValue {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [syncMode, setSyncMode] = useState<StoreMode>(() => getStoreState().mode);
+  const [progressMode, setProgressMode] = useState<string>(() => getProgressState().mode);
+  const [collectionsMode, setCollectionsMode] = useState<string>(() => collectionsStore.getState().mode);
+  const [streakMode, setStreakMode] = useState<string>(() => streakStore.getState().mode);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [pendingMigration, setPendingMigration] =
-    useState<PendingMigration | null>(null);
+    useState<PendingMigrationCounts | null>(null);
 
-  // Hydrate progress store from localStorage at mount so logged-out reads
-  // return real data immediately.
+  // Hydrate all three stores on mount so logged-out reads work immediately.
   useEffect(() => {
-    hydrateFromLocalOnce();
-    setSyncMode(getStoreState().mode);
-    const off = subscribeStore((s) => {
-      setSyncMode(s.mode);
-      setSyncError(s.syncError);
+    hydrateProgressLocalOnce();
+    collectionsStore.hydrateFromLocalOnce();
+    streakStore.hydrateFromLocalOnce();
+    setProgressMode(getProgressState().mode);
+    setCollectionsMode(collectionsStore.getState().mode);
+    setStreakMode(streakStore.getState().mode);
+    const offP = subscribeProgress((s) => {
+      setProgressMode(s.mode);
+      if (s.syncError) setSyncError(s.syncError);
     });
-    return off;
+    const offC = collectionsStore.subscribe((s) => {
+      setCollectionsMode(s.mode);
+      if (s.syncError) setSyncError(s.syncError);
+    });
+    const offS = streakStore.subscribe((s) => {
+      setStreakMode(s.mode);
+      if (s.syncError) setSyncError(s.syncError);
+    });
+    return () => {
+      offP();
+      offC();
+      offS();
+    };
   }, []);
 
   // Auth session lifecycle.
@@ -91,20 +111,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // React to login/logout — hydrate cloud data or reset to local.
+  // React to login/logout — hydrate cloud data for all stores or reset to local.
   const userId = session?.user?.id ?? null;
   useEffect(() => {
     if (!userId) {
       stopSync();
       setPendingMigration(null);
+      setSyncError(null);
       return;
     }
     let cancelled = false;
     (async () => {
       const res = await startSyncFor(userId);
       if (cancelled) return;
-      if (res.needsMigrationChoice && res.localData) {
-        setPendingMigration({ userId, localData: res.localData });
+      if (res.needsMigrationChoice && res.itemCounts) {
+        setPendingMigration(res.itemCounts);
       } else {
         setPendingMigration(null);
       }
@@ -121,15 +142,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const confirmMigrationUpload = async () => {
-    if (!pendingMigration) return;
-    await finishMigrationUpload(pendingMigration.userId, pendingMigration.localData);
+    await finishMigrationUpload();
     setPendingMigration(null);
   };
   const confirmMigrationDiscard = async () => {
-    if (!pendingMigration) return;
-    await finishMigrationDiscard(pendingMigration.userId);
+    await finishMigrationDiscard();
     setPendingMigration(null);
   };
+
+  const syncMode = aggregateSyncMode(progressMode, collectionsMode, streakMode);
 
   return (
     <AuthContext.Provider

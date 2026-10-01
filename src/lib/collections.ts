@@ -1,95 +1,40 @@
 /**
- * Collections-based bookmark system.
- *
- * Replaces the old "lf2-quiz-bookmarks" flat list with named, colored
- * collections. On first read, any old bookmarks are migrated into a
- * collection named "Neuřazené". The stored `CollectionQuestion.facultyId`
- * field is retained for backwards compatibility with existing localStorage
- * data; internally we always use the 2lf namespace.
+ * Collections-based bookmark system — public API is unchanged, but reads
+ * and writes now go through the in-memory collectionsStore (which flushes
+ * to localStorage when logged out, Supabase when logged in).
  */
 
-const STORAGE_KEY = "lf2-quiz-collections";
-const OLD_BOOKMARKS_KEY = "lf2-quiz-bookmarks";
+import {
+  collectionsStore,
+  type Collection,
+  type CollectionQuestion,
+  type CollectionsData,
+} from "./collectionsStore";
 
-// Storage shape stays nested under the 2lf namespace so existing users keep
-// their bookmarks. Don't flatten without a migration.
+const OLD_BOOKMARKS_KEY = "lf2-quiz-bookmarks";
 const FACULTY = "2lf";
 
-export interface CollectionQuestion {
-  facultyId: string;
-  subject: string;
-  questionId: number | string;
-}
-
-export interface Collection {
-  id: string;
-  name: string;
-  color: string;
-  createdAt: string;
-  questions: CollectionQuestion[];
-  pinned?: boolean;
-  pinnedAt?: string;
-}
-
-interface CollectionsData {
-  collections: Collection[];
-}
+export type { Collection, CollectionQuestion };
 
 export const COLLECTION_COLORS = [
-  "#3b82f6", // blue
-  "#22c55e", // green
-  "#ef4444", // red
-  "#f59e0b", // orange
-  "#8b5cf6", // purple
-  "#ec4899", // pink
-  "#6b7280", // gray
-  "#06b6d4", // teal
+  "#3b82f6",
+  "#22c55e",
+  "#ef4444",
+  "#f59e0b",
+  "#8b5cf6",
+  "#ec4899",
+  "#6b7280",
+  "#06b6d4",
 ];
 
-function emptyData(): CollectionsData {
-  return { collections: [] };
+function ensureHydrated() {
+  collectionsStore.hydrateFromLocalOnce();
+  migrateOldBookmarks();
 }
 
-let facultyMigrationDone = false;
-
-function normalizeFacultyIds(data: CollectionsData): {
-  data: CollectionsData;
-  changed: boolean;
-} {
-  let changed = false;
-  for (const c of data.collections) {
-    for (const q of c.questions) {
-      if (!q.facultyId) {
-        q.facultyId = FACULTY;
-        changed = true;
-      }
-    }
-  }
-  return { data, changed };
-}
-
-function readRaw(): CollectionsData {
-  if (typeof window === "undefined") return emptyData();
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return emptyData();
-    const parsed = JSON.parse(raw);
-    if (!parsed || !Array.isArray(parsed.collections)) return emptyData();
-    const data = parsed as CollectionsData;
-    if (!facultyMigrationDone) {
-      const { changed } = normalizeFacultyIds(data);
-      facultyMigrationDone = true;
-      if (changed) writeRaw(data);
-    }
-    return data;
-  } catch {
-    return emptyData();
-  }
-}
-
-function writeRaw(data: CollectionsData) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+function readData(): CollectionsData {
+  ensureHydrated();
+  return collectionsStore.getState().data;
 }
 
 function genId(): string {
@@ -104,13 +49,8 @@ function sameQuestion(a: CollectionQuestion, b: CollectionQuestion): boolean {
   );
 }
 
-/**
- * Read all collections, running migration from old bookmarks key if needed.
- */
 export function getCollections(): Collection[] {
-  if (typeof window === "undefined") return [];
-  migrateOldBookmarks();
-  return readRaw().collections;
+  return readData().collections;
 }
 
 export function getCollection(id: string): Collection | undefined {
@@ -118,7 +58,7 @@ export function getCollection(id: string): Collection | undefined {
 }
 
 export function createCollection(name: string, color: string): Collection {
-  const data = readRaw();
+  ensureHydrated();
   const collection: Collection = {
     id: genId(),
     name: name.trim() || "Bez názvu",
@@ -126,72 +66,75 @@ export function createCollection(name: string, color: string): Collection {
     createdAt: new Date().toISOString(),
     questions: [],
   };
-  data.collections.push(collection);
-  writeRaw(data);
+  collectionsStore.mutate((d) => {
+    d.collections.push(collection);
+  });
   return collection;
 }
 
 export function renameCollection(id: string, name: string): void {
-  const data = readRaw();
-  const c = data.collections.find((c) => c.id === id);
-  if (!c) return;
-  c.name = name.trim() || c.name;
-  writeRaw(data);
+  ensureHydrated();
+  collectionsStore.mutate((d) => {
+    const c = d.collections.find((c) => c.id === id);
+    if (!c) return;
+    c.name = name.trim() || c.name;
+  });
 }
 
 export function setCollectionColor(id: string, color: string): void {
-  const data = readRaw();
-  const c = data.collections.find((c) => c.id === id);
-  if (!c) return;
-  c.color = color;
-  writeRaw(data);
+  ensureHydrated();
+  collectionsStore.mutate((d) => {
+    const c = d.collections.find((c) => c.id === id);
+    if (!c) return;
+    c.color = color;
+  });
 }
 
 export function deleteCollection(id: string): void {
-  const data = readRaw();
-  data.collections = data.collections.filter((c) => c.id !== id);
-  writeRaw(data);
+  ensureHydrated();
+  collectionsStore.mutate((d) => {
+    d.collections = d.collections.filter((c) => c.id !== id);
+  });
 }
 
 export function pinCollection(id: string): void {
-  const data = readRaw();
-  const c = data.collections.find((c) => c.id === id);
-  if (!c) return;
-  c.pinned = true;
-  c.pinnedAt = new Date().toISOString();
-  writeRaw(data);
+  ensureHydrated();
+  collectionsStore.mutate((d) => {
+    const c = d.collections.find((c) => c.id === id);
+    if (!c) return;
+    c.pinned = true;
+    c.pinnedAt = new Date().toISOString();
+  });
 }
 
 export function unpinCollection(id: string): void {
-  const data = readRaw();
-  const c = data.collections.find((c) => c.id === id);
-  if (!c) return;
-  c.pinned = false;
-  c.pinnedAt = undefined;
-  writeRaw(data);
+  ensureHydrated();
+  collectionsStore.mutate((d) => {
+    const c = d.collections.find((c) => c.id === id);
+    if (!c) return;
+    c.pinned = false;
+    c.pinnedAt = undefined;
+  });
 }
 
-/**
- * Set the membership of a question across all collections at once.
- * `targetCollectionIds` is the desired full set the question should be in.
- */
 export function setQuestionCollections(
   subject: string,
   questionId: number | string,
   targetCollectionIds: string[]
 ): void {
-  const data = readRaw();
+  ensureHydrated();
   const target = new Set(targetCollectionIds);
   const q: CollectionQuestion = { facultyId: FACULTY, subject, questionId };
-  for (const c of data.collections) {
-    const has = c.questions.some((cq) => sameQuestion(cq, q));
-    if (target.has(c.id) && !has) {
-      c.questions.push(q);
-    } else if (!target.has(c.id) && has) {
-      c.questions = c.questions.filter((cq) => !sameQuestion(cq, q));
+  collectionsStore.mutate((d) => {
+    for (const c of d.collections) {
+      const has = c.questions.some((cq) => sameQuestion(cq, q));
+      if (target.has(c.id) && !has) {
+        c.questions.push(q);
+      } else if (!target.has(c.id) && has) {
+        c.questions = c.questions.filter((cq) => !sameQuestion(cq, q));
+      }
     }
-  }
-  writeRaw(data);
+  });
 }
 
 export function removeQuestionFromCollection(
@@ -199,30 +142,27 @@ export function removeQuestionFromCollection(
   subject: string,
   questionId: number | string
 ): void {
-  const data = readRaw();
-  const c = data.collections.find((c) => c.id === collectionId);
-  if (!c) return;
-  c.questions = c.questions.filter(
-    (cq) => !sameQuestion(cq, { facultyId: FACULTY, subject, questionId })
-  );
-  writeRaw(data);
+  ensureHydrated();
+  collectionsStore.mutate((d) => {
+    const c = d.collections.find((c) => c.id === collectionId);
+    if (!c) return;
+    c.questions = c.questions.filter(
+      (cq) => !sameQuestion(cq, { facultyId: FACULTY, subject, questionId })
+    );
+  });
 }
 
 export function getCollectionsContaining(
   subject: string,
   questionId: number | string
 ): string[] {
-  const data = readRaw();
+  const data = readData();
   const q: CollectionQuestion = { facultyId: FACULTY, subject, questionId };
   return data.collections
     .filter((c) => c.questions.some((cq) => sameQuestion(cq, q)))
     .map((c) => c.id);
 }
 
-/**
- * Returns true if the question is in at least one collection (used to
- * decide whether to display a filled-in bookmark icon).
- */
 export function isQuestionSaved(
   subject: string,
   questionId: number | string
@@ -230,13 +170,10 @@ export function isQuestionSaved(
   return getCollectionsContaining(subject, questionId).length > 0;
 }
 
-/**
- * Returns the unique union of questions across all collections.
- */
 export function getAllSavedQuestions(): CollectionQuestion[] {
   const seen = new Set<string>();
   const result: CollectionQuestion[] = [];
-  for (const c of readRaw().collections) {
+  for (const c of readData().collections) {
     for (const q of c.questions) {
       const key = `${q.facultyId}::${q.subject}::${q.questionId}`;
       if (!seen.has(key)) {
@@ -248,15 +185,13 @@ export function getAllSavedQuestions(): CollectionQuestion[] {
   return result;
 }
 
-let migrationDone = false;
+// ─── Legacy bookmarks migration ──────────────────────────────────────────
 
-/**
- * One-shot migration from the legacy `lf2-quiz-bookmarks` key into a
- * single collection named "Neuřazené". Removes the old key afterward.
- */
+let legacyMigrationDone = false;
+
 function migrateOldBookmarks(): void {
-  if (typeof window === "undefined" || migrationDone) return;
-  migrationDone = true;
+  if (typeof window === "undefined" || legacyMigrationDone) return;
+  legacyMigrationDone = true;
   try {
     const oldRaw = localStorage.getItem(OLD_BOOKMARKS_KEY);
     if (!oldRaw) return;
@@ -271,18 +206,18 @@ function migrateOldBookmarks(): void {
       localStorage.removeItem(OLD_BOOKMARKS_KEY);
       return;
     }
-    const data = readRaw();
     const collection: Collection = {
       id: genId(),
       name: "Neuřazené",
-      color: COLLECTION_COLORS[6], // gray
+      color: COLLECTION_COLORS[6],
       createdAt: new Date().toISOString(),
       questions: flat,
     };
-    data.collections.unshift(collection);
-    writeRaw(data);
+    collectionsStore.mutate((d) => {
+      d.collections.unshift(collection);
+    });
     localStorage.removeItem(OLD_BOOKMARKS_KEY);
   } catch {
-    // ignore migration errors
+    /* ignore migration errors */
   }
 }
