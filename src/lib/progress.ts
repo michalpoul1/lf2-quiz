@@ -132,6 +132,48 @@ export function getLastRunTime(
   return typeof cp.lastRunSeconds === "number" ? cp.lastRunSeconds : null;
 }
 
+/** Read the current note for a question, or "" if none. */
+export function getNote(
+  subject: string,
+  chapterId: number | string,
+  questionId: number | string
+): string {
+  const cp = getChapterProgress(subject, chapterId);
+  return cp.notes?.[String(questionId)] ?? "";
+}
+
+/** Set or clear a note for a question. Empty/whitespace-only text deletes
+ *  the entry so `hasNote()` queries stay honest. */
+export function setNote(
+  subject: string,
+  chapterId: number | string,
+  questionId: number | string,
+  text: string
+): void {
+  ensureHydrated();
+  const qidStr = String(questionId);
+  const trimmed = text.trim();
+  mutate((all) => {
+    if (!all[FACULTY_KEY]) all[FACULTY_KEY] = {};
+    const fp = all[FACULTY_KEY];
+    if (!fp[subject]) fp[subject] = {};
+    const key = String(chapterId);
+    if (!fp[subject][key]) {
+      fp[subject][key] = { answered: 0, correct: 0, wrongIds: [], correctIds: [] };
+    }
+    const ch = fp[subject][key];
+    if (!trimmed) {
+      if (ch.notes) {
+        delete ch.notes[qidStr];
+        if (Object.keys(ch.notes).length === 0) delete ch.notes;
+      }
+      return;
+    }
+    if (!ch.notes) ch.notes = {};
+    ch.notes[qidStr] = text;
+  });
+}
+
 export function getQuestionStatus(
   subject: string,
   chapterId: number | string,

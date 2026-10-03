@@ -16,6 +16,8 @@ import {
   getSubjectProgress,
   removeFromWrong,
   recordChapterRunTime,
+  getNote,
+  setNote,
 } from "@/lib/progress";
 import { isQuestionSaved } from "@/lib/collections";
 import { formatMmSs } from "@/lib/formatTime";
@@ -88,6 +90,11 @@ export default function QuizRunner({
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set());
   const [modalQuestionId, setModalQuestionId] = useState<number | string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  // Notes: open/close + per-question drafts. "hasNote" map drives the icon
+  // fill state without re-reading storage on every render.
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteDraft, setNoteDraft] = useState("");
+  const [hasNoteMap, setHasNoteMap] = useState<Record<string, boolean>>({});
   // Track which questions have already been recorded to progress in this run.
   // Prevents double-counting when user navigates back with the arrow and answers
   // the same question again — stats stay honest.
@@ -217,6 +224,38 @@ export default function QuizRunner({
     },
     [data, chapterParam]
   );
+
+  // Note icon state — rebuild when questions/subject change or progress mutates.
+  const refreshNoteMap = useCallback(() => {
+    const map: Record<string, boolean> = {};
+    for (const q of sourceQuestions) {
+      const key = findProgressKey(q.id);
+      if (getNote(subject, key, q.id).trim().length > 0) {
+        map[String(q.id)] = true;
+      }
+    }
+    setHasNoteMap(map);
+  }, [sourceQuestions, subject, findProgressKey]);
+  useEffect(() => {
+    refreshNoteMap();
+    const onUpdate = () => refreshNoteMap();
+    window.addEventListener("lf2-progress-updated", onUpdate);
+    return () => window.removeEventListener("lf2-progress-updated", onUpdate);
+  }, [refreshNoteMap]);
+
+  const openNote = () => {
+    if (!currentQuestion) return;
+    const key = findProgressKey(currentQuestion.id);
+    setNoteDraft(getNote(subject, key, currentQuestion.id));
+    setNoteOpen(true);
+  };
+  const closeNote = () => setNoteOpen(false);
+  const saveNote = () => {
+    if (!currentQuestion) return;
+    const key = findProgressKey(currentQuestion.id);
+    setNote(subject, key, currentQuestion.id, noteDraft);
+    setNoteOpen(false);
+  };
 
   const handleCheck = () => {
     if (!currentQuestion || selected.size === 0) return;
@@ -602,25 +641,46 @@ export default function QuizRunner({
             <p className="text-xs text-gray-400">
               Otázka {currentQuestion.id}
             </p>
-            <button
-              onClick={() => handleOpenBookmark(currentQuestion.id)}
-              className="tap-highlight -mt-1 -mr-1 p-1"
-              aria-label="Záložka"
-            >
-              <svg
-                className={`w-5 h-5 transition-colors ${
-                  bookmarked.has(String(currentQuestion.id))
-                    ? "text-[var(--color-primary)] dark:text-blue-400 fill-current"
-                    : "text-gray-300 dark:text-gray-600"
-                }`}
-                fill={bookmarked.has(String(currentQuestion.id)) ? "currentColor" : "none"}
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
+            <div className="flex items-center gap-1 -mt-1 -mr-1">
+              <button
+                onClick={openNote}
+                className="tap-highlight p-1"
+                aria-label="Poznámka"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-              </svg>
-            </button>
+                <svg
+                  className={`w-5 h-5 transition-colors ${
+                    hasNoteMap[String(currentQuestion.id)]
+                      ? "text-amber-500"
+                      : "text-gray-300 dark:text-gray-600"
+                  }`}
+                  fill={hasNoteMap[String(currentQuestion.id)] ? "currentColor" : "none"}
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.6}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => handleOpenBookmark(currentQuestion.id)}
+                className="tap-highlight p-1"
+                aria-label="Záložka"
+              >
+                <svg
+                  className={`w-5 h-5 transition-colors ${
+                    bookmarked.has(String(currentQuestion.id))
+                      ? "text-[var(--color-primary)] dark:text-blue-400 fill-current"
+                      : "text-gray-300 dark:text-gray-600"
+                  }`}
+                  fill={bookmarked.has(String(currentQuestion.id)) ? "currentColor" : "none"}
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                </svg>
+              </button>
+            </div>
           </div>
           <p className="text-base font-medium leading-relaxed">
             {currentQuestion.text}
@@ -828,6 +888,54 @@ export default function QuizRunner({
           if (modalQuestionId !== null) handleModalSaved(modalQuestionId, isSaved);
         }}
       />
+
+      {noteOpen && currentQuestion && (
+        <div
+          className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center px-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={closeNote}
+          />
+          <div className="relative w-full sm:max-w-md bg-white dark:bg-[#1e293b] rounded-t-2xl sm:rounded-2xl shadow-2xl p-5 safe-area-bottom">
+            <div className="sm:hidden flex justify-center mb-3">
+              <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+            </div>
+            <h2 className="text-lg font-bold text-[var(--color-primary)] dark:text-blue-400 mb-1">
+              Poznámka k otázce {currentQuestion.id}
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              Zůstane u otázky napořád — dokud ji nesmažeš.
+            </p>
+            <textarea
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+              rows={6}
+              autoFocus
+              placeholder="Vlastní poznámka k této otázce…"
+              className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#0f172a] focus:outline-none focus:border-[var(--color-primary)] text-sm leading-relaxed resize-none mb-3"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={closeNote}
+                className="flex-1 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 tap-highlight active:opacity-80"
+              >
+                Zrušit
+              </button>
+              <button
+                type="button"
+                onClick={saveNote}
+                className="flex-1 py-3 rounded-xl font-semibold text-white bg-[var(--color-primary)] tap-highlight active:opacity-80"
+              >
+                Uložit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

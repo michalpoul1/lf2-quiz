@@ -48,6 +48,9 @@ export interface ChapterProgress {
   /** Duration (seconds) of the most recently completed/left-off quiz run of
    * this chapter. Overwrites previous value. */
   lastRunSeconds?: number;
+  /** Free-text user note per question. Persistent across runs — only removed
+   * when the user clears/empties it. */
+  notes?: Record<string, string>;
 }
 
 export type SubjectProgress = Record<string, ChapterProgress>;
