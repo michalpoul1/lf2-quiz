@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Collection,
   COLLECTION_COLORS,
+  createCollection,
   deleteCollection,
   getCollections,
   pinCollection,
@@ -42,6 +43,10 @@ export default function BookmarksPage() {
   const [colorPickerId, setColorPickerId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  // "Vytvořit kolekci" dialog state — standalone empty-collection creation.
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newColor, setNewColor] = useState<string>(COLLECTION_COLORS[0]);
 
   const reload = () => setCollections(getCollections());
 
@@ -106,6 +111,20 @@ export default function BookmarksPage() {
     reload();
   };
 
+  const openCreate = () => {
+    setNewName("");
+    setNewColor(COLLECTION_COLORS[0]);
+    setCreateOpen(true);
+  };
+  const closeCreate = () => setCreateOpen(false);
+  const confirmCreate = () => {
+    const name = newName.trim();
+    if (!name) return;
+    createCollection(name, newColor);
+    setCreateOpen(false);
+    reload();
+  };
+
   // While not yet hydrated, render a static skeleton that matches server output.
   if (!loaded) {
     return (
@@ -127,11 +146,22 @@ export default function BookmarksPage() {
       <h1 className="text-2xl font-bold text-[var(--color-primary)] dark:text-blue-400 mb-1">
         Záložky
       </h1>
-      <p className="text-sm text-gray-500 mb-5">
+      <p className="text-sm text-gray-500 mb-3">
         {collections.length > 0
           ? `${collections.length} ${collections.length === 1 ? "kolekce" : collections.length < 5 ? "kolekce" : "kolekcí"} • ${totalUnique} otázek`
           : "Žádné kolekce"}
       </p>
+
+      <button
+        type="button"
+        onClick={openCreate}
+        className="w-full mb-5 py-3 rounded-xl text-sm font-semibold text-[var(--color-primary)] dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 tap-highlight active:opacity-80 transition-opacity flex items-center justify-center gap-2"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Vytvořit kolekci
+      </button>
 
       {/* "All saved" virtual collection */}
       {totalUnique > 0 && (
@@ -200,7 +230,7 @@ export default function BookmarksPage() {
             Zatím nemáte žádné kolekce
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500">
-            Vytvořte kolekci kliknutím na ikonu záložky při procvičování
+            Vytvořte kolekci tlačítkem nahoře, nebo rovnou ikonou záložky při procvičování
           </p>
         </div>
       )}
@@ -409,6 +439,72 @@ export default function BookmarksPage() {
           );
         })}
       </div>
+
+      {createOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center px-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={closeCreate}
+          />
+          <div className="relative w-full sm:max-w-md bg-white dark:bg-[#1e293b] rounded-t-2xl sm:rounded-2xl shadow-2xl p-5">
+            <div className="sm:hidden flex justify-center mb-3">
+              <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+            </div>
+            <h2 className="text-lg font-bold text-[var(--color-primary)] dark:text-blue-400 mb-3">
+              Nová kolekce
+            </h2>
+            <input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") confirmCreate();
+                if (e.key === "Escape") closeCreate();
+              }}
+              placeholder="Název kolekce"
+              autoFocus
+              className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#0f172a] focus:outline-none focus:border-[var(--color-primary)] mb-3"
+            />
+            <div className="flex flex-wrap gap-2 mb-4">
+              {COLLECTION_COLORS.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  aria-label={`Barva ${color}`}
+                  onClick={() => setNewColor(color)}
+                  className={`w-8 h-8 rounded-full transition-transform tap-highlight ${
+                    newColor === color
+                      ? "ring-2 ring-offset-2 ring-[var(--color-primary)] dark:ring-offset-[#1e293b] scale-110"
+                      : ""
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+            <div className="flex gap-2 safe-area-bottom">
+              <button
+                type="button"
+                onClick={closeCreate}
+                className="flex-1 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 tap-highlight active:opacity-80"
+              >
+                Zrušit
+              </button>
+              <button
+                type="button"
+                onClick={confirmCreate}
+                disabled={!newName.trim()}
+                className="flex-1 py-3 rounded-xl font-semibold text-white bg-[var(--color-primary)] tap-highlight active:opacity-80 disabled:opacity-50"
+              >
+                Vytvořit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
