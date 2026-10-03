@@ -5,8 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 import { getSubjectData, filterValidQuestions, getWrongQuestions } from "@/lib/data";
 import {
   getQuestionStatus,
+  getQuestionTime,
   removeFromWrong,
 } from "@/lib/progress";
+import { formatSeconds } from "@/lib/formatTime";
 import { useRefreshOnReturn } from "@/lib/useRefreshOnReturn";
 import type { Question } from "@/lib/types";
 
@@ -59,6 +61,7 @@ export default function QuestionList({
 
   // Rebuild status map on mount + return (localStorage is client-only).
   const [statusMap, setStatusMap] = useState<Record<string, "correct" | "wrong" | "unanswered">>({});
+  const [timeMap, setTimeMap] = useState<Record<string, number>>({});
   const [statusLoaded, setStatusLoaded] = useState(false);
   // Wrong-mode: track items the user has manually dismissed via "Už umím" so
   // they vanish without needing a full storage re-read.
@@ -160,16 +163,17 @@ export default function QuestionList({
   // switch, or a bumped dataVersion after returning to this page).
   useEffect(() => {
     const map: Record<string, "correct" | "wrong" | "unanswered"> = {};
+    const times: Record<string, number> = {};
     for (const g of groups) {
       for (const it of g.items) {
-        map[`${it.progressKey}::${it.question.id}`] = getQuestionStatus(
-          subject,
-          it.progressKey,
-          it.question.id
-        );
+        const key = `${it.progressKey}::${it.question.id}`;
+        map[key] = getQuestionStatus(subject, it.progressKey, it.question.id);
+        const t = getQuestionTime(subject, it.progressKey, it.question.id);
+        if (t != null) times[key] = t;
       }
     }
     setStatusMap(map);
+    setTimeMap(times);
     setStatusLoaded(true);
   }, [subject, groups]);
 
@@ -361,11 +365,13 @@ export default function QuestionList({
             )}
             <ul className="space-y-1.5">
               {g.items.map((it) => {
+                const key = `${it.progressKey}::${it.question.id}`;
                 const status = statusLoaded
-                  ? statusMap[`${it.progressKey}::${it.question.id}`] ?? "unanswered"
+                  ? statusMap[key] ?? "unanswered"
                   : "unanswered";
+                const time = statusLoaded ? timeMap[key] : undefined;
                 return (
-                  <li key={`${it.progressKey}::${it.question.id}`}>
+                  <li key={key}>
                     <Link
                       href={itemHref(it)}
                       className="flex items-start gap-3 bg-white dark:bg-[#1e293b] rounded-xl px-3 py-2.5 border border-gray-100 dark:border-gray-700 tap-highlight active:bg-gray-50 dark:active:bg-gray-800 transition-colors"
@@ -382,6 +388,11 @@ export default function QuestionList({
                           {it.question.text}
                         </span>
                       </span>
+                      {time != null && (
+                        <span className="flex-shrink-0 text-[11px] text-gray-400 dark:text-gray-500 tabular-nums mt-1.5 ml-1">
+                          {formatSeconds(time)}
+                        </span>
+                      )}
                     </Link>
                   </li>
                 );

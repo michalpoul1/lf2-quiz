@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRefreshOnReturn } from "@/lib/useRefreshOnReturn";
 import { useRouter } from "next/navigation";
 import { getSubjectData, getChapterQuestions, countValidQuestions } from "@/lib/data";
-import { getChapterProgress, getTotalProgress, resetProgress } from "@/lib/progress";
+import { getChapterProgress, getLastRunTime, getTotalProgress, resetProgress } from "@/lib/progress";
+import { formatHumanDuration } from "@/lib/formatTime";
 import { getTestHistory, clearTestHistory } from "@/lib/testHistory";
 import { getStreak, getTodayCount, getDailyGoal } from "@/lib/streak";
 import type { ChapterProgress } from "@/lib/types";
@@ -66,6 +67,7 @@ interface ChapterStat {
   totalQuestions: number;
   progress: ChapterProgress;
   pct: number;
+  lastRunSeconds: number | null;
 }
 
 interface SubjectStat {
@@ -116,6 +118,12 @@ export default function StatisticsPage() {
             aggregated.wrongIds = [...aggregated.wrongIds, ...scp.wrongIds];
           }
         }
+        // For flat chapters we store under the chapter id; for subchapter
+        // ones we don't aggregate per-chapter time because each subchapter
+        // has its own run.
+        const lastRunSeconds = ch.subchapters
+          ? null
+          : getLastRunTime(s.id, ch.id);
         return {
           id: ch.id,
           name: ch.name,
@@ -123,6 +131,7 @@ export default function StatisticsPage() {
           totalQuestions: validCount,
           progress: aggregated,
           pct: aggregated.answered > 0 ? Math.round((aggregated.correct / aggregated.answered) * 100) : -1,
+          lastRunSeconds,
         };
       });
       result[s.id] = {
@@ -338,6 +347,11 @@ export default function StatisticsPage() {
                                     />
                                   )}
                                 </div>
+                                {ch.lastRunSeconds != null && (
+                                  <div className="text-[11px] text-gray-400 dark:text-gray-500 mt-1 text-left">
+                                    Naposledy: {formatHumanDuration(ch.lastRunSeconds)}
+                                  </div>
+                                )}
                               </div>
                               <span className="text-xs text-gray-400 flex-shrink-0 w-14 text-right">
                                 {ch.progress.answered > 0

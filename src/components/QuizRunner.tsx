@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   getSubjectData,
@@ -11,8 +11,14 @@ import {
   getExplanation,
   getWrongQuestions,
 } from "@/lib/data";
-import { recordAnswer, getSubjectProgress, removeFromWrong } from "@/lib/progress";
+import {
+  recordAnswer,
+  getSubjectProgress,
+  removeFromWrong,
+  recordChapterRunTime,
+} from "@/lib/progress";
 import { isQuestionSaved } from "@/lib/collections";
+import { formatMmSs } from "@/lib/formatTime";
 import SaveToCollectionModal from "@/components/SaveToCollectionModal";
 import type { Question } from "@/lib/types";
 
@@ -95,6 +101,35 @@ export default function QuizRunner({
   // the same, so a plain <Link> to it wouldn't re-run any effects).
   const [effectiveMode, setEffectiveMode] = useState(mode);
   const [runId, setRunId] = useState(0);
+
+  // ─── Timing ───────────────────────────────────────────────────────────────
+  // Reset on every (currentIndex, runId) change so each question gets its own
+  // clock. The display elapsed counter ticks separately so we don't re-render
+  // other state on each second.
+  const [questionStartMs, setQuestionStartMs] = useState<number>(() => Date.now());
+  const [elapsedMs, setElapsedMs] = useState<number>(0);
+  const runStartMsRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    setQuestionStartMs(Date.now());
+    setElapsedMs(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, runId, quizState]);
+
+  useEffect(() => {
+    if (quizState !== "active") return;
+    const id = setInterval(() => {
+      setElapsedMs(Date.now() - questionStartMs);
+    }, 500);
+    return () => clearInterval(id);
+  }, [quizState, questionStartMs]);
+
+  // Mark run start when quiz enters active state.
+  useEffect(() => {
+    if (quizState === "active") {
+      runStartMsRef.current = Date.now();
+    }
+  }, [quizState, runId]);
 
   const questions = useMemo(() => {
     let qs: Question[];
@@ -197,7 +232,8 @@ export default function QuizRunner({
     const qidStr = String(currentQuestion.id);
     if (!recordedIds.has(qidStr)) {
       const key = findProgressKey(currentQuestion.id);
-      recordAnswer(subject, key, currentQuestion.id, isCorrect);
+      const timeSeconds = (Date.now() - questionStartMs) / 1000;
+      recordAnswer(subject, key, currentQuestion.id, isCorrect, timeSeconds);
       setRecordedIds((prev) => {
         const next = new Set(prev);
         next.add(qidStr);
@@ -210,6 +246,17 @@ export default function QuizRunner({
     }
   };
 
+  /** Record total chapter run time to progress. Called at every transition
+   *  from "active" to "results" (plus on unmount for partial-run exits). */
+  const persistRunTime = useCallback(() => {
+    if (chapterId === "all") return; // all-subjects runs aren't a single chapter
+    const seconds = (Date.now() - runStartMsRef.current) / 1000;
+    if (seconds <= 0) return;
+    const key =
+      subchapterParam ?? (typeof chapterId === "number" ? String(chapterId) : chapterParam);
+    recordChapterRunTime(subject, key, seconds);
+  }, [chapterId, chapterParam, subchapterParam, subject]);
+
   /** Reset per-question UI state (used when moving to a different question,
    *  either forward via check→next or via the prev/next arrows). */
   const resetQuestionUi = () => {
@@ -220,6 +267,7 @@ export default function QuizRunner({
 
   const handleNext = () => {
     if (currentIndex + 1 >= totalQuestions) {
+      persistRunTime();
       setQuizState("results");
     } else {
       setCurrentIndex((i) => i + 1);
@@ -280,6 +328,7 @@ export default function QuizRunner({
     // clamp to length - 1 if we were at the end.
     const remaining = totalQuestions - 1;
     if (remaining <= 0) {
+      persistRunTime();
       setQuizState("results");
     } else {
       if (currentIndex >= remaining) setCurrentIndex(remaining - 1);
@@ -497,9 +546,21 @@ export default function QuizRunner({
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
-          {currentIndex + 1} / {totalQuestions}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
+            {currentIndex + 1} / {totalQuestions}
+          </span>
+          <span
+            className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 tabular-nums"
+            aria-label="Čas otázky"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <circle cx="12" cy="12" r="9" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 2" />
+            </svg>
+            {formatMmSs(elapsedMs)}
+          </span>
+        </div>
         <button
           type="button"
           onClick={handleSkipForward}

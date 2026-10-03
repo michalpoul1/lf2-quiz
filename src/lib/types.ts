@@ -39,6 +39,15 @@ export interface ChapterProgress {
   /** IDs of questions answered correctly. Missing on legacy records — always
    * read via a nullish coalescing to `[]`. */
   correctIds?: (number | string)[];
+  /**
+   * Last recorded time (seconds) per question in this chapter — overwritten
+   * on every answer, so this is the "latest attempt" not a history. Missing
+   * on records written before the timing feature.
+   */
+  questionTimes?: Record<string, number>;
+  /** Duration (seconds) of the most recently completed/left-off quiz run of
+   * this chapter. Overwrites previous value. */
+  lastRunSeconds?: number;
 }
 
 export type SubjectProgress = Record<string, ChapterProgress>;
