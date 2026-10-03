@@ -11,7 +11,7 @@ import {
   buildBackup,
   backupFilename,
   validateBackup,
-  restoreBackup,
+  restoreBackupSmart,
   countBackupKeys,
   type BackupFile,
 } from "@/lib/backup";
@@ -138,10 +138,10 @@ export default function SettingsPage() {
       return;
     }
     try {
-      restoreBackup(backup);
+      await restoreBackupSmart(backup);
       setImportStatus({
         kind: "success",
-        message: `Import proběhl (${keyCount} položek). Načtěte stránku pro projevení změn.`,
+        message: `Import proběhl (${keyCount} položek).`,
       });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Neznámá chyba.";
