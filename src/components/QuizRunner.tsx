@@ -784,20 +784,10 @@ export default function QuizRunner({
           })}
         </div>
 
-        {/* Action button */}
-        {!checked ? (
-          <button
-            onClick={handleCheck}
-            disabled={selected.size === 0}
-            className={`w-full font-semibold py-4 rounded-xl text-lg tap-highlight transition-all ${
-              selected.size > 0
-                ? "bg-[var(--color-primary)] text-white active:opacity-80"
-                : "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            Zkontrolovat
-          </button>
-        ) : (
+        {/* Correctness feedback + explanation stay in-flow after answer check.
+            The Zkontrolovat / Další otázka button itself is rendered in a
+            floating bar fixed above BottomNav (see below). */}
+        {checked && (
           <div className="space-y-3">
             <div
               className={`text-center py-2 rounded-lg font-medium ${
@@ -866,17 +856,43 @@ export default function QuizRunner({
                 </>
               );
             })()}
+          </div>
+        )}
+        {/* Spacer so the last in-flow element isn't hidden behind the floating
+            action bar (BottomNav h-14 + action bar ~72px + safe area). */}
+        <div className="h-28" aria-hidden="true" />
+      </div>
 
+      {/* Floating action bar — sits just above BottomNav. Fixed to the
+          viewport like BottomNav itself; z-40 keeps it under BottomNav
+          (z-50) in case they ever overlap on an unusual viewport. Solid
+          background and no transform/filter on the ancestor chain to keep
+          BottomNav's own fixed positioning rock-solid. */}
+      <div className="fixed left-0 right-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-40 bg-white dark:bg-[#0f172a] border-t border-gray-100 dark:border-gray-800">
+        <div className="max-w-[640px] mx-auto px-4 py-3">
+          {!checked ? (
+            <button
+              onClick={handleCheck}
+              disabled={selected.size === 0}
+              className={`w-full font-semibold py-3.5 rounded-xl text-lg tap-highlight transition-all ${
+                selected.size > 0
+                  ? "bg-[var(--color-primary)] text-white active:opacity-80"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              Zkontrolovat
+            </button>
+          ) : (
             <button
               onClick={handleNext}
-              className="w-full bg-[var(--color-primary)] text-white font-semibold py-4 rounded-xl text-lg tap-highlight active:opacity-80 transition-opacity"
+              className="w-full bg-[var(--color-primary)] text-white font-semibold py-3.5 rounded-xl text-lg tap-highlight active:opacity-80 transition-opacity"
             >
               {currentIndex + 1 >= totalQuestions
                 ? "Zobrazit výsledky"
                 : "Další otázka →"}
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <SaveToCollectionModal
