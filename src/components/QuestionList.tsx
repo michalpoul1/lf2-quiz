@@ -79,40 +79,59 @@ export default function QuestionList({
   const groups = useMemo<Group[]>(() => {
     if (wrongOnly) {
       if (!data) return [];
-      // Single source of truth — dedupes across all progress keys and keeps
-      // only questions that still exist in current data.
-      const wrongIdSet = new Set(getWrongQuestions(subject).map((q) => String(q.id)));
-      if (wrongIdSet.size === 0) return [];
-      const out: Group[] = [];
-      for (const ch of data.chapters) {
-        if (ch.subchapters && ch.subchapters.length > 0) {
-          for (const sub of ch.subchapters) {
-            const items = filterValidQuestions(sub.questions)
-              .filter((q) => wrongIdSet.has(String(q.id)))
-              .map((q) => ({
-                question: q,
-                chapterId: ch.id,
-                progressKey: sub.id,
-                subchapterId: sub.id,
-                status: "wrong" as const,
-              }));
-            if (items.length > 0) {
-              out.push({ id: sub.id, name: `${ch.id}. ${ch.name} › ${sub.id} ${sub.name}`, items });
+      // Iterate the wrong-pair pool: each entry is a single (chapterKey, id)
+      // that actually sits in progress. For chemistry with repeated ids,
+      // each pair maps to exactly one subchapter — no duplicate rendering.
+      const pairs = getWrongQuestions(subject);
+      if (pairs.length === 0) return [];
+      // Group items by chapterKey, with the matching chapter/subchapter
+      // metadata from the data tree (for the group heading + href).
+      type GroupMeta = { label: string; chapterId: number; subchapterId?: string };
+      const metaFor = (chapterKey: string): GroupMeta | null => {
+        for (const ch of data.chapters) {
+          if (ch.subchapters) {
+            for (const sub of ch.subchapters) {
+              if (sub.id === chapterKey) {
+                return {
+                  label: `${ch.id}. ${ch.name} › ${sub.id} ${sub.name}`,
+                  chapterId: ch.id,
+                  subchapterId: sub.id,
+                };
+              }
             }
           }
-        } else if (ch.questions) {
-          const items = filterValidQuestions(ch.questions)
-            .filter((q) => wrongIdSet.has(String(q.id)))
-            .map((q) => ({
-              question: q,
-              chapterId: ch.id,
-              progressKey: String(ch.id),
-              status: "wrong" as const,
-            }));
-          if (items.length > 0) {
-            out.push({ id: String(ch.id), name: `${ch.id}. ${ch.name}`, items });
+          if (String(ch.id) === chapterKey && ch.questions) {
+            return { label: `${ch.id}. ${ch.name}`, chapterId: ch.id };
           }
         }
+        return null;
+      };
+      const grouped = new Map<string, { meta: GroupMeta; items: Item[] }>();
+      for (const p of pairs) {
+        const meta = metaFor(p.chapterKey);
+        if (!meta) continue;
+        const existing = grouped.get(p.chapterKey);
+        const item: Item = {
+          question: p.question,
+          chapterId: meta.chapterId,
+          progressKey: p.chapterKey,
+          subchapterId: meta.subchapterId,
+          status: "wrong" as const,
+        };
+        if (existing) existing.items.push(item);
+        else grouped.set(p.chapterKey, { meta, items: [item] });
+      }
+      // Preserve data-order of chapters/subchapters in the output.
+      const out: Group[] = [];
+      for (const ch of data.chapters) {
+        if (ch.subchapters) {
+          for (const sub of ch.subchapters) {
+            const g = grouped.get(sub.id);
+            if (g) out.push({ id: sub.id, name: g.meta.label, items: g.items });
+          }
+        }
+        const g = grouped.get(String(ch.id));
+        if (g) out.push({ id: String(ch.id), name: g.meta.label, items: g.items });
       }
       return out;
     }

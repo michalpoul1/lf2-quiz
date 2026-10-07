@@ -141,15 +141,20 @@ export default function QuizRunner({
     }
   }, [quizState, runId]);
 
-  const questions = useMemo(() => {
+  // Pool for the active run. For wrong-mode-all we drive it from
+  // getWrongQuestions() pairs — each pair carries its real chapterKey, so
+  // the question's writes go back under the same key. The returned
+  // extraKeyMap merges into keyForQuestion below.
+  const { questions, extraKeyMap } = useMemo(() => {
     let qs: Question[];
+    const extra = new WeakMap<Question, string>();
     if (effectiveMode === "wrong") {
       if (chapterId === "all") {
-        // Single source of truth — must equal the wrong-count badge and the
-        // "Moje chyby" list length.
-        qs = getWrongQuestions(subject);
+        const pairs = getWrongQuestions(subject);
+        qs = pairs.map((p) => p.question);
+        for (const p of pairs) extra.set(p.question, p.chapterKey);
       } else {
-        // Per-chapter wrong-mode: still scoped to keys of this chapter/sub,
+        // Per-chapter wrong-mode: scoped to this chapter/sub's progress entry
         // and intersected with sourceQuestions so stale ids get dropped.
         const progress = getSubjectProgress(subject);
         const wrongIds = new Set<string>();
@@ -169,11 +174,8 @@ export default function QuizRunner({
     // navigation arrows work off currentIndex, so the surrounding questions
     // must stay in their original chapter/subchapter positions. Shuffle
     // is intentionally ignored in that case.
-    if (startId) {
-      return qs;
-    }
-
-    return shuffle ? shuffleArray(qs) : qs;
+    const ordered = startId ? qs : shuffle ? shuffleArray(qs) : qs;
+    return { questions: ordered, extraKeyMap: extra };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizState, effectiveMode, runId]);
 
@@ -233,13 +235,15 @@ export default function QuizRunner({
    *  pairing (should never happen in normal flow). */
   const keyForQuestion = useCallback(
     (q: Question): string => {
-      const k = sourceKeyMap.get(q);
+      // Pool-specific map first (wrong-mode-all pairs carry their own key),
+      // then the source-pool map built from data.
+      const k = extraKeyMap.get(q) ?? sourceKeyMap.get(q);
       if (k) return k;
       if (subchapterParam) return subchapterParam;
       if (typeof chapterId === "number") return String(chapterId);
       return chapterParam;
     },
-    [sourceKeyMap, subchapterParam, chapterId, chapterParam]
+    [extraKeyMap, sourceKeyMap, subchapterParam, chapterId, chapterParam]
   );
 
   // Note icon state — rebuild when questions/subject change or progress mutates.

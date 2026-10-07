@@ -171,22 +171,60 @@ export function lookupChapterKey(
 }
 
 /**
- * Single source of truth for "wrong questions" in a subject. Dedupes IDs
- * across all progress keys (Set-union), then intersects with valid questions
- * present in current data. Used by the wrong-count badge on the subject page,
- * the "Moje chyby" list, and the "Procvičit všechny chybné" quiz — all three
- * must show the same number.
+ * Single source of truth for "wrong questions" in a subject. Each wrongId
+ * is paired with the ACTUAL chapterKey it was recorded under — so for
+ * chemistry where the same question id lives in many subchapters, we get
+ * one entry per (chapterKey, id) that actually appears in progress, not
+ * N copies from flat-scanning data.
+ *
+ * Used by:
+ *  - the "Chyby (N)" badge (`.length`)
+ *  - "Moje chyby" list (iterate pairs, group by chapterKey)
+ *  - "Procvičit všechny chybné" quiz (pool is these pairs)
+ *
+ * Pairs whose (chapterKey, id) doesn't resolve to a valid question in the
+ * current data are dropped — they're stale progress entries that would
+ * crash the UI if returned.
  */
-export function getWrongQuestions(subject: string): Question[] {
+export function getWrongQuestions(subject: string): QuestionWithKey[] {
   const data = getSubjectData(subject);
   if (!data) return [];
   const progress = getSubjectProgress(subject);
-  const wrongSet = new Set<string>();
-  for (const cp of Object.values(progress)) {
-    (cp?.wrongIds ?? []).forEach((id) => wrongSet.add(String(id)));
+  const out: QuestionWithKey[] = [];
+  const seen = new Set<string>();
+  for (const [chapterKey, cp] of Object.entries(progress)) {
+    for (const rawId of cp?.wrongIds ?? []) {
+      const idStr = String(rawId);
+      const dedupe = `${chapterKey}::${idStr}`;
+      if (seen.has(dedupe)) continue;
+      const q = findQuestionAt(data, chapterKey, idStr);
+      if (!q) continue;
+      seen.add(dedupe);
+      out.push({ question: q, chapterKey });
+    }
   }
-  const all = filterValidQuestions(getChapterQuestions(subject, "all"));
-  return all.filter((q) => wrongSet.has(String(q.id)));
+  return out;
+}
+
+function findQuestionAt(
+  data: SubjectData,
+  chapterKey: string,
+  idStr: string
+): Question | null {
+  for (const ch of data.chapters) {
+    if (ch.subchapters) {
+      for (const sub of ch.subchapters) {
+        if (sub.id !== chapterKey) continue;
+        const q = sub.questions.find((q) => String(q.id) === idStr);
+        return q && q.correct.length > 0 ? q : null;
+      }
+    }
+    if (String(ch.id) === chapterKey && ch.questions) {
+      const q = ch.questions.find((q) => String(q.id) === idStr);
+      return q && q.correct.length > 0 ? q : null;
+    }
+  }
+  return null;
 }
 
 export function shuffleArray<T>(array: T[]): T[] {
