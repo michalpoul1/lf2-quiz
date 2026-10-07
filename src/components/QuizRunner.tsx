@@ -920,6 +920,7 @@ export default function QuizRunner({
         open={modalQuestionId !== null}
         subject={subject}
         questionId={modalQuestionId ?? ""}
+        chapterKey={currentQuestion ? keyForQuestion(currentQuestion) : undefined}
         onClose={() => setModalQuestionId(null)}
         onSaved={(isSaved) => {
           if (modalQuestionId !== null) handleModalSaved(modalQuestionId, isSaved);

@@ -14,6 +14,10 @@ interface Props {
   open: boolean;
   subject: string;
   questionId: number | string;
+  /** Real chapterKey (sub.id or String(ch.id)) the question was opened
+   *  from. Persisted into the CollectionQuestion so later bookmark-quiz
+   *  can disambiguate chemistry duplicates. */
+  chapterKey?: string;
   onClose: () => void;
   /** Called after the modal saves; receives the new "is saved anywhere" state. */
   onSaved?: (isSaved: boolean) => void;
@@ -23,6 +27,7 @@ export default function SaveToCollectionModal({
   open,
   subject,
   questionId,
+  chapterKey,
   onClose,
   onSaved,
 }: Props) {
@@ -90,7 +95,7 @@ export default function SaveToCollectionModal({
   };
 
   const handleSave = () => {
-    setQuestionCollections(subject, questionId, Array.from(selected));
+    setQuestionCollections(subject, questionId, Array.from(selected), chapterKey);
     onSaved?.(selected.size > 0);
     // Find the name of the first selected collection for the toast
     const savedTo = collections.find((c) => selected.has(c.id));

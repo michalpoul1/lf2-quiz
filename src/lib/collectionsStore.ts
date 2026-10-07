@@ -4,6 +4,10 @@ export interface CollectionQuestion {
   facultyId: string;
   subject: string;
   questionId: number | string;
+  /** Real chapter/subchapter key the question was bookmarked from.
+   *  Optional — old bookmarks (saved before this field existed) don't carry
+   *  it; readers fall back to first-match (findProgressKey) for those. */
+  chapterKey?: string;
 }
 
 export interface Collection {

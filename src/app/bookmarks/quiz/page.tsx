@@ -18,47 +18,62 @@ import { getNote, recordAnswer, setNote } from "@/lib/progress";
 import SaveToCollectionModal from "@/components/SaveToCollectionModal";
 import type { Question } from "@/lib/types";
 
-function findProgressKey(subject: string, qId: number | string): string {
-  const data = getSubjectData(subject);
-  if (!data) return "unknown";
-  for (const ch of data.chapters) {
-    if (ch.subchapters) {
-      for (const sub of ch.subchapters) {
-        if (sub.questions.some((q) => String(q.id) === String(qId))) {
-          return sub.id;
-        }
-      }
-    }
-    if (ch.questions?.some((q) => String(q.id) === String(qId))) {
-      return String(ch.id);
-    }
-  }
-  return "unknown";
-}
-
 function findQuestion(
   subject: string,
   qId: number | string
-): Question | null {
+): { q: Question; chapterKey: string } | null {
   const data = getSubjectData(subject);
   if (!data) return null;
   for (const ch of data.chapters) {
     if (ch.questions) {
-      const q = ch.questions.find((q) => String(q.id) === String(qId));
-      if (q) return q;
+      const q = ch.questions.find((qq) => String(qq.id) === String(qId));
+      if (q) return { q, chapterKey: String(ch.id) };
     }
     if (ch.subchapters) {
       for (const sub of ch.subchapters) {
-        const q = sub.questions.find((q) => String(q.id) === String(qId));
-        if (q) return q;
+        const q = sub.questions.find((qq) => String(qq.id) === String(qId));
+        if (q) return { q, chapterKey: sub.id };
       }
     }
   }
   return null;
 }
 
+/** When a CollectionQuestion carries its real chapterKey, look up the
+ *  question in exactly that chapter/subchapter — critical for chemistry
+ *  where the same id lives in many subchapters. Falls back to first-match
+ *  (findQuestion above) for legacy bookmarks saved without a chapterKey. */
+function resolveQuestion(
+  subject: string,
+  qId: number | string,
+  chapterKey: string | undefined
+): { q: Question; chapterKey: string } | null {
+  if (!chapterKey) return findQuestion(subject, qId);
+  const data = getSubjectData(subject);
+  if (!data) return null;
+  for (const ch of data.chapters) {
+    if (ch.subchapters) {
+      for (const sub of ch.subchapters) {
+        if (sub.id === chapterKey) {
+          const q = sub.questions.find((qq) => String(qq.id) === String(qId));
+          return q ? { q, chapterKey: sub.id } : findQuestion(subject, qId);
+        }
+      }
+    }
+    if (String(ch.id) === chapterKey && ch.questions) {
+      const q = ch.questions.find((qq) => String(qq.id) === String(qId));
+      return q ? { q, chapterKey: String(ch.id) } : findQuestion(subject, qId);
+    }
+  }
+  // chapterKey doesn't match current data at all — fall back.
+  return findQuestion(subject, qId);
+}
+
 interface BmQuestion extends Question {
   _subject: string;
+  /** Real chapterKey — from the bookmark if present, otherwise first-match
+   *  fallback at resolve time. */
+  _chapterKey: string;
 }
 
 interface ResultRow {
@@ -111,9 +126,9 @@ function BookmarkQuizInner() {
     const resolved: BmQuestion[] = [];
     const bmSet = new Set<string>();
     for (const cq of qs) {
-      const q = findQuestion(cq.subject, cq.questionId);
-      if (q) {
-        resolved.push({ ...q, _subject: cq.subject });
+      const hit = resolveQuestion(cq.subject, cq.questionId, cq.chapterKey);
+      if (hit) {
+        resolved.push({ ...hit.q, _subject: cq.subject, _chapterKey: hit.chapterKey });
         bmSet.add(`${cq.subject}-${cq.questionId}`);
       }
     }
@@ -133,8 +148,7 @@ function BookmarkQuizInner() {
     const rebuild = () => {
       const map: Record<string, boolean> = {};
       for (const q of questions) {
-        const key = findProgressKey(q._subject, q.id);
-        if (getNote(q._subject, key, q.id).trim().length > 0) {
+        if (getNote(q._subject, q._chapterKey, q.id).trim().length > 0) {
           map[`${q._subject}::${q.id}`] = true;
         }
       }
@@ -147,15 +161,13 @@ function BookmarkQuizInner() {
 
   const openNote = () => {
     if (!currentQuestion) return;
-    const key = findProgressKey(currentQuestion._subject, currentQuestion.id);
-    setNoteDraft(getNote(currentQuestion._subject, key, currentQuestion.id));
+    setNoteDraft(getNote(currentQuestion._subject, currentQuestion._chapterKey, currentQuestion.id));
     setNoteOpen(true);
   };
   const closeNote = () => setNoteOpen(false);
   const saveNote = () => {
     if (!currentQuestion) return;
-    const key = findProgressKey(currentQuestion._subject, currentQuestion.id);
-    setNote(currentQuestion._subject, key, currentQuestion.id, noteDraft);
+    setNote(currentQuestion._subject, currentQuestion._chapterKey, currentQuestion.id, noteDraft);
     setNoteOpen(false);
   };
 
@@ -193,8 +205,12 @@ function BookmarkQuizInner() {
     // and answers the same question again.
     const recordKey = `${currentQuestion._subject}::${currentQuestion.id}`;
     if (!recordedIds.has(recordKey)) {
-      const key = findProgressKey(currentQuestion._subject, currentQuestion.id);
-      recordAnswer(currentQuestion._subject, key, currentQuestion.id, isCorrect);
+      recordAnswer(
+        currentQuestion._subject,
+        currentQuestion._chapterKey,
+        currentQuestion.id,
+        isCorrect
+      );
       setRecordedIds((prev) => {
         const next = new Set(prev);
         next.add(recordKey);
@@ -650,6 +666,7 @@ function BookmarkQuizInner() {
         open={modalQuestionId !== null}
         subject={modalSubject}
         questionId={modalQuestionId ?? ""}
+        chapterKey={currentQuestion?._chapterKey}
         onClose={() => setModalQuestionId(null)}
         onSaved={handleModalSaved}
       />

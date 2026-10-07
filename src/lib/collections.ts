@@ -120,17 +120,26 @@ export function unpinCollection(id: string): void {
 export function setQuestionCollections(
   subject: string,
   questionId: number | string,
-  targetCollectionIds: string[]
+  targetCollectionIds: string[],
+  /** Real chapterKey of the question — carried into the stored
+   *  CollectionQuestion so bookmark-quiz can later open the exact
+   *  subchapter instance (critical for chemistry). Optional for backwards
+   *  compatibility; readers fall back to first-match when absent. */
+  chapterKey?: string
 ): void {
   ensureHydrated();
   const target = new Set(targetCollectionIds);
-  const q: CollectionQuestion = { facultyId: FACULTY, subject, questionId };
+  const q: CollectionQuestion = { facultyId: FACULTY, subject, questionId, chapterKey };
   collectionsStore.mutate((d) => {
     for (const c of d.collections) {
-      const has = c.questions.some((cq) => sameQuestion(cq, q));
-      if (target.has(c.id) && !has) {
-        c.questions.push(q);
-      } else if (!target.has(c.id) && has) {
+      const existing = c.questions.find((cq) => sameQuestion(cq, q));
+      if (target.has(c.id)) {
+        if (!existing) c.questions.push(q);
+        else if (chapterKey && !existing.chapterKey) {
+          // Upgrade old entry in place when we now know the real key.
+          existing.chapterKey = chapterKey;
+        }
+      } else if (existing) {
         c.questions = c.questions.filter((cq) => !sameQuestion(cq, q));
       }
     }

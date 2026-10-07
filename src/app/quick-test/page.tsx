@@ -704,6 +704,7 @@ export default function QuickTestPage() {
         open={bookmarkModalOpen && !!currentQuestion}
         subject={currentQuestion?._subject ?? ""}
         questionId={currentQuestion?.id ?? ""}
+        chapterKey={currentQuestion?._chapterKey}
         onClose={() => setBookmarkModalOpen(false)}
         onSaved={handleBookmarkSaved}
       />
