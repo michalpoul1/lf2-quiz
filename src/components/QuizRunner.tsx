@@ -74,14 +74,11 @@ export default function QuizRunner({
 
   const [shuffle, setShuffle] = useState(!startId);
   const [quizState, setQuizState] = useState<QuizState>(startId ? "active" : "setup");
-  // When startId is set, jump to that question's natural position so the
-  // prev/next arrows and the "X / N" counter are anchored to the real
-  // ordering of the source list.
-  const [currentIndex, setCurrentIndex] = useState<number>(() => {
-    if (!startId) return 0;
-    const idx = sourceQuestions.findIndex((q) => String(q.id) === startId);
-    return idx >= 0 ? idx : 0;
-  });
+  // When startId is set we seek to that question's position in the ACTUAL
+  // visible list below (post wrong-mode filter), not in sourceQuestions —
+  // see initialSeekRef / effect further down. Starts at 0 so the first
+  // render has a valid index even before the seek effect runs.
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [checked, setChecked] = useState(false);
   const [results, setResults] = useState<
@@ -173,6 +170,25 @@ export default function QuizRunner({
     return shuffle ? shuffleArray(qs) : qs;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizState, effectiveMode, runId]);
+
+  // One-shot seek to startId's position inside the ACTUAL (post-filter)
+  // questions list. Fixes the Moje chyby → specific-question deep link
+  // where wrong-mode filters the pool to just a few items but the old
+  // init indexed into the unfiltered sourceQuestions and overshot.
+  // If startId isn't in the filtered pool (user already dismissed it or
+  // wrongIds were just cleared) we stay at 0 — no crash.
+  const initialSeekDoneRef = useRef(false);
+  useEffect(() => {
+    if (initialSeekDoneRef.current) return;
+    if (!startId) {
+      initialSeekDoneRef.current = true;
+      return;
+    }
+    if (questions.length === 0) return; // wait for the pool to materialise
+    const idx = questions.findIndex((q) => String(q.id) === startId);
+    if (idx > 0) setCurrentIndex(idx);
+    initialSeekDoneRef.current = true;
+  }, [startId, questions]);
 
   // Initialize bookmark state from localStorage (after mount, to avoid hydration mismatch)
   useEffect(() => {
