@@ -4,9 +4,8 @@ import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   getSubjectData,
-  getChapterQuestions,
-  getSubchapterQuestions,
-  filterValidQuestions,
+  getChapterQuestionsWithKeys,
+  getSubchapterQuestionsWithKeys,
   shuffleArray,
   getExplanation,
   getWrongQuestions,
@@ -63,13 +62,20 @@ export default function QuizRunner({
     ? `/${subject}/chapter/${chapterParam}`
     : `/${subject}`;
 
-  const sourceQuestions = useMemo(() => {
-    if (subchapterParam && chapterId !== "all") {
-      return filterValidQuestions(
-        getSubchapterQuestions(subject, chapterId as number, subchapterParam)
-      );
-    }
-    return filterValidQuestions(getChapterQuestions(subject, chapterId));
+  // sourceQuestions is paired with a WeakMap<Question, chapterKey> so every
+  // write (recordAnswer, note, removeFromWrong) persists under the REAL
+  // chapter/subchapter the question belongs to — not the first-match guess
+  // findProgressKey used to do. For chemistry this prevents piling up all
+  // activity under subchapter "1.1".
+  const { sourceQuestions, sourceKeyMap } = useMemo(() => {
+    const pairs =
+      subchapterParam && chapterId !== "all"
+        ? getSubchapterQuestionsWithKeys(subject, chapterId as number, subchapterParam)
+        : getChapterQuestionsWithKeys(subject, chapterId);
+    const list = pairs.map((p) => p.question);
+    const map = new WeakMap<Question, string>();
+    for (const p of pairs) map.set(p.question, p.chapterKey);
+    return { sourceQuestions: list, sourceKeyMap: map };
   }, [subject, chapterId, subchapterParam]);
 
   const [shuffle, setShuffle] = useState(!startId);
@@ -220,38 +226,33 @@ export default function QuizRunner({
   const currentQuestion = visibleQuestions[currentIndex];
   const totalQuestions = visibleQuestions.length;
 
-  const findProgressKey = useCallback(
-    (qId: number | string): string => {
-      if (!data) return chapterParam;
-      // For subjects with subchapters, use subchapter id as key
-      for (const ch of data.chapters) {
-        if (ch.subchapters) {
-          for (const sub of ch.subchapters) {
-            if (sub.questions.some((q) => String(q.id) === String(qId))) {
-              return sub.id;
-            }
-          }
-        }
-        if (ch.questions?.some((q) => String(q.id) === String(qId))) {
-          return String(ch.id);
-        }
-      }
+  /** Real chapter/subchapter key for a specific question instance in the
+   *  current pool. Uses the sourceKeyMap built when the pool was computed —
+   *  so for chemistry each duplicate ID carries the subchapter it actually
+   *  came from. Falls back to chapterParam only if we somehow lost the
+   *  pairing (should never happen in normal flow). */
+  const keyForQuestion = useCallback(
+    (q: Question): string => {
+      const k = sourceKeyMap.get(q);
+      if (k) return k;
+      if (subchapterParam) return subchapterParam;
+      if (typeof chapterId === "number") return String(chapterId);
       return chapterParam;
     },
-    [data, chapterParam]
+    [sourceKeyMap, subchapterParam, chapterId, chapterParam]
   );
 
   // Note icon state — rebuild when questions/subject change or progress mutates.
   const refreshNoteMap = useCallback(() => {
     const map: Record<string, boolean> = {};
     for (const q of sourceQuestions) {
-      const key = findProgressKey(q.id);
+      const key = keyForQuestion(q);
       if (getNote(subject, key, q.id).trim().length > 0) {
         map[String(q.id)] = true;
       }
     }
     setHasNoteMap(map);
-  }, [sourceQuestions, subject, findProgressKey]);
+  }, [sourceQuestions, subject, keyForQuestion]);
   useEffect(() => {
     refreshNoteMap();
     const onUpdate = () => refreshNoteMap();
@@ -261,14 +262,14 @@ export default function QuizRunner({
 
   const openNote = () => {
     if (!currentQuestion) return;
-    const key = findProgressKey(currentQuestion.id);
+    const key = keyForQuestion(currentQuestion);
     setNoteDraft(getNote(subject, key, currentQuestion.id));
     setNoteOpen(true);
   };
   const closeNote = () => setNoteOpen(false);
   const saveNote = () => {
     if (!currentQuestion) return;
-    const key = findProgressKey(currentQuestion.id);
+    const key = keyForQuestion(currentQuestion);
     setNote(subject, key, currentQuestion.id, noteDraft);
     setNoteOpen(false);
   };
@@ -286,7 +287,7 @@ export default function QuizRunner({
     // arrow followed by re-answering must not inflate `answered`.
     const qidStr = String(currentQuestion.id);
     if (!recordedIds.has(qidStr)) {
-      const key = findProgressKey(currentQuestion.id);
+      const key = keyForQuestion(currentQuestion);
       const timeSeconds = (Date.now() - questionStartMs) / 1000;
       recordAnswer(subject, key, currentQuestion.id, isCorrect, timeSeconds);
       setRecordedIds((prev) => {
@@ -371,7 +372,7 @@ export default function QuizRunner({
   const handleAlreadyKnow = () => {
     if (!currentQuestion) return;
     const qId = currentQuestion.id;
-    const key = findProgressKey(qId);
+    const key = keyForQuestion(currentQuestion);
     removeFromWrong(subject, key, qId);
     setDismissedIds((prev) => {
       const next = new Set(prev);

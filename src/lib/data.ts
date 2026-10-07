@@ -86,6 +86,90 @@ export function filterValidQuestions(questions: Question[]): Question[] {
   return questions.filter((q) => q.correct.length > 0);
 }
 
+/** A question paired with the actual progress key it should be recorded
+ *  under (sub.id for subchapters, String(ch.id) for flat chapters). Used
+ *  everywhere we need the REAL chapter/subchapter, not the first-match
+ *  guess that findProgressKey would give. */
+export interface QuestionWithKey {
+  question: Question;
+  chapterKey: string;
+}
+
+function collectWithKeys(
+  ch: { id: number; questions?: Question[]; subchapters?: { id: string; questions: Question[] }[] }
+): QuestionWithKey[] {
+  const out: QuestionWithKey[] = [];
+  if (ch.subchapters && ch.subchapters.length > 0) {
+    for (const sub of ch.subchapters) {
+      for (const q of sub.questions) {
+        if (q.correct.length > 0) out.push({ question: q, chapterKey: sub.id });
+      }
+    }
+  } else if (ch.questions) {
+    const key = String(ch.id);
+    for (const q of ch.questions) {
+      if (q.correct.length > 0) out.push({ question: q, chapterKey: key });
+    }
+  }
+  return out;
+}
+
+/** Flat questions for a chapter (or "all" chapters) with each item paired
+ *  to its real progress key. filterValidQuestions is applied inline. */
+export function getChapterQuestionsWithKeys(
+  subject: string,
+  chapterId: number | "all"
+): QuestionWithKey[] {
+  const data = getSubjectData(subject);
+  if (!data) return [];
+  if (chapterId === "all") return data.chapters.flatMap(collectWithKeys);
+  const chapter = data.chapters.find((ch) => ch.id === chapterId);
+  return chapter ? collectWithKeys(chapter) : [];
+}
+
+/** Questions from a specific subchapter, each paired with its (sub.id) key. */
+export function getSubchapterQuestionsWithKeys(
+  subject: string,
+  chapterId: number,
+  subchapterId: string
+): QuestionWithKey[] {
+  const data = getSubjectData(subject);
+  if (!data) return [];
+  const chapter = data.chapters.find((ch) => ch.id === chapterId);
+  if (!chapter?.subchapters) return [];
+  const sub = chapter.subchapters.find((s) => s.id === subchapterId);
+  if (!sub) return [];
+  return sub.questions
+    .filter((q) => q.correct.length > 0)
+    .map((q) => ({ question: q, chapterKey: sub.id }));
+}
+
+/** Look up the real progress key for a specific question instance in data.
+ *  Returns null if the exact question (by object identity OR by the
+ *  (chapter, subchapter, id) triple) isn't in the data for `subject`. */
+export function lookupChapterKey(
+  subject: string,
+  chapterId: number,
+  subchapterId: string | undefined,
+  questionId: number | string
+): string | null {
+  const data = getSubjectData(subject);
+  if (!data) return null;
+  const chapter = data.chapters.find((ch) => ch.id === chapterId);
+  if (!chapter) return null;
+  if (subchapterId && chapter.subchapters) {
+    const sub = chapter.subchapters.find((s) => s.id === subchapterId);
+    if (sub?.questions.some((q) => String(q.id) === String(questionId))) {
+      return sub.id;
+    }
+    return null;
+  }
+  if (chapter.questions?.some((q) => String(q.id) === String(questionId))) {
+    return String(chapter.id);
+  }
+  return null;
+}
+
 /**
  * Single source of truth for "wrong questions" in a subject. Dedupes IDs
  * across all progress keys (Set-union), then intersects with valid questions

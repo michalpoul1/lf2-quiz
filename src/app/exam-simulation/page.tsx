@@ -4,9 +4,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 
 import {
-  getSubjectData,
-  getChapterQuestions,
-  filterValidQuestions,
+  getChapterQuestionsWithKeys,
   shuffleArray,
 } from "@/lib/data";
 import { recordAnswer } from "@/lib/progress";
@@ -17,6 +15,8 @@ import type { Question } from "@/lib/types";
 /* ─── types ─── */
 interface TaggedQuestion extends Question {
   _subject: string;
+  /** Real chapter/subchapter key, carried from pool-build time. */
+  _chapterKey: string;
 }
 
 type Phase = "setup" | "exam" | "results";
@@ -37,22 +37,6 @@ function formatTimer(ms: number): string {
   return `${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
 }
 
-function findProgressKey(subject: string, qId: number | string): string {
-  const data = getSubjectData(subject);
-  if (!data) return "unknown";
-  for (const ch of data.chapters) {
-    if (ch.subchapters) {
-      for (const sub of ch.subchapters) {
-        if (sub.questions.some((q) => String(q.id) === String(qId)))
-          return sub.id;
-      }
-    }
-    if (ch.questions?.some((q) => String(q.id) === String(qId)))
-      return String(ch.id);
-  }
-  return "unknown";
-}
-
 function buildQuestions(
   totalCount: number,
   bioRatio: number,
@@ -65,10 +49,10 @@ function buildQuestions(
   const physCount = totalCount - bioCount - chemCount;
 
   const pick = (subject: string, n: number): TaggedQuestion[] => {
-    const all = filterValidQuestions(getChapterQuestions(subject, "all"));
-    return shuffleArray(all)
+    const pairs = getChapterQuestionsWithKeys(subject, "all");
+    return shuffleArray(pairs)
       .slice(0, n)
-      .map((q) => ({ ...q, _subject: subject }));
+      .map((p) => ({ ...p.question, _subject: subject, _chapterKey: p.chapterKey }));
   };
 
   const qs = [
@@ -232,8 +216,7 @@ export default function ExamSimulationPage() {
         const isCorrect =
           userAns.length === correctSet.size &&
           userAns.every((l) => correctSet.has(l));
-        const key = findProgressKey(q._subject, q.id);
-        recordAnswer(q._subject, key, q.id, isCorrect);
+        recordAnswer(q._subject, q._chapterKey, q.id, isCorrect);
       }
       // Save test result to history
       let correctCount = 0;

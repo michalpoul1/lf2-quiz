@@ -4,8 +4,8 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 
 import {
-  getSubjectData,
   getChapterQuestions,
+  getChapterQuestionsWithKeys,
   filterValidQuestions,
   shuffleArray,
 } from "@/lib/data";
@@ -18,25 +18,12 @@ import type { Question } from "@/lib/types";
 
 interface TaggedQuestion extends Question {
   _subject: string;
+  /** Real chapter/subchapter key where this question actually lives.
+   *  Set at pool-build time so writes don't rely on first-match guessing. */
+  _chapterKey: string;
 }
 
 type Phase = "setup" | "active" | "results";
-
-function findProgressKey(subject: string, qId: number | string): string {
-  const data = getSubjectData(subject);
-  if (!data) return "unknown";
-  for (const ch of data.chapters) {
-    if (ch.subchapters) {
-      for (const sub of ch.subchapters) {
-        if (sub.questions.some((q) => String(q.id) === String(qId)))
-          return sub.id;
-      }
-    }
-    if (ch.questions?.some((q) => String(q.id) === String(qId)))
-      return String(ch.id);
-  }
-  return "unknown";
-}
 
 function formatTime(ms: number): string {
   const totalSec = Math.floor(ms / 1000);
@@ -112,8 +99,10 @@ export default function QuickTestPage() {
   const startTest = () => {
     const pool: TaggedQuestion[] = [];
     for (const subj of selectedSubjects) {
-      const qs = filterValidQuestions(getChapterQuestions(subj, "all"));
-      pool.push(...qs.map((q) => ({ ...q, _subject: subj })));
+      const pairs = getChapterQuestionsWithKeys(subj, "all");
+      pool.push(
+        ...pairs.map((p) => ({ ...p.question, _subject: subj, _chapterKey: p.chapterKey }))
+      );
     }
     const shuffled = shuffleArray(pool).slice(0, count);
     setQuestions(shuffled);
@@ -160,8 +149,12 @@ export default function QuickTestPage() {
     const isCorrect =
       selectedArr.length === correctSet.size &&
       selectedArr.every((s) => correctSet.has(s));
-    const key = findProgressKey(currentQuestion._subject, currentQuestion.id);
-    recordAnswer(currentQuestion._subject, key, currentQuestion.id, isCorrect);
+    recordAnswer(
+      currentQuestion._subject,
+      currentQuestion._chapterKey,
+      currentQuestion.id,
+      isCorrect
+    );
     setResults((prev) => [
       ...prev,
       {
