@@ -30,6 +30,11 @@ interface Props {
   mode: string;
   /** When set, skip the setup screen and start directly at this question ID. */
   startId?: string;
+  /** For wrong-mode deep links where the historical wrongId lives under a
+   *  key other than the question's current home (biology/physics after
+   *  chapter renumbering). Wrong-mode intersection and "Už umím" use this
+   *  key to find/clean the stale entry. */
+  storageKey?: string;
 }
 
 type QuizState = "setup" | "active" | "results";
@@ -40,6 +45,7 @@ export default function QuizRunner({
   subchapterParam,
   mode,
   startId,
+  storageKey,
 }: Props) {
   const data = getSubjectData(subject);
   const chapterId = chapterParam === "all" ? "all" : Number(chapterParam);
@@ -141,30 +147,44 @@ export default function QuizRunner({
     }
   }, [quizState, runId]);
 
-  // Pool for the active run. For wrong-mode-all we drive it from
-  // getWrongQuestions() pairs — each pair carries its real chapterKey, so
-  // the question's writes go back under the same key. The returned
-  // extraKeyMap merges into keyForQuestion below.
-  const { questions, extraKeyMap } = useMemo(() => {
+  // Pool for the active run.
+  // Two WeakMaps paired with the pool:
+  //   extraKeyMap  — chapterKey (where the question actually lives in data),
+  //                  used for recordAnswer / notes.
+  //   storageKeyMap — storageKey (where the wrongId sits in progress), used
+  //                  for removeFromWrong / "Už umím". Often equals the
+  //                  chapterKey but differs for relinked biology/physics
+  //                  wrongs after chapter renumbering.
+  const { questions, extraKeyMap, storageKeyMap } = useMemo(() => {
     let qs: Question[];
     const extra = new WeakMap<Question, string>();
+    const storage = new WeakMap<Question, string>();
     if (effectiveMode === "wrong") {
       if (chapterId === "all") {
         const pairs = getWrongQuestions(subject);
         qs = pairs.map((p) => p.question);
-        for (const p of pairs) extra.set(p.question, p.chapterKey);
+        for (const p of pairs) {
+          extra.set(p.question, p.chapterKey);
+          storage.set(p.question, p.storageKey);
+        }
       } else {
-        // Per-chapter wrong-mode: scoped to this chapter/sub's progress entry
-        // and intersected with sourceQuestions so stale ids get dropped.
+        // Per-chapter wrong-mode: the deep link may carry an explicit
+        // storageKey (renumbered chapters). If not, we fall back to the
+        // chapter/subchapter from the URL.
         const progress = getSubjectProgress(subject);
         const wrongIds = new Set<string>();
-        const cp = progress[String(chapterId)];
-        if (cp) cp.wrongIds.forEach((id) => wrongIds.add(String(id)));
-        if (subchapterParam) {
-          const scp = progress[subchapterParam];
-          if (scp) scp.wrongIds.forEach((id) => wrongIds.add(String(id)));
+        const keys: string[] = [];
+        if (storageKey) keys.push(storageKey);
+        keys.push(String(chapterId));
+        if (subchapterParam) keys.push(subchapterParam);
+        for (const k of keys) {
+          const cp = progress[k];
+          if (cp) cp.wrongIds.forEach((id) => wrongIds.add(String(id)));
         }
         qs = sourceQuestions.filter((q) => wrongIds.has(String(q.id)));
+        // When the deep link carried a different storageKey, map matched
+        // questions to it so "Už umím" removes the stale entry.
+        if (storageKey) for (const q of qs) storage.set(q, storageKey);
       }
     } else {
       qs = sourceQuestions;
@@ -175,7 +195,7 @@ export default function QuizRunner({
     // must stay in their original chapter/subchapter positions. Shuffle
     // is intentionally ignored in that case.
     const ordered = startId ? qs : shuffle ? shuffleArray(qs) : qs;
-    return { questions: ordered, extraKeyMap: extra };
+    return { questions: ordered, extraKeyMap: extra, storageKeyMap: storage };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizState, effectiveMode, runId]);
 
@@ -294,6 +314,13 @@ export default function QuizRunner({
       const key = keyForQuestion(currentQuestion);
       const timeSeconds = (Date.now() - questionStartMs) / 1000;
       recordAnswer(subject, key, currentQuestion.id, isCorrect, timeSeconds);
+      // For relinked wrongs the stale entry under the old storageKey must
+      // also be cleaned up — otherwise the "wrong" count/list would keep
+      // showing it even after the user got it right.
+      const stale = storageKeyMap.get(currentQuestion);
+      if (isCorrect && stale && stale !== key) {
+        removeFromWrong(subject, stale, currentQuestion.id);
+      }
       setRecordedIds((prev) => {
         const next = new Set(prev);
         next.add(qidStr);
@@ -376,8 +403,11 @@ export default function QuizRunner({
   const handleAlreadyKnow = () => {
     if (!currentQuestion) return;
     const qId = currentQuestion.id;
-    const key = keyForQuestion(currentQuestion);
-    removeFromWrong(subject, key, qId);
+    // Remove from wherever the wrongId actually sits (may differ from the
+    // question's current home for relinked biology/physics wrongs).
+    const removeKey =
+      storageKeyMap.get(currentQuestion) ?? keyForQuestion(currentQuestion);
+    removeFromWrong(subject, removeKey, qId);
     setDismissedIds((prev) => {
       const next = new Set(prev);
       next.add(String(qId));

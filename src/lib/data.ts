@@ -170,39 +170,84 @@ export function lookupChapterKey(
   return null;
 }
 
+/** A wrong-question entry. `chapterKey` is where the question actually
+ *  lives in current data (used for recordAnswer, notes, URL). `storageKey`
+ *  is where the wrongId is stored in progress (used for removeFromWrong /
+ *  "Už umím"). The two can differ when subjects were renumbered: historical
+ *  wrongIds stayed under their old chapter key while the data moved. */
+export interface WrongPair {
+  question: Question;
+  chapterKey: string;
+  storageKey: string;
+}
+
 /**
- * Single source of truth for "wrong questions" in a subject. Each wrongId
- * is paired with the ACTUAL chapterKey it was recorded under — so for
- * chemistry where the same question id lives in many subchapters, we get
- * one entry per (chapterKey, id) that actually appears in progress, not
- * N copies from flat-scanning data.
+ * Single source of truth for "wrong questions" in a subject.
  *
- * Used by:
- *  - the "Chyby (N)" badge (`.length`)
- *  - "Moje chyby" list (iterate pairs, group by chapterKey)
- *  - "Procvičit všechny chybné" quiz (pool is these pairs)
- *
- * Pairs whose (chapterKey, id) doesn't resolve to a valid question in the
- * current data are dropped — they're stale progress entries that would
- * crash the UI if returned.
+ * - If (storageKey, id) resolves in current data → use that key for both.
+ * - For biology/physics (globally unique IDs): if (storageKey, id) does NOT
+ *   resolve but the ID exists exactly once in current data elsewhere, we
+ *   relink: chapterKey points at the real home, storageKey keeps the old
+ *   location so "Už umím" removes the stale entry. This recovers wrongs
+ *   whose chapter was renumbered.
+ * - For chemistry (IDs repeat across subchapters) we never guess — if
+ *   (storageKey, id) misses, the pair is skipped. Dead ids stay in storage.
  */
-export function getWrongQuestions(subject: string): QuestionWithKey[] {
+export function getWrongQuestions(subject: string): WrongPair[] {
   const data = getSubjectData(subject);
   if (!data) return [];
+  const allowRelink = subject === "biology" || subject === "physics";
+  const uniqueLookup = allowRelink ? buildUniqueIdLookup(data) : null;
   const progress = getSubjectProgress(subject);
-  const out: QuestionWithKey[] = [];
+  const out: WrongPair[] = [];
   const seen = new Set<string>();
-  for (const [chapterKey, cp] of Object.entries(progress)) {
+  for (const [storageKey, cp] of Object.entries(progress)) {
     for (const rawId of cp?.wrongIds ?? []) {
       const idStr = String(rawId);
+      let q = findQuestionAt(data, storageKey, idStr);
+      let chapterKey = storageKey;
+      if (!q && uniqueLookup) {
+        const home = uniqueLookup.get(idStr);
+        if (home) {
+          q = findQuestionAt(data, home, idStr);
+          if (q) chapterKey = home;
+        }
+      }
+      if (!q) continue;
       const dedupe = `${chapterKey}::${idStr}`;
       if (seen.has(dedupe)) continue;
-      const q = findQuestionAt(data, chapterKey, idStr);
-      if (!q) continue;
       seen.add(dedupe);
-      out.push({ question: q, chapterKey });
+      out.push({ question: q, chapterKey, storageKey });
     }
   }
+  return out;
+}
+
+/** For subjects with globally unique IDs, map id → chapter/subchapter key.
+ *  Returns null for ids appearing more than once (never happens for bio/phys
+ *  today, but defensive against future data changes). */
+function buildUniqueIdLookup(data: SubjectData): Map<string, string> {
+  const seen = new Map<string, string | null>();
+  for (const ch of data.chapters) {
+    if (ch.subchapters) {
+      for (const sub of ch.subchapters) {
+        for (const q of sub.questions) {
+          if (q.correct.length === 0) continue;
+          const idStr = String(q.id);
+          seen.set(idStr, seen.has(idStr) ? null : sub.id);
+        }
+      }
+    } else if (ch.questions) {
+      const key = String(ch.id);
+      for (const q of ch.questions) {
+        if (q.correct.length === 0) continue;
+        const idStr = String(q.id);
+        seen.set(idStr, seen.has(idStr) ? null : key);
+      }
+    }
+  }
+  const out = new Map<string, string>();
+  for (const [id, key] of seen) if (key) out.set(id, key);
   return out;
 }
 

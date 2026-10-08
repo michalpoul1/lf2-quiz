@@ -10,6 +10,7 @@ function QuizContent() {
   const sub = params.get("sub") || undefined;
   const mode = params.get("mode") || "normal";
   const startId = params.get("startId") || undefined;
+  const storageKey = params.get("storageKey") || undefined;
 
   return (
     <QuizRunner
@@ -18,6 +19,7 @@ function QuizContent() {
       subchapterParam={sub}
       mode={mode}
       startId={startId}
+      storageKey={storageKey}
     />
   );
 }

@@ -34,6 +34,11 @@ interface Item {
   progressKey: string;
   /** subchapter id if this question is inside one, undefined otherwise */
   subchapterId?: string;
+  /** For wrong-mode entries where the historical wrongId lives under a
+   *  different key than the question's current home (biology/physics after
+   *  chapter renumbering). "Už umím" and wrong-mode pool need the
+   *  storageKey; URL / display use chapter+sub derived from progressKey. */
+  storageKey?: string;
   status: "correct" | "wrong" | "unanswered";
 }
 
@@ -116,6 +121,7 @@ export default function QuestionList({
           chapterId: meta.chapterId,
           progressKey: p.chapterKey,
           subchapterId: meta.subchapterId,
+          storageKey: p.storageKey !== p.chapterKey ? p.storageKey : undefined,
           status: "wrong" as const,
         };
         if (existing) existing.items.push(item);
@@ -210,7 +216,10 @@ export default function QuestionList({
     const totalCount = visibleGroups.reduce((sum, g) => sum + g.items.length, 0);
 
     const dismissItem = (it: Item) => {
-      removeFromWrong(subject, it.progressKey, it.question.id);
+      // "Už umím" must remove the wrongId from wherever it's actually
+      // stored. For renumbered biology/physics the storageKey differs
+      // from the question's current home (progressKey).
+      removeFromWrong(subject, it.storageKey ?? it.progressKey, it.question.id);
       setDismissed((prev) => {
         const next = new Set(prev);
         next.add(`${it.progressKey}::${it.question.id}`);
@@ -436,5 +445,9 @@ function wrongItemHref(
   if (it.subchapterId) p.set("sub", it.subchapterId);
   p.set("startId", String(it.question.id));
   p.set("mode", "wrong");
+  // When the historical wrongId lives under a different key than the
+  // question's current home, pass it through — QuizRunner uses it to find
+  // the wrong entry and to clean it up on "Už umím" / correct answer.
+  if (it.storageKey) p.set("storageKey", it.storageKey);
   return `/${subjectPath}/quiz?${p.toString()}`;
 }
